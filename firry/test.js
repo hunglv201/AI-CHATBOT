@@ -1,0 +1,15 @@
+const fs=require('fs');
+const h=fs.readFileSync(__dirname+'/index.html','utf8');
+const code=h.split('//PARSER_START')[1].split('//PARSER_END')[0];
+const {parseText,parseAmount}=new Function(code+';return {parseText,parseAmount}')();
+const assert=require('assert');
+assert.equal(parseAmount('phòng 4tr'),4000000);
+assert.equal(parseAmount('mua áo 400k'),400000);
+assert.equal(parseAmount('cà phê 50.000'),50000);
+assert.equal(parseAmount('lương 1tr5'),1500000);
+assert.equal(parseAmount('ăn trưa 35,5k'),35500);
+const r=parseText('phòng 4tr, bữa tối 100k, mua sắm 400k, lương 15tr');
+assert.equal(r.length,4);
+assert.deepEqual(r.map(x=>x.category),['Nhà','Thức ăn & Đồ uống','Mua sắm','Thu nhập']);
+assert.equal(r[3].type,'income');
+console.log('OK',JSON.stringify(r));
