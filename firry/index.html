@@ -55,8 +55,8 @@ const CATS={
 const INCOME_KW=['lương','thưởng','nhận','thu nhập','được cho','bán'];
 function parseAmount(s){
  s=s.toLowerCase();
- let m=s.match(/(\d+)\s*(?:tr|triệu)\s*(\d{1,3})?(?!\d)/);
- if(m){let v=+m[1]*1e6;if(m[2]){const d=m[2];v+=+d*(1e6/Math.pow(10,d.length))}return v}
+ let m=s.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:tr|triệu)\s*(\d{1,3})?(?!\d)/);
+ if(m){let v=parseFloat(m[1].replace(',','.'))*1e6;if(m[2]){const d=m[2];v+=+d*(1e6/Math.pow(10,d.length))}return Math.round(v)}
  m=s.match(/(\d+(?:[.,]\d+)?)\s*(k|nghìn|ngàn|tr|triệu|đ|vnd|d)?(?![a-zà-ỹ\d])/);
  if(!m)return null;
  let raw=m[1],u=m[2];

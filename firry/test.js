@@ -13,3 +13,7 @@ assert.equal(r.length,4);
 assert.deepEqual(r.map(x=>x.category),['Nhà','Thức ăn & Đồ uống','Mua sắm','Thu nhập']);
 assert.equal(r[3].type,'income');
 console.log('OK',JSON.stringify(r));
+assert.equal(parseAmount('ăn trưa 1.5tr'),1500000);
+assert.equal(parseAmount('2,5tr'),2500000);
+assert.equal(parseAmount('1tr5'),1500000);
+console.log('decimal tr OK');
