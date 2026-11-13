@@ -1,0 +1,6 @@
+Pixel art in this folder comes from Kenney (https://kenney.nl), licensed CC0 1.0:
+- tiny-town.png    : "Tiny Town" 1.1
+- tiny-dungeon.png : "Tiny Dungeon"
+- tiny-battle.png  : "Tiny Battle" 1.0 (water tile only)
+All sheets are 16x16 tiles, packed with no spacing. They are embedded in ../index.html as data URIs,
+so the game still runs from that single file; these copies are kept as the editable source.
