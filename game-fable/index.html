@@ -241,7 +241,7 @@ const BUILD_LIST=['house','farm','store','barracks','tower'];
 const CAP=12, POP_MAX=50;
 const RATE={wood:.85,food:1.0,gold:.75,farm:.7};
 const DIFF=[
-  {name:'Dễ',desc:'Trại Son thu hoạch chậm, đánh muộn và ít quân. Hợp để làm quen.',gm:.7,tm:.8,maxVill:9,first:380,interval:170,base:3,grow:1,maxArmy:10,towers:0,towerAt:1e9,bonus:0},
+  {name:'Dễ',desc:'Trại Son thu hoạch chậm, đánh muộn và ít quân. Hợp để làm quen.',gm:.7,tm:.7,maxVill:9,first:380,interval:180,base:3,grow:1,maxArmy:8,towers:0,towerAt:1e9,bonus:0},
   {name:'Vừa',desc:'Trại Son phát triển ngang bạn và kéo quân sang từng đợt lớn dần.',gm:1,tm:1,maxVill:15,first:280,interval:120,base:5,grow:2,maxArmy:18,towers:1,towerAt:300,bonus:0},
   {name:'Khó',desc:'Trại Son thu hoạch nhanh, đánh sớm, dùng cả tượng binh. Đừng chần chừ!',gm:1.3,tm:1.25,maxVill:22,first:190,interval:85,base:6,grow:3,maxArmy:28,towers:2,towerAt:200,bonus:150}
 ];
@@ -550,7 +550,7 @@ function damage(t,amt,src){
   if(t.dead)return;t.hp-=amt;t.hitT=G.time;
   const px=t.k?t.tx+t.size/2:t.x,py=t.k?t.ty+t.size/2:t.y;
   G.teams[t.team].alarm={x:px,y:py,t:G.time};
-  if(t.team===0)alertAttack(px,py);
+  if(t.team===0&&(t.k===1||!UD[t.type].mil))alertAttack(px,py);
   if(t.k===0&&UD[t.type].mil&&src&&!src.dead&&src.k===0){
     if(!t.order)t.order={type:'attack',id:src.id,auto:1};
     else if(t.order.type==='attack'&&!t.order.user){const cur=G.ents.get(t.order.id);if(cur&&cur.k===1&&distTo(t,src)<5){t.order={type:'attack',id:src.id,resume:t.order.resume||null};t.path=null}}
@@ -832,7 +832,7 @@ function clampCam(){let x=(cam.x/HW+cam.y/HH)/2,y=(cam.y/HH-cam.x/HW)/2;x=clamp(
 function zoomAt(sx,sy,nz){nz=clamp(nz,.42,2);const wx=(sx-cw/2)/cam.z+cam.x,wy=(sy-ch/2)/cam.z+cam.y;cam.z=nz;cam.x=wx-(sx-cw/2)/nz;cam.y=wy-(sy-ch/2)/nz;clampCam()}
 
 /* ---------------- Vẽ khung hình ---------------- */
-const drawList=[];
+const drawList=[],hideT=new Uint8Array(N*N);
 function diamond(c,tx,ty,s){const wx=(tx-ty)*HW,wy=(tx+ty)*HH;c.beginPath();c.moveTo(wx,wy);c.lineTo(wx+s*HW,wy+s*HH);c.lineTo(wx,wy+s*2*HH);c.lineTo(wx-s*HW,wy+s*HH);c.closePath()}
 function render(){
   const z=cam.z,t=G.time,now=performance.now();
@@ -867,9 +867,11 @@ function render(){
   // gom vật thể rồi sắp theo chiều sâu
   for(const b of G.blds){if(b.team!==0&&!b.seen)continue;const wx=(b.tx-b.ty)*HW,wy=(b.tx+b.ty)*HH;if(wx<vx0-100||wx>vx1+100||wy<vy0-80||wy>vy1+20)continue;list.push([b.type==='farm'?b.tx+b.ty+.5:b.tx+b.ty+b.size,1,b,wx,wy])}
   for(const u of G.units){if(u.team!==0&&!vis[(u.y|0)*N+(u.x|0)])continue;const wx=(u.x-u.y)*HW,wy=(u.x+u.y)*HH;if(wx<vx0||wx>vx1||wy<vy0||wy>vy1)continue;list.push([u.x+u.y,2,u,wx,wy])}
+  hideT.fill(0);
+  for(const it of list)if(it[1]===2){const u=it[2],ux=u.x|0,uy=u.y|0;for(const [dx,dy] of [[1,1],[1,0],[0,1],[2,2],[2,1],[1,2]]){const x=ux+dx,y=uy+dy;if(x<N&&y<N)hideT[y*N+x]=1}}
   list.sort((a,b)=>a[0]-b[0]);
   for(const it of list){
-    if(it[1]===0){const o=G.obj[it[2]];const sp=o===O_TREE?SPR.trees[(G.tvar[it[2]]+it[2])%3]:o===O_GOLD?SPR.gold:SPR.berry;ctx.drawImage(sp.c,it[3]-sp.ax,it[4]-sp.ay,sp.w,sp.h)}
+    if(it[1]===0){const o=G.obj[it[2]];const sp=o===O_TREE?SPR.trees[(G.tvar[it[2]]+it[2])%3]:o===O_GOLD?SPR.gold:SPR.berry;if(o===O_TREE&&hideT[it[2]])ctx.globalAlpha=.42;ctx.drawImage(sp.c,it[3]-sp.ax,it[4]-sp.ay,sp.w,sp.h);ctx.globalAlpha=1}
     else if(it[1]===1){const b=it[2],sp=SPR.b[b.team][b.type];if(!b.built)ctx.globalAlpha=.4+.45*b.prog;ctx.drawImage(sp.c,it[3]-sp.ax,it[4]-sp.ay,sp.w,sp.h);ctx.globalAlpha=1;
       if(b.built&&b.hp<b.max*.5){const cx=it[3],cy=it[4]+b.size*HH-BD[b.type].h*.5;ctx.fillStyle='rgba(60,50,45,.5)';for(let k=0;k<3;k++){const a=(now/900+k/3)%1;ctx.globalAlpha=.5*(1-a);ctx.beginPath();ctx.arc(cx+Math.sin(k*2+a*3)*6,cy-a*26,4+a*7,0,7);ctx.fill()}ctx.globalAlpha=1}}
     else{const u=it[2];drawUnit(ctx,u.type,u.team,it[3],it[4],{face:u.face,anim:u.anim,moving:u.moving,work:u.work,carry:u.carry,ck:u.ck,atk:Math.max(0,1-(t-u.atkT)/.25)})}
@@ -1155,6 +1157,7 @@ window.SG={get G(){return G},cam,t2s,s2t,
   start(d){$('ovStart').classList.add('hid');newGame(d==null?1:d)},
   ff(sec){const n=Math.round(sec*20);for(let i=0;i<n&&!G.over;i++)step(.05);updateTop();refreshPanel();return this.info()},
   reveal(v){G.reveal=v!==false;updFog()},
+  spawn(type,team,x,y){return addUnit(type,team,x,y).id},
   set speed(v){speed=v},get sel(){return sel},get placing(){return placing},
   info(){const c=t=>{const o={vil:0,army:0,blds:{}};for(const u of G.units)if(u.team===t)u.type==='vil'?o.vil++:o.army++;for(const b of G.blds)if(b.team===t)o.blds[b.type]=(o.blds[b.type]||0)+1;o.res=Object.assign({},G.teams[t].res);o.pop=G.teams[t].pop;o.cap=G.teams[t].cap;return o};
     return {time:G.time,over:G.over,me:c(0),ai:c(1),waves:G.ai.waves,nextWave:G.ai.nextWave,aiGath:G.stats.aiGath,stats:G.stats}}
