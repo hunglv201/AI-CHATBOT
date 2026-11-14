@@ -201,7 +201,7 @@ table.st td:last-child{text-align:right;font-weight:800}
         <li><b>Chuồng voi ngựa</b> luyện kỵ binh và tượng binh, <b>Lò rèn</b> nâng cấp vũ khí và giáp, <b>Chợ</b> đổi lương hoặc gỗ lấy vàng.</li>
         <li>Bấm <b>Lên thời</b> ở Đình làng để lên đời: nhà đổi sang mái ngói, gỗ son, bền hơn, mở khoá công trình và lính mới.</li>
         <li><b>Tường thành</b>: chạm điểm đầu rồi điểm cuối để xây cả đoạn; <b>Cổng</b> cho quân mình đi qua. <b>Tướng quân</b> hồi máu cho quân quanh mình, <b>Thầy lang</b> tự chữa thương (luyện ở Đình làng, thời II).</li>
-        <li>Dân làng và nhà cửa tự hồi máu chậm khi không bị đánh một lúc; lính chiến cần Thầy lang hoặc Tướng quân.</li>
+        <li>Dân làng, lính và nhà cửa tự hồi máu chậm khi không bị đánh một lúc; Thầy lang và Tướng quân giúp hồi nhanh hơn nhiều.</li>
         <li>Có ngày và đêm (đêm nhìn ngắn hơn), thỉnh thoảng mưa (quân đi chậm). Ván chơi tự lưu; bấm <b>Chơi tiếp</b> ở màn hình chính để quay lại.</li>
         <li>Săn <b>hươu</b> và <b>voi rừng</b> để lấy thịt (voi rừng sẽ đánh trả). Trong menu Tạm dừng có ô nhập <b>mã hỗ trợ</b>.</li>
         <li>Phá <b>Đình làng</b> của địch để thắng. Mất đình là thua.</li>
@@ -1079,8 +1079,8 @@ function step(dt){
   G.time+=dt;G.tick++;
   const T=G.teams;T[0].pop=0;T[1].pop=0;for(const u of G.units)T[u.team].pop+=UD[u.type].pop;
   const us=G.units.slice();for(const u of us)if(!u.dead){PT=u.team;updUnit(u,dt)}PT=-1;
-  // tự hồi máu khi đã yên ổn: dân làng sau 8 giây, công trình sau 10 giây không bị đánh
-  for(const u of G.units)if(u.type==='vil'&&u.hp<u.max&&G.time-u.hitT>8)u.hp=Math.min(u.max,u.hp+.6*dt);
+  // tự hồi máu khi đã yên ổn: dân làng sau 8 giây (0,6 máu/giây), lính sau 10 giây (1% máu/giây), công trình sau 10 giây (0,4%/giây)
+  for(const u of G.units){if(u.hp>=u.max||UD[u.type].wild)continue;const vil=u.type==='vil';if(G.time-u.hitT>(vil?8:10))u.hp=Math.min(u.max,u.hp+(vil?.6:u.max*.01)*dt)}
   for(const b of G.blds)if(b.built&&b.hp<b.max&&G.time-b.hitT>10)b.hp=Math.min(b.max,b.hp+b.max*.004*dt);
   // tướng quân hồi máu cho bản thân và quân quanh mình
   for(const h of G.units)if(h.type==='hero'){h.hp=Math.min(h.max,h.hp+2*dt);for(const v of G.units)if(v!==h&&v.team===h.team&&v.hp<v.max&&!UD[v.type].wild&&Math.abs(v.x-h.x)<3.5&&Math.abs(v.y-h.y)<3.5)v.hp=Math.min(v.max,v.hp+1.5*dt)}
