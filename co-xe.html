@@ -1,0 +1,662 @@
+<title>Cò Xe Bắc Nam</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: dispatch desk — order waybills left, live road map center, fleet with yellow commercial plates right */
+:root{
+  --bg:#e9edf0; --panel:#ffffff; --panel-2:#f4f6f8; --ink:#17222c; --muted:#5b6976; --line:#d2d9df;
+  --accent:#e2600b; --accent-ink:#ffffff; --accent-soft:#fde6d6;
+  --land:#dfe6d8; --land-edge:#b9c4b0; --sea:#cfe0ea; --road:#8d99a5; --road-hi:#e2600b;
+  --empty:#3d74a8; --good:#1d7f47; --good-soft:#dcf1e4; --bad:#b8352a; --bad-soft:#f8e0dd; --warn:#a86a10;
+  --plate:#f4c51f; --plate-ink:#14181b;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10161b; --panel:#182128; --panel-2:#1e2931; --ink:#e4ebf0; --muted:#94a3b0; --line:#2b3741;
+  --accent:#ff7d2e; --accent-ink:#1a0d03; --accent-soft:#3b2414;
+  --land:#1d2721; --land-edge:#33443a; --sea:#13202b; --road:#56636e; --road-hi:#ff7d2e;
+  --empty:#6ea6dc; --good:#4cc07e; --good-soft:#163527; --bad:#ef6d60; --bad-soft:#3a1c19; --warn:#e0a643;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161b; --panel:#182128; --panel-2:#1e2931; --ink:#e4ebf0; --muted:#94a3b0; --line:#2b3741;
+  --accent:#ff7d2e; --accent-ink:#1a0d03; --accent-soft:#3b2414;
+  --land:#1d2721; --land-edge:#33443a; --sea:#13202b; --road:#56636e; --road-hi:#ff7d2e;
+  --empty:#6ea6dc; --good:#4cc07e; --good-soft:#163527; --bad:#ef6d60; --bad-soft:#3a1c19; --warn:#e0a643;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 24px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding-block:12px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:30px;letter-spacing:.02em;margin:0;line-height:1}
+.brand h1 b{color:var(--accent)}
+.brand span{color:var(--muted);font-size:12px}
+.stats{display:flex;flex-wrap:wrap;gap:6px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 10px;display:flex;flex-direction:column;min-width:84px}
+.stat small{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.stat strong{font-family:var(--f-display);font-size:20px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat strong.neg{color:var(--bad)}
+.speed{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.speed button{border:0;background:transparent;padding:8px 12px;font-family:var(--f-display);font-weight:600;font-size:16px;min-width:44px}
+.speed button+button{border-left:1px solid var(--line)}
+.speed button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.goal{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;color:var(--muted);font-size:12.5px;padding-block:8px}
+.goal b{color:var(--ink)}
+.goal details{flex-basis:100%}
+.goal summary{cursor:pointer;color:var(--ink);font-weight:500;width:max-content}
+.goal ul{margin:6px 0 0;padding-left:18px;max-width:75ch}
+
+/* Grid */
+.app{display:grid;gap:14px;grid-template-columns:minmax(0,1fr);grid-template-areas:"map" "orders" "fleet"}
+@media (min-width:780px){.app{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-areas:"orders map" "fleet fleet"}}
+@media (min-width:1180px){.app{grid-template-columns:minmax(0,340px) minmax(0,1fr) minmax(0,330px);grid-template-areas:"orders map fleet"}
+  .col{max-height:calc(100dvh - 150px);overflow:auto;position:sticky;top:120px}}
+.col{min-width:0;display:flex;flex-direction:column;gap:10px}
+.col-orders{grid-area:orders}.col-map{grid-area:map}.col-fleet{grid-area:fleet}
+.col h2{font-family:var(--f-display);font-weight:600;font-size:15px;letter-spacing:.12em;text-transform:uppercase;margin:4px 0 0;display:flex;justify-content:space-between;align-items:baseline;color:var(--muted)}
+.col h2 em{font-style:normal;color:var(--ink)}
+
+/* Map */
+.mapbox{position:relative;background:var(--sea);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mapbox svg{display:block;width:100%;height:auto;max-height:calc(100dvh - 160px)}
+.land{fill:var(--land);stroke:var(--land-edge);stroke-width:1.2}
+.isle{fill:var(--land);stroke:var(--land-edge)}
+.sea-lbl{fill:var(--muted);font-family:var(--f-display);font-size:13px;letter-spacing:.3em;opacity:.7}
+.isle-lbl{fill:var(--muted);font-family:var(--f-display);font-size:10.5px;letter-spacing:.05em}
+.road{stroke:var(--road);stroke-width:2.2;stroke-linecap:round;fill:none}
+.road-lbl{fill:var(--muted);font-size:8px;font-family:var(--f-display);font-weight:600;letter-spacing:.04em}
+.city circle{fill:var(--panel);stroke:var(--ink);stroke-width:1.6}
+.city text{fill:var(--ink);font-family:var(--f-display);font-weight:600;font-size:12.5px;paint-order:stroke;stroke:var(--land);stroke-width:3px;stroke-linejoin:round}
+.city{cursor:default}
+.picking .city{cursor:pointer}
+.picking .city circle{stroke:var(--accent);stroke-width:2.6}
+.route-hi{stroke:var(--road-hi);stroke-width:4.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.route-empty{stroke:var(--empty);stroke-width:3;fill:none;stroke-dasharray:5 5;stroke-linecap:round}
+.pin{fill:var(--road-hi);stroke:var(--panel);stroke-width:1.5}
+.pin-txt{fill:var(--accent-ink);font-family:var(--f-display);font-weight:700;font-size:10px;text-anchor:middle}
+.trk circle{stroke:var(--panel);stroke-width:1.5}
+.trk text{font-family:var(--f-display);font-weight:700;font-size:8.5px;text-anchor:middle;fill:var(--panel)}
+.trk.idle circle{fill:var(--ink)}
+.trk.empty circle{fill:var(--empty)}
+.trk.loaded circle{fill:var(--accent)}
+.trk.hl circle{stroke:var(--accent);stroke-width:3}
+.maphint{position:absolute;left:12px;right:12px;bottom:12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font-size:13px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.maphint b{color:var(--accent)}
+.maphint button{margin-left:auto}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+
+/* Orders as waybills */
+.order{background:var(--panel);border:1px solid var(--line);border-radius:6px;position:relative}
+.order::before{content:"";position:absolute;left:10px;top:0;bottom:0;border-left:1.5px dashed var(--line)}
+.order.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.o-head{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 12px 10px 22px}
+.o-top{display:flex;gap:8px;align-items:center}
+.cargo{font-weight:600;font-size:14.5px}
+.tag{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:var(--good-soft);color:var(--good)}
+.w{margin-left:auto;font-family:var(--f-display);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.o-route{font-family:var(--f-display);font-size:17px;font-weight:600;letter-spacing:.01em}
+.o-route .arr{color:var(--accent);padding:0 3px}
+.o-route .km{font-family:var(--f-body);font-size:12px;font-weight:400;color:var(--muted);margin-left:4px}
+.o-meta{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12px;color:var(--muted);margin-top:3px;align-items:baseline}
+.pay{font-family:var(--f-display);font-size:19px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.exp.urgent{color:var(--bad);font-weight:600}
+.opts{border-top:1px solid var(--line);padding:8px 10px 10px 22px;display:flex;flex-direction:column;gap:6px}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;background:var(--panel-2);border-radius:5px;padding:7px 8px}
+.opt-info{font-size:12px;color:var(--muted);min-width:0}
+.opt-info b{color:var(--ink);font-weight:600}
+.opt-act{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.opt-act span{font-size:12px;color:var(--muted)}
+.opt-act span b{font-family:var(--f-display);font-size:16px;color:var(--ink)}
+.opt-act span b.neg{color:var(--bad)}
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:0 6px;border-radius:3px;margin-top:2px}
+.chip.ok{background:var(--good-soft);color:var(--good)}
+.chip.late{background:var(--bad-soft);color:var(--bad)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:12.5px;padding:5px 10px;border-radius:5px;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.opt.out{grid-template-columns:minmax(0,1fr) auto}
+.none{font-size:12px;color:var(--muted);margin:0}
+.empty{color:var(--muted);font-size:13px;background:var(--panel);border:1px dashed var(--line);border-radius:6px;padding:14px;margin:0}
+
+/* Plates */
+.plate{display:inline-block;background:var(--plate);color:var(--plate-ink);font-family:var(--f-display);font-weight:700;font-size:13.5px;letter-spacing:.04em;padding:1px 6px;border-radius:3px;border:1.5px solid var(--plate-ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* Fleet */
+.truck{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.truck.hl{border-color:var(--accent)}
+.t-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.t-type{font-weight:600}
+.t-cap{color:var(--muted);font-size:12px;margin-left:auto}
+.t-status{font-size:13px}
+.t-status.idle{color:var(--good);font-weight:600}
+.t-status.empty{color:var(--empty)}
+.t-status.loaded{color:var(--accent);font-weight:500}
+.bar{height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.t-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.t-foot .sp{margin-right:auto}
+.lease{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.lease label{font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.lease select{font:inherit;padding:4px 6px;border-radius:5px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink)}
+.l-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:center;border-top:1px solid var(--line);padding-top:8px}
+.l-row b{font-weight:600}
+.l-row small{color:var(--muted);font-size:12px;grid-column:1}
+.l-row .btn{grid-row:1/3;grid-column:2}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:12.5px}
+.log li{display:grid;grid-template-columns:62px minmax(0,1fr);gap:6px;color:var(--muted)}
+.log li time{font-variant-numeric:tabular-nums;font-size:11.5px}
+.log li span{color:var(--ink)}
+.log li.good span b{color:var(--good)}
+.log li.bad span b{color:var(--bad)}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:13px;z-index:20;max-width:calc(100% - 32px)}
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 70%,transparent);display:grid;place-items:center;z-index:30;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:12px}
+.card h3{font-family:var(--f-display);font-size:30px;margin:0;line-height:1.05;text-wrap:balance}
+.card dl{display:grid;grid-template-columns:1fr auto;gap:4px 12px;margin:0}
+.card dt{color:var(--muted)}
+.card dd{margin:0;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.rank{font-family:var(--f-display);font-size:20px;color:var(--accent);font-weight:700}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="brand"><h1>CÒ <b>XE</b></h1><span>Sàn điều xe tải Bắc – Nam</span></div>
+  <div class="stats">
+    <div class="stat"><small>Thời gian</small><strong id="sTime" class="num">Ngày 1 · 06:00</strong></div>
+    <div class="stat"><small>Tiền mặt</small><strong id="sMoney" class="num">50,0 tr</strong></div>
+    <div class="stat"><small>Uy tín</small><strong id="sRep" class="num">60</strong></div>
+    <div class="stat"><small>Dầu DO</small><strong id="sDiesel" class="num">20.900đ</strong></div>
+  </div>
+  <div class="speed" role="group" aria-label="Tốc độ">
+    <button id="sp0" data-sp="0" aria-pressed="true" title="Tạm dừng (phím cách)">❚❚</button>
+    <button data-sp="1" aria-pressed="false" title="Chạy thường">▶</button>
+    <button data-sp="3" aria-pressed="false" title="Nhanh">▶▶</button>
+    <button data-sp="8" aria-pressed="false" title="Rất nhanh">▶▶▶</button>
+  </div>
+</header>
+
+<div class="goal">
+  <span>Mục tiêu: <b>lãi ròng 300 triệu</b> sau <b>30 ngày</b>. Âm quá 30 triệu là phá sản.</span>
+  <span id="sNet" class="num"></span>
+  <details>
+    <summary>Luật chơi</summary>
+    <ul>
+      <li>Chủ hàng đăng đơn ở cột trái. Bấm vào đơn để xem xe nào nhận được, bao lâu giao tới và lãi bao nhiêu.</li>
+      <li><b>Điều xe</b>: xe của bạn chạy rỗng tới điểm lấy hàng, bốc 1 giờ, chở tới nơi, dỡ 1 giờ. Tiền dầu trừ theo từng km, theo giá dầu hôm đó.</li>
+      <li><b>Đẩy cho xe ngoài</b>: làm cò, ăn hoa hồng 10% khi hàng tới. Không tốn xe, nhưng nhà xe ngoài đôi khi giao trễ.</li>
+      <li>Giao trễ hạn bị phạt 30% cước và mất uy tín. Uy tín cao thì đơn về dày hơn, cước cao hơn.</li>
+      <li>Nửa đêm trả tiền thuê xe kèm lương tài xế. Thuê thêm xe ở cột phải, trả xe thì lấy lại tiền cọc.</li>
+      <li>Xe rảnh có thể <b>chạy rỗng</b> về thành phố khác để đón đơn. Phím cách để tạm dừng.</li>
+    </ul>
+  </details>
+</div>
+
+<main class="app">
+  <section class="col col-orders" aria-label="Đơn hàng">
+    <h2>Đơn chờ xe <em id="oCount" class="num">0</em></h2>
+    <div id="orders"></div>
+  </section>
+
+  <section class="col col-map" aria-label="Bản đồ">
+    <div class="mapbox" id="mapbox">
+      <svg id="map" viewBox="0 0 520 650" role="img" aria-label="Bản đồ tuyến đường và vị trí xe"></svg>
+      <div class="maphint" id="hint"><span>Bấm <b>▶</b> để bắt đầu ca. Chọn một đơn bên trái rồi điều xe.</span></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--ink)"></i>Xe rảnh</span>
+      <span><i style="background:var(--empty)"></i>Chạy rỗng</span>
+      <span><i style="background:var(--accent)"></i>Đang chở hàng</span>
+      <span>Chữ trên xe: N = 2,5T · 8 = 8T · C = container</span>
+    </div>
+  </section>
+
+  <section class="col col-fleet" aria-label="Đội xe">
+    <h2>Đội xe <em id="fCount" class="num">0</em></h2>
+    <div id="fleet" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="lease">
+      <label for="leaseCity">Thuê thêm xe, nhận tại
+        <select id="leaseCity"></select></label>
+      <div id="leaseRows"></div>
+    </div>
+    <h2>Nhật ký</h2>
+    <ul class="log" id="log"></ul>
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+<div class="modal" id="modal" hidden><div class="card" id="modalCard"></div></div>
+
+<script>
+(()=>{
+// ---------- Data ----------
+const CITIES={
+  lc:{n:'Lào Cai',lon:103.97,lat:22.48,w:1,p:'24C',l:1},
+  ls:{n:'Lạng Sơn',lon:106.76,lat:21.85,w:2,p:'12C'},
+  hn:{n:'Hà Nội',lon:105.85,lat:21.03,w:5,p:'29C',l:1},
+  hp:{n:'Hải Phòng',lon:106.68,lat:20.86,w:3,p:'15C'},
+  th:{n:'Thanh Hóa',lon:105.78,lat:19.81,w:1.5,p:'36C',l:1},
+  vi:{n:'Vinh',lon:105.68,lat:18.67,w:1.5,p:'37C',l:1},
+  hu:{n:'Huế',lon:107.59,lat:16.46,w:1,p:'75C',l:1},
+  dn:{n:'Đà Nẵng',lon:108.22,lat:16.05,w:3,p:'43C'},
+  pk:{n:'Pleiku',lon:108.0,lat:13.98,w:1,p:'81C',l:1},
+  qn:{n:'Quy Nhơn',lon:109.22,lat:13.78,w:1.5,p:'77C'},
+  bm:{n:'Buôn Ma Thuột',lon:108.05,lat:12.67,w:1.5,p:'47C',l:1},
+  nt:{n:'Nha Trang',lon:109.19,lat:12.24,w:1.5,p:'79C'},
+  dl:{n:'Đà Lạt',lon:108.44,lat:11.94,w:1.5,p:'49C',l:1,dy:12},
+  sg:{n:'TP.HCM',lon:106.66,lat:10.76,w:6,p:'51C',l:1},
+  vt:{n:'Vũng Tàu',lon:107.08,lat:10.35,w:1.5,p:'72C'},
+  ct:{n:'Cần Thơ',lon:105.78,lat:10.03,w:3,p:'65C',l:1},
+};
+const ROADS=[['hn','lc',260,'CT05'],['hn','ls',155,'QL1A'],['hn','hp',105,'CT04'],['hn','th',155,'CT01'],['th','vi',140,'CT01'],
+  ['vi','hu',365,'QL1A'],['hu','dn',95,'QL1A'],['dn','qn',320,'QL1A'],['dn','pk',400,'QL14'],['qn','nt',215,'QL1A'],['qn','pk',165,'QL19'],
+  ['pk','bm',180,'QL14'],['bm','nt',190,'QL26'],['bm','sg',350,'QL14'],['nt','dl',135,'QL27C'],['dl','sg',300,'QL20'],
+  ['nt','sg',430,'CT01'],['sg','vt',95,'QL51'],['sg','ct',170,'CT01']];
+const CARGO={
+  hn:[['Hàng điện tử',1,6,1.25],['Dệt may',2,8,1],['Hàng tiêu dùng',1,10,1]],
+  hp:[['Container nhập khẩu',15,24,1],['Thép cuộn',10,24,.9],['Xi măng',5,20,.85]],
+  ls:[['Hàng biên mậu',2,15,1.1],['Hoa quả nhập',2,12,1.2,1]],
+  lc:[['Phân bón',5,20,.85],['Quặng apatit',15,24,.8]],
+  th:[['Xi măng',5,24,.85],['Đường mía',3,12,.95]],
+  vi:[['Gỗ ép',5,15,.9],['Bia',2,10,1]],
+  hu:[['Dệt may',1,6,1],['Hàng tiêu dùng',1,5,1]],
+  dn:[['Thủy sản',1,8,1.2,1],['Linh kiện điện tử',1,5,1.25]],
+  qn:[['Gỗ dăm',10,24,.8],['Hải sản',1,6,1.2,1]],
+  pk:[['Cà phê',5,20,1],['Mủ cao su',5,18,.95]],
+  bm:[['Cà phê nhân',5,22,1],['Hồ tiêu',2,10,1.1]],
+  nt:[['Hải sản đông lạnh',1,8,1.3,1],['Yến sào',.3,1,1.6]],
+  dl:[['Rau Đà Lạt',1,8,1.3,1],['Hoa tươi',.5,3,1.5,1]],
+  sg:[['Hàng tiêu dùng',1,10,1],['Hàng điện tử',1,6,1.25],['Container xuất khẩu',15,24,1]],
+  vt:[['Dầu nhớt',2,15,1],['Hải sản',1,6,1.2,1]],
+  ct:[['Gạo',5,24,.9],['Cá tra',2,10,1.2,1],['Trái cây',1,8,1.25,1]],
+};
+const TT={
+  nhe:{n:'Tải nhẹ',cap:2.5,lpk:.11,spd:60,rent:.8,dep:10,ch:'N'},
+  trung:{n:'Tải 8 tấn',cap:8,lpk:.19,spd:55,rent:1.6,dep:25,ch:'8'},
+  cont:{n:'Đầu kéo container',cap:25,lpk:.32,spd:48,rent:3.2,dep:50,ch:'C'},
+};
+const START_MONEY=50, END=30*24, GOAL=300, BANKRUPT=-30, COMM=.06, OUT_LATE=.15, HOUR_PER_SEC=.6;
+
+// ---------- Geometry & routing ----------
+const proj=(lon,lat)=>[(lon-102)*39.4+20,(23.6-lat)*41+10];
+const ids=Object.keys(CITIES);
+ids.forEach(k=>{const c=CITIES[k];[c.x,c.y]=proj(c.lon,c.lat);});
+const EK={},D={},NX={};
+ids.forEach(a=>{D[a]={};NX[a]={};ids.forEach(b=>{D[a][b]=a===b?0:Infinity;NX[a][b]=a===b?a:null;});});
+ROADS.forEach(([a,b,km])=>{EK[a+'|'+b]=EK[b+'|'+a]=km;D[a][b]=D[b][a]=km;NX[a][b]=b;NX[b][a]=a;});
+ids.forEach(k=>ids.forEach(i=>ids.forEach(j=>{if(D[i][k]+D[k][j]<D[i][j]){D[i][j]=D[i][k]+D[k][j];NX[i][j]=NX[i][k];}})));
+const pathOf=(a,b)=>{const p=[a];while(a!==b){a=NX[a][b];p.push(a);}return p;};
+const CN=k=>CITIES[k].n;
+
+// ---------- Helpers ----------
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const nf1=new Intl.NumberFormat('vi-VN',{minimumFractionDigits:1,maximumFractionDigits:1});
+const nf0=new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0});
+const tr=x=>nf1.format(x)+' tr';
+const kmf=x=>nf0.format(x)+' km';
+const wf=w=>(w<1?nf1.format(w):nf1.format(w).replace(/,0$/,''))+' T';
+const hrs=h=>h<1?'<1h':h>=48?nf1.format(h/24)+' ngày':Math.ceil(h)+'h';
+const clock=t=>{const d=Math.floor(t/24)+1,h=Math.floor(t%24),m=Math.floor((t%1)*60/10)*10;return `Ngày ${Math.min(d,30)} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function pickCity(){let tot=ids.reduce((s,k)=>s+CITIES[k].w,0),r=Math.random()*tot;for(const k of ids){r-=CITIES[k].w;if(r<=0)return k;}return 'sg';}
+function plate(city){return `${CITIES[city].p}-${String(Math.floor(rand(100,999)))}.${String(Math.floor(rand(10,99)))}`;}
+
+// ---------- State ----------
+let S;
+function newGame(){
+  S={t:6,money:START_MONEY,rep:60,diesel:20.9,speed:0,orders:[],trucks:[],out:[],log:[],oid:0,tid:0,
+     sel:null,hover:null,mode:null,nextOrder:6,over:false,started:false,
+     stats:{done:0,late:0,outs:0,fuel:0,rent:0,revenue:0,comm:0}};
+  addTruck('nhe','hn',true); addTruck('trung','sg',true);
+  S.startWorth=worth();
+  for(let i=0;i<5;i++)genOrder();
+  S.nextOrder=S.t+rand(1.5,3);
+  log('Mở sàn. Đội xe có 1 xe tải nhẹ ở Hà Nội và 1 xe 8 tấn ở TP.HCM.');
+}
+const deposits=()=>S.trucks.reduce((s,x)=>s+TT[x.type].dep,0);
+const worth=()=>S.money+deposits();
+function log(msg,cls=''){S.log.unshift({t:S.t,msg,cls});S.log.length=Math.min(S.log.length,40);}
+
+function addTruck(type,city,free){
+  const t={id:++S.tid,type,city,plate:plate(city),ph:[],job:null,trips:0,earn:0,total:0};
+  S.trucks.push(t); return t;
+}
+
+function genOrder(){
+  if(S.orders.length>=9)return;
+  const from=pickCity();let to,g=0;
+  do{to=pickCity();g++;}while((to===from||D[from][to]<90)&&g<50);
+  if(to===from)return;
+  const c=pick(CARGO[from]);
+  let w=Math.max(.5,Math.round(rand(c[1],c[2])*2)/2);
+  const km=D[from][to],perish=!!c[4];
+  const pay=.8*(.5+km*(.0055+w*.0011))*c[3]*(.85+S.rep/400)*rand(.92,1.12)*(perish?1.15:1);
+  const base=km/52+2;
+  const deadline=S.t+base*(perish?rand(1.15,1.4):rand(1.35,1.9))+rand(2,8);
+  S.orders.push({id:++S.oid,from,to,cargo:c[0],w,km,pay,deadline,expires:S.t+rand(5,10),perish});
+}
+
+// ---------- Planning ----------
+function plan(t,o){
+  const T=TT[t.type],kmA=D[t.city][o.from],kmB=o.km;
+  const h=(kmA+kmB)/T.spd+2,eta=S.t+h,fuel=(kmA+kmB)*T.lpk*S.diesel/1000;
+  return {t,kmA,h,eta,fuel,late:eta>o.deadline,lateBy:eta-o.deadline,profit:o.pay-fuel};
+}
+function optionsFor(o){
+  return S.trucks.filter(t=>!t.ph.length&&TT[t.type].cap>=o.w).map(t=>plan(t,o))
+    .sort((a,b)=>(a.late-b.late)||(b.profit-a.profit));
+}
+function drivePhase(a,b,label,cls){return {k:'drive',path:pathOf(a,b),km:D[a][b],done:0,to:b,label,cls};}
+
+function assign(oid,tid){
+  const o=S.orders.find(x=>x.id===oid),t=S.trucks.find(x=>x.id===tid);
+  if(!o||!t||t.ph.length||TT[t.type].cap<o.w)return;
+  const ph=[];
+  if(t.city!==o.from)ph.push(drivePhase(t.city,o.from,`Chạy rỗng → ${CN(o.from)} lấy ${o.cargo}`,'empty'));
+  ph.push({k:'wait',left:1,label:`Bốc ${o.cargo} tại ${CN(o.from)}`,cls:'loaded'});
+  ph.push(drivePhase(o.from,o.to,`Chở ${wf(o.w)} ${o.cargo} → ${CN(o.to)}`,'loaded'));
+  ph.push({k:'wait',left:1,label:`Dỡ hàng tại ${CN(o.to)}`,cls:'loaded'});
+  t.ph=ph;t.job={o,fuel:0};t.total=remaining(t);
+  S.orders=S.orders.filter(x=>x!==o);S.sel=null;S.hover=null;
+  log(`Điều xe <b>${t.plate}</b> nhận ${wf(o.w)} ${esc(o.cargo)}, ${CN(o.from)} → ${CN(o.to)}.`);
+}
+function outsource(oid){
+  const o=S.orders.find(x=>x.id===oid);if(!o)return;
+  const h=(rand(0,250)+o.km)/52+2,late=Math.random()<OUT_LATE;
+  S.out.push({o,at:S.t+(late?Math.max(h,o.deadline-S.t+rand(2,10)):Math.min(h,o.deadline-S.t-.5)),late});
+  S.orders=S.orders.filter(x=>x!==o);S.sel=null;S.stats.outs++;
+  log(`Đẩy đơn ${esc(o.cargo)} ${CN(o.from)} → ${CN(o.to)} cho xe ngoài, chờ hoa hồng ${tr(o.pay*COMM)}.`);
+}
+function moveEmpty(tid,city){
+  const t=S.trucks.find(x=>x.id===tid);if(!t||t.ph.length||t.city===city)return;
+  t.ph=[drivePhase(t.city,city,`Chạy rỗng → ${CN(city)}`,'empty')];t.total=remaining(t);
+  log(`Xe <b>${t.plate}</b> chạy rỗng từ ${CN(t.city)} về ${CN(city)} (${kmf(D[t.city][city])}).`);
+}
+function remaining(t){const sp=TT[t.type].spd;return t.ph.reduce((s,p)=>s+(p.k==='drive'?(p.km-p.done)/sp:p.left),0);}
+function lease(type,city){
+  const T=TT[type];
+  if(S.trucks.length>=14){toast('Bãi đã đầy, tối đa 14 xe.');return;}
+  if(S.money<T.dep){toast(`Thiếu tiền cọc. Cần ${tr(T.dep)}, đang có ${tr(S.money)}.`);return;}
+  S.money-=T.dep;const t=addTruck(type,city);
+  log(`Thuê ${T.n} <b>${t.plate}</b> tại ${CN(city)}, đặt cọc ${tr(T.dep)}.`);
+}
+function giveBack(tid){
+  const t=S.trucks.find(x=>x.id===tid);if(!t||t.ph.length)return;
+  if(S.trucks.length<=1){toast('Phải giữ lại ít nhất 1 xe.');return;}
+  S.money+=TT[t.type].dep;S.trucks=S.trucks.filter(x=>x!==t);
+  if(S.mode&&S.mode.tid===tid)S.mode=null;
+  log(`Trả xe <b>${t.plate}</b>, nhận lại cọc ${tr(TT[t.type].dep)}.`);
+}
+
+// ---------- Simulation ----------
+function deliver(t){
+  const {o,fuel}=t.job,late=S.t>o.deadline,pay=late?o.pay*.7:o.pay;
+  S.money+=pay;S.stats.revenue+=pay;S.stats.done++;t.trips++;t.earn+=pay-fuel;
+  if(late){S.stats.late++;S.rep=Math.max(0,S.rep-7);
+    log(`Xe <b>${t.plate}</b> giao trễ ${hrs(S.t-o.deadline)} ở ${CN(o.to)}. Bị phạt, nhận <b>+${tr(pay)}</b>.`,'bad');}
+  else{S.rep=Math.min(100,S.rep+2);
+    log(`Xe <b>${t.plate}</b> giao ${esc(o.cargo)} ở ${CN(o.to)} đúng hạn, nhận <b>+${tr(pay)}</b>.`,'good');}
+  t.job=null;
+}
+function moveTruck(t,h){
+  const T=TT[t.type];
+  while(h>1e-9&&t.ph.length){
+    const p=t.ph[0];
+    if(p.k==='drive'){
+      const s=Math.min(h,(p.km-p.done)/T.spd),km=s*T.spd,f=km*T.lpk*S.diesel/1000;
+      p.done+=km;h-=s;S.money-=f;S.stats.fuel+=f;if(t.job)t.job.fuel+=f;else t.earn-=f;
+      if(p.done>=p.km-1e-6){t.city=p.to;t.ph.shift();}
+    }else{const s=Math.min(h,p.left);p.left-=s;h-=s;if(p.left<=1e-9)t.ph.shift();}
+  }
+  if(!t.ph.length&&t.job)deliver(t);
+}
+function advance(h){
+  S.trucks.forEach(t=>moveTruck(t,h));
+  const now=S.t+h;
+  S.out=S.out.filter(x=>{
+    if(now<x.at)return true;
+    const c=x.o.pay*COMM*(x.late?.5:1);S.money+=c;S.stats.comm+=c;
+    if(x.late){S.rep=Math.max(0,S.rep-5);log(`Xe ngoài giao trễ đơn ${esc(x.o.cargo)} tới ${CN(x.o.to)}. Hoa hồng còn <b>+${tr(c)}</b>, mất uy tín.`,'bad');}
+    else log(`Xe ngoài giao xong ${esc(x.o.cargo)} tới ${CN(x.o.to)}. Hoa hồng <b>+${tr(c)}</b>.`,'good');
+    return false;});
+  S.orders=S.orders.filter(o=>{if(now>o.expires){if(S.sel===o.id)S.sel=null;return false;}return true;});
+  if(now>=S.nextOrder){genOrder();S.nextOrder=now+rand(2,4.5)/(.5+S.rep/100);}
+}
+function midnight(){
+  const rent=S.trucks.reduce((s,t)=>s+TT[t.type].rent,0);
+  S.money-=rent;S.stats.rent+=rent;
+  S.diesel=Math.min(26,Math.max(17,S.diesel*(1+rand(-.04,.045))));
+  const d=Math.round(S.t/24)+1;
+  if(d<=30)log(`Sang ngày ${d}. Trả thuê xe và lương tài xế <b>−${tr(rent)}</b>. Dầu DO ${nf0.format(S.diesel*1000)}đ/lít.`);
+  if(S.money<BANKRUPT)end('bankrupt');
+}
+function step(dt){
+  while(dt>1e-9&&!S.over){
+    const mid=(Math.floor(S.t/24+1e-9)+1)*24,h=Math.min(dt,mid-S.t,.25);
+    advance(h);S.t+=h;dt-=h;
+    if(Math.abs(S.t-mid)<1e-7){S.t=mid;midnight();}
+    if(S.t>=END-1e-7&&!S.over)end('time');
+  }
+}
+
+// ---------- End ----------
+function end(why){
+  S.over=true;setSpeed(0);
+  const profit=worth()-S.startWorth;
+  const rank=why==='bankrupt'?'Vỡ nợ, bán sạch xe':profit>=GOAL?'Ông trùm vận tải':profit>=150?'Cò lành nghề':profit>=0?'Cò tập sự':'Lỗ vốn';
+  let best=null;try{best=+localStorage.getItem('coxe-best')||null;if(why!=='bankrupt'&&(best===null||profit>best))localStorage.setItem('coxe-best',profit);}catch(e){}
+  $('#modalCard').innerHTML=`<h3>${why==='bankrupt'?'Phá sản':'Hết tháng'}</h3>
+    <div class="rank">${rank}</div>
+    <dl>
+      <dt>Lãi ròng</dt><dd>${tr(profit)}</dd>
+      <dt>Đơn tự chạy</dt><dd>${S.stats.done} (trễ ${S.stats.late})</dd>
+      <dt>Đơn đẩy xe ngoài</dt><dd>${S.stats.outs}</dd>
+      <dt>Cước thu về</dt><dd>${tr(S.stats.revenue)}</dd>
+      <dt>Hoa hồng</dt><dd>${tr(S.stats.comm)}</dd>
+      <dt>Tiền dầu</dt><dd>−${tr(S.stats.fuel)}</dd>
+      <dt>Thuê xe, lương</dt><dd>−${tr(S.stats.rent)}</dd>
+      <dt>Uy tín cuối</dt><dd>${Math.round(S.rep)}</dd>
+      ${best!==null&&best!==profit?`<dt>Kỷ lục cũ</dt><dd>${tr(best)}</dd>`:''}
+    </dl>
+    <button class="btn" id="again" style="padding:9px">Chơi tháng mới</button>`;
+  $('#modal').hidden=false;$('#again').focus();
+}
+
+// ---------- Rendering ----------
+const $=s=>document.querySelector(s);
+const svg=$('#map');
+function staticMap(){
+  const outline=[[102.1,22.4],[102.6,22.75],[103.5,22.6],[104.0,22.8],[104.8,22.85],[105.3,23.3],[106.0,22.95],[106.7,22.85],[106.7,22.4],[107.4,21.7],[108.0,21.55],
+    [107.3,21.0],[106.7,20.7],[106.2,20.2],[105.9,19.6],[105.8,19.0],[106.3,18.3],[106.6,17.6],[107.2,16.9],[107.8,16.3],[108.3,16.0],[108.8,15.4],[109.1,14.6],
+    [109.3,13.6],[109.4,12.8],[109.2,12.0],[109.0,11.4],[108.5,11.0],[107.9,10.7],[107.2,10.4],[106.8,10.3],[106.6,9.7],[106.0,9.3],[105.4,8.6],[104.8,8.6],
+    [104.9,9.3],[104.8,10.0],[104.5,10.4],[105.1,10.95],[106.1,11.0],[106.4,11.6],[106.9,11.75],[107.5,12.3],[107.6,13.0],[107.5,14.0],[107.6,14.6],[107.4,15.2],
+    [107.2,15.9],[106.7,16.4],[106.5,17.0],[105.7,17.8],[105.1,18.5],[104.4,19.0],[104.0,19.4],[104.5,19.7],[104.2,20.4],[103.7,20.7],[103.2,20.8],[102.9,21.3],[102.7,21.7],[102.2,22.0]]
+    .map(p=>proj(...p).map(v=>v.toFixed(1)).join(',')).join(' ');
+  const isles=(lon,lat,n,sp)=>Array.from({length:n},(_,i)=>{const[x,y]=proj(lon+Math.cos(i*2.4)*sp*(i%3+1)/3,lat+Math.sin(i*2.4)*sp*(i%3+1)/3);return `<circle class="isle" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="1.8"/>`;}).join('');
+  const [hsx,hsy]=proj(112,16.5),[tsx,tsy]=proj(114,10);
+  let s=`<rect width="520" height="650" fill="var(--sea)"/>
+    <polygon class="land" points="${outline}"/>
+    ${isles(112,16.5,9,.6)}${isles(114,10,12,1)}
+    <text class="isle-lbl" x="${hsx}" y="${hsy+22}" text-anchor="middle">QĐ. Hoàng Sa</text>
+    <text class="isle-lbl" x="${tsx-10}" y="${tsy+34}" text-anchor="middle">QĐ. Trường Sa</text>
+    <text class="sea-lbl" x="400" y="220" text-anchor="middle">BIỂN ĐÔNG</text>`;
+  ROADS.forEach(([a,b,,name])=>{const A=CITIES[a],B=CITIES[b];
+    s+=`<line class="road" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;});
+  ROADS.forEach(([a,b,km,name])=>{const A=CITIES[a],B=CITIES[b];
+    const mx=(A.x+B.x)/2,my=(A.y+B.y)/2,ang=Math.atan2(B.y-A.y,B.x-A.x)*180/Math.PI,r=ang>90||ang<-90?ang+180:ang;
+    if(D[a][b]<120)return;
+    s+=`<text class="road-lbl" transform="translate(${mx.toFixed(1)},${my.toFixed(1)}) rotate(${r.toFixed(0)})" dy="-3" text-anchor="middle">${name}</text>`;});
+  s+='<g id="routes"></g>';
+  ids.forEach(k=>{const c=CITIES[k];
+    s+=`<g class="city" data-c="${k}"><circle cx="${c.x}" cy="${c.y}" r="5"/><text x="${c.l?c.x-9:c.x+9}" y="${c.y+4+(c.dy||0)}" text-anchor="${c.l?'end':'start'}">${c.n}</text></g>`;});
+  s+='<g id="trucks"></g>';
+  svg.innerHTML=s;
+}
+function truckXY(t,idx){
+  const p=t.ph[0];
+  if(p&&p.k==='drive'){
+    let d=p.done;
+    for(let i=0;i<p.path.length-1;i++){const a=p.path[i],b=p.path[i+1],e=EK[a+'|'+b];
+      if(d<=e||i===p.path.length-2){const f=Math.min(1,d/e),A=CITIES[a],B=CITIES[b];return [A.x+(B.x-A.x)*f,A.y+(B.y-A.y)*f];}d-=e;}
+  }
+  const c=CITIES[t.city],ang=-Math.PI/2+idx*1.1,r=idx===0?0:11;
+  return [c.x+Math.cos(ang)*r+ (idx===0?0:0),c.y-12+Math.sin(ang)*r*0+(idx===0?0:0)-(idx*0)];
+}
+function poly(path){return path.map(k=>`${CITIES[k].x},${CITIES[k].y}`).join(' ');}
+function renderMap(){
+  // routes
+  let r='',pins='';
+  const o=S.orders.find(x=>x.id===S.sel);
+  if(o){
+    const ht=S.trucks.find(x=>x.id===S.hover);
+    if(ht&&ht.city!==o.from&&!ht.ph.length)r+=`<polyline class="route-empty" points="${poly(pathOf(ht.city,o.from))}"/>`;
+    r+=`<polyline class="route-hi" points="${poly(pathOf(o.from,o.to))}"/>`;
+    [[o.from,'A'],[o.to,'B']].forEach(([k,l])=>{const c=CITIES[k];pins+=`<circle class="pin" cx="${c.x}" cy="${c.y}" r="8"/><text class="pin-txt" x="${c.x}" y="${c.y+3.5}">${l}</text>`;});
+  }
+  S.trucks.forEach(t=>{const p=t.ph[0];if(p&&p.k==='drive'){
+    const rest=[...p.path];r+=`<polyline class="${p.cls==='loaded'?'route-hi':'route-empty'}" style="opacity:.35;stroke-width:2.5" points="${poly(rest)}"/>`;}});
+  $('#routes').innerHTML=r;
+  // trucks
+  const parked={};let s=pins;
+  S.trucks.forEach(t=>{
+    const p=t.ph[0],driving=p&&p.k==='drive';
+    let x,y;
+    if(driving){[x,y]=truckXY(t,0);}
+    else{const i=parked[t.city]=(parked[t.city]||0)+1;const c=CITIES[t.city];x=c.x-6+((i-1)%4)*12-(Math.min(4,i)>1?0:0);y=c.y-14-Math.floor((i-1)/4)*12;}
+    const cls=!p?'idle':p.cls;
+    const hl=(S.hover===t.id||(S.mode&&S.mode.tid===t.id))?' hl':'';
+    s+=`<g class="trk ${cls}${hl}" transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><title>${t.plate} · ${TT[t.type].n}</title><circle r="6.5"/><text y="3">${TT[t.type].ch}</text></g>`;
+  });
+  $('#trucks').innerHTML=s;
+  svg.classList.toggle('picking',!!S.mode);
+}
+function ordersHTML(){
+  if(!S.orders.length)return `<p class="empty">Chưa có đơn mới. Đơn về sau vài giờ, uy tín càng cao thì đơn càng dày.</p>`;
+  return S.orders.slice().sort((a,b)=>a.expires-b.expires).map(o=>{
+    const sel=S.sel===o.id,exp=o.expires-S.t;
+    return `<article class="order${sel?' sel':''}">
+      <button class="o-head" data-act="sel" data-o="${o.id}" aria-expanded="${sel}">
+        <div class="o-top"><span class="cargo">${esc(o.cargo)}</span>${o.perish?'<span class="tag">Tươi sống</span>':''}<span class="w">${wf(o.w)}</span></div>
+        <div class="o-route">${CN(o.from)}<span class="arr">→</span>${CN(o.to)}<span class="km">${kmf(o.km)}</span></div>
+        <div class="o-meta"><span class="pay">${tr(o.pay)}</span><span>Hạn giao ${hrs(o.deadline-S.t)}</span><span class="exp${exp<2?' urgent':''}">Hết nhận sau ${hrs(exp)}</span></div>
+      </button>${sel?optsHTML(o):''}</article>`;}).join('');
+}
+function optsHTML(o){
+  const ops=optionsFor(o);
+  let h='<div class="opts">';
+  if(!ops.length){
+    const busy=S.trucks.some(t=>TT[t.type].cap>=o.w);
+    h+=`<p class="none">${busy?'Xe đủ tải đang bận hết.':`Không có xe nào chở được ${wf(o.w)}. Cần ${o.w>8?'đầu kéo container':'xe 8 tấn trở lên'}.`}</p>`;
+  }
+  ops.forEach(p=>{const t=p.t;
+    h+=`<div class="opt" data-hv="${t.id}">
+      <span class="plate">${t.plate}</span>
+      <div class="opt-info"><b>${TT[t.type].n}</b> · ở ${CN(t.city)}${p.kmA?` · rỗng ${kmf(p.kmA)}`:''}<br>
+        <span class="chip ${p.late?'late':'ok'}">${p.late?`Trễ ~${hrs(p.lateBy)}`:'Kịp hạn'} · tới nơi sau ${hrs(p.h)}</span></div>
+      <div class="opt-act"><span>Lãi ~<b class="${p.profit-(p.late?o.pay*.3:0)<0?'neg':''}">${tr(p.profit-(p.late?o.pay*.3:0))}</b></span>
+        <button class="btn" data-act="assign" data-o="${o.id}" data-t="${t.id}">Điều xe</button></div></div>`;});
+  h+=`<div class="opt out"><div class="opt-info"><b>Đẩy cho xe ngoài</b> · hoa hồng ${Math.round(COMM*100)}% = <b>${tr(o.pay*COMM)}</b><br>Không tốn xe. Khoảng 1/7 chuyến nhà xe ngoài giao trễ.</div>
+    <button class="btn ghost" data-act="out" data-o="${o.id}">Đẩy đơn</button></div>`;
+  return h+'</div>';
+}
+function fleetHTML(){
+  return S.trucks.map(t=>{
+    const p=t.ph[0],T=TT[t.type];
+    const st=!p?{label:`Rảnh tại ${CN(t.city)}`,cls:'idle'}:p;
+    const rem=p?remaining(t):0,pct=p&&t.total?Math.round((1-rem/t.total)*100):0;
+    const picking=S.mode&&S.mode.tid===t.id;
+    return `<article class="truck${S.hover===t.id||picking?' hl':''}">
+      <div class="t-top"><span class="plate">${t.plate}</span><span class="t-type">${T.n}</span><span class="t-cap">tải ${wf(T.cap)} · ${tr(T.rent)}/ngày</span></div>
+      <div class="t-status ${st.cls}">${esc(st.label)}${p?` · còn ${hrs(rem)}`:''}</div>
+      ${p?`<div class="bar"><i style="width:${pct}%"></i></div>`:''}
+      <div class="t-foot"><span class="sp">${t.trips} chuyến · lãi ${tr(t.earn)}</span>
+        ${!p?(picking?`<button class="btn" data-act="cancelmove">Hủy chọn</button>`:`<button class="btn ghost" data-act="move" data-t="${t.id}">Chạy rỗng…</button><button class="btn ghost" data-act="return" data-t="${t.id}">Trả xe</button>`):''}</div>
+    </article>`;}).join('');
+}
+function logHTML(){return S.log.slice(0,10).map(l=>`<li class="${l.cls}"><time>${clock(l.t).replace('Ngày ','N')}</time><span>${l.msg}</span></li>`).join('');}
+function leaseStatic(){
+  $('#leaseCity').innerHTML=ids.map(k=>`<option value="${k}"${k==='sg'?' selected':''}>${CN(k)}</option>`).join('');
+  $('#leaseRows').innerHTML=Object.entries(TT).map(([k,T])=>`<div class="l-row"><b>${T.n} · ${wf(T.cap)}</b>
+    <small>Cọc ${tr(T.dep)} · ${tr(T.rent)}/ngày · ${nf0.format(T.lpk*100)} lít/100 km</small>
+    <button class="btn ghost" data-act="lease" data-ty="${k}">Thuê</button></div>`).join('');
+}
+
+let pressing=false,lastStruct=0;const cache={};
+function setHTML(id,html){if(cache[id]!==html){cache[id]=html;document.getElementById(id).innerHTML=html;}}
+function render(force){
+  $('#sTime').textContent=clock(S.t);
+  const m=$('#sMoney');m.textContent=tr(S.money);m.classList.toggle('neg',S.money<0);
+  $('#sRep').textContent=Math.round(S.rep);
+  $('#sDiesel').textContent=nf0.format(S.diesel*1000)+'đ';
+  const net=worth()-S.startWorth;
+  $('#sNet').innerHTML=`Lãi ròng hiện tại (tính cả tiền cọc xe): <b class="num">${tr(net)}</b>`;
+  renderMap();
+  const now=performance.now();
+  if(force||(!pressing&&now-lastStruct>180)){
+    lastStruct=now;
+    setHTML('orders',ordersHTML());setHTML('fleet',fleetHTML());setHTML('log',logHTML());
+    $('#oCount').textContent=S.orders.length;$('#fCount').textContent=S.trucks.length;
+  }
+  $('#hint').hidden=S.started&&!S.mode;
+  if(S.mode){const t=S.trucks.find(x=>x.id===S.mode.tid);
+    setHTML('hint',t?`<span>Chọn thành phố trên bản đồ để xe <span class="plate">${t.plate}</span> chạy rỗng tới.</span><button class="btn ghost" data-act="cancelmove">Hủy</button>`:'');}
+  else if(!S.started)setHTML('hint',`<span>Bấm <b>▶</b> để bắt đầu ca. Chọn một đơn bên trái rồi điều xe.</span><button class="btn" data-act="go">Bắt đầu</button>`);
+}
+
+// ---------- Controls ----------
+function setSpeed(v){S.speed=v;if(v>0)S.started=true;
+  document.querySelectorAll('[data-sp]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.sp===v)));}
+let toastTimer;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.hidden=true,2600);}
+
+document.addEventListener('pointerdown',()=>{pressing=true;});
+document.addEventListener('pointerup',()=>setTimeout(()=>{pressing=false;},0));
+document.addEventListener('pointercancel',()=>{pressing=false;});
+document.addEventListener('click',e=>{
+  const sp=e.target.closest('[data-sp]');if(sp){if(!S.over)setSpeed(+sp.dataset.sp);return;}
+  const city=e.target.closest('.city');
+  if(city&&S.mode){moveEmpty(S.mode.tid,city.dataset.c);S.mode=null;render(true);return;}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,oid=+b.dataset.o,tid=+b.dataset.t;
+  if(S.over&&a!=='again')return;
+  if(a==='sel'){S.sel=S.sel===oid?null:oid;S.hover=null;}
+  else if(a==='assign')assign(oid,tid);
+  else if(a==='out')outsource(oid);
+  else if(a==='move'){S.mode={tid};S.sel=null;}
+  else if(a==='cancelmove')S.mode=null;
+  else if(a==='return')giveBack(tid);
+  else if(a==='lease')lease(b.dataset.ty,$('#leaseCity').value);
+  else if(a==='go')setSpeed(1);
+  render(true);
+});
+document.addEventListener('pointerover',e=>{const o=e.target.closest('[data-hv]');const v=o?+o.dataset.hv:null;if(v!==S.hover&&S.sel){S.hover=v;}});
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'&&!/INPUT|SELECT|TEXTAREA|BUTTON/.test(e.target.tagName)){e.preventDefault();if(!S.over)setSpeed(S.speed?0:(S.lastSp||1));}
+  if(e.key==='Escape'){S.mode=null;S.sel=null;render(true);}
+});
+document.addEventListener('click',e=>{if(e.target.id==='again'){$('#modal').hidden=true;newGame();Object.keys(cache).forEach(k=>delete cache[k]);setSpeed(0);render(true);}});
+const _set=setSpeed;setSpeed=v=>{if(v>0)S.lastSp=v;_set(v);};
+
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000);last=now;
+  if(S.speed>0&&!S.over)step(dt*S.speed*HOUR_PER_SEC);
+  render(false);requestAnimationFrame(frame);
+}
+newGame();staticMap();leaseStatic();render(true);requestAnimationFrame(frame);
+window.__coxe={get S(){return S},step,assign,outsource,optionsFor,lease};
+})();
+</script>
