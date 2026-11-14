@@ -1053,6 +1053,8 @@ cv.addEventListener('pointerdown',e=>{
   if(ptrs.size===2){if(gest)clearTimeout(gest.lp);gest=null;const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:cam.z,mx:(a.x+b.x)/2,my:(a.y+b.y)/2};return}
   if(ptrs.size>2)return;
   const g=gest={id:e.pointerId,sx:e.clientX,sy:e.clientY,x:e.clientX,y:e.clientY,moved:false,btn:e.button,touch,box:false,lp:0};
+  if(touch&&placing){const p=s2t(e.clientX,e.clientY),s=BD[placing.type].size;
+    if(p.x>=placing.tx-1&&p.x<=placing.tx+s+1&&p.y>=placing.ty-1&&p.y<=placing.ty+s+1){g.dragGhost={ox:p.x-placing.tx,oy:p.y-placing.ty}}}
   if(touch&&!placing&&!rallyMode){if(boxMode)g.box=true;else g.lp=setTimeout(()=>{if(gest===g&&!g.moved){g.box=true;g.long=true;if(navigator.vibrate)navigator.vibrate(12);toast('Kéo để khoanh vùng chọn')}},420)}
 },{passive:false});
 cv.addEventListener('pointermove',e=>{
@@ -1064,6 +1066,7 @@ cv.addEventListener('pointermove',e=>{
   const g=gest;if(!g||g.id!==e.pointerId)return;
   g.x=e.clientX;g.y=e.clientY;
   if(!g.moved&&Math.hypot(g.x-g.sx,g.y-g.sy)>(g.touch?10:5)){g.moved=true;clearTimeout(g.lp);if(!g.touch&&g.btn===0&&!placing&&!rallyMode)g.box=true}
+  if(g.dragGhost&&placing){const p=s2t(g.x,g.y),s=BD[placing.type].size;placing.tx=clamp(Math.round(p.x-g.dragGhost.ox),0,N-s);placing.ty=clamp(Math.round(p.y-g.dragGhost.oy),0,N-s);placing.ok=canPlace(placing.type,placing.tx,placing.ty,0);return}
   if(g.moved&&!g.box){if(g.touch||g.btn!==0||placing||rallyMode){cam.x-=dx/cam.z;cam.y-=dy/cam.z;clampCam()}}
   if(placing&&!g.touch)ghostAt(g.x,g.y);
 });
@@ -1073,6 +1076,7 @@ function ptrEnd(e){
   const g=gest;if(!g||g.id!==e.pointerId)return;gest=null;clearTimeout(g.lp);
   if(e.type==='pointercancel'||!G||G.over||paused)return;
   if(g.box&&g.moved)boxSelect(g.sx,g.sy,g.x,g.y,e.shiftKey);
+  else if(g.dragGhost&&g.moved){}
   else if(!g.moved){if(g.touch||g.btn===0)tapAt(g.x,g.y,g.touch,e.shiftKey);else if(g.btn===2)rclickAt(g.x,g.y)}
 }
 cv.addEventListener('pointerup',ptrEnd);cv.addEventListener('pointercancel',ptrEnd);
