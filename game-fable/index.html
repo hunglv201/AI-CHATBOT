@@ -201,6 +201,7 @@ table.st td:last-child{text-align:right;font-weight:800}
         <li><b>Chuồng voi ngựa</b> luyện kỵ binh và tượng binh, <b>Lò rèn</b> nâng cấp vũ khí và giáp, <b>Chợ</b> đổi lương hoặc gỗ lấy vàng.</li>
         <li>Bấm <b>Lên thời</b> ở Đình làng để lên đời: nhà đổi sang mái ngói, gỗ son, bền hơn, mở khoá công trình và lính mới.</li>
         <li><b>Tường thành</b>: chạm điểm đầu rồi điểm cuối để xây cả đoạn; <b>Cổng</b> cho quân mình đi qua. <b>Tướng quân</b> hồi máu cho quân quanh mình, <b>Thầy lang</b> tự chữa thương (luyện ở Đình làng, thời II).</li>
+        <li><b>Bến thuyền</b> xây sát bờ trên mặt nước: thuyền đánh cá lấy lương, thuyền chiến bắn tên lên bờ.</li>
         <li>Lính mới: <b>Lính nỏ</b> (mạnh với kỵ binh, voi), <b>Do thám</b> (nhanh, nhìn xa), <b>Máy bắn đá</b> ở Xưởng công thành, <b>Nữ tướng</b> tăng tốc cho quân. <b>Trại chăn nuôi</b> tự nuôi vịt để lấy thịt. Coi chừng <b>hổ</b> rình người đi lạc.</li>
         <li>Dân làng, lính và nhà cửa tự hồi máu chậm khi không bị đánh một lúc; Thầy lang và Tướng quân giúp hồi nhanh hơn nhiều.</li>
         <li>Có ngày và đêm (đêm nhìn ngắn hơn), thỉnh thoảng mưa (quân đi chậm). Ván chơi tự lưu; bấm <b>Chơi tiếp</b> ở màn hình chính để quay lại.</li>
@@ -245,9 +246,9 @@ table.st td:last-child{text-align:right;font-weight:800}
    ============================================================ */
 const N=40,HW=32,HH=16;
 const T_GRASS=0,T_WATER=1,T_DIRT=2;
-const O_TREE=1,O_GOLD=2,O_BERRY=3,O_MEAT=4;
-const OBJ_OF={wood:O_TREE,gold:O_GOLD,food:O_BERRY,meat:O_MEAT};
-const RES_OF=[null,'wood','gold','food','meat'];
+const O_TREE=1,O_GOLD=2,O_BERRY=3,O_MEAT=4,O_FISH=5;
+const OBJ_OF={wood:O_TREE,gold:O_GOLD,food:O_BERRY,meat:O_MEAT,fish:O_FISH};
+const RES_OF=[null,'wood','gold','food','meat','fish'];
 const RNAME={food:'Lương',wood:'Gỗ',gold:'Vàng'};
 const INK='#2b1d14';
 const TEAM=[
@@ -266,6 +267,8 @@ const UD={
   heroine:{name:'Nữ tướng',hp:300,atk:11,range:5,cd:1.2,speed:2.9,sight:9,cost:{food:180,gold:170},time:30,pop:1,bm:.8,mil:1,hero:1,age:2,desc:'Bắn cung, tăng tốc chạy cho quân quanh mình'},
   hero:{name:'Tướng quân',hp:420,atk:16,range:1,cd:1.1,speed:2.7,sight:8,cost:{food:200,gold:150},time:30,pop:1,bm:1.2,mil:1,hero:1,age:2,desc:'Mỗi làng một vị, hồi máu cho quân quanh mình'},
   healer:{name:'Thầy lang',hp:40,atk:0,range:1.6,cd:1,speed:2.3,sight:6,cost:{food:60,gold:60},time:16,pop:1,bm:0,heal:1,age:2,desc:'Tự chữa thương cho quân mình ở gần'},
+  fboat:{name:'Thuyền đánh cá',hp:60,atk:0,range:.9,cd:1,speed:2.4,sight:5,cost:{wood:60},time:14,pop:1,bm:0,naval:1,desc:'Đánh cá lấy lương, nộp ở bến thuyền'},
+  wboat:{name:'Thuyền chiến',hp:180,atk:8,range:5,cd:1.6,speed:2.5,sight:7,cost:{wood:150,gold:50},time:25,pop:2,bm:.8,mil:1,naval:1,age:2,desc:'Bắn tên từ dưới nước lên bờ'},
   tiger:{name:'Hổ',hp:90,atk:10,range:.9,cd:1.3,speed:3,sight:5,cost:{},time:1,pop:0,bm:0,wild:1,meat:200,aggro:1,desc:'Rình vồ người đi lạc'},
   duck:{name:'Vịt',hp:12,atk:0,range:.9,cd:1,speed:1.5,sight:3,cost:{},time:1,pop:0,bm:0,stock:1,meat:70,desc:'Vật nuôi — chọn dân làng rồi chạm vào vịt để giết thịt'},
   deer:{name:'Hươu',hp:16,atk:0,range:.9,cd:1,speed:2.1,sight:4,cost:{},time:1,pop:0,bm:0,wild:1,meat:130,desc:'Săn để lấy thịt'},
@@ -284,6 +287,7 @@ const BD={
   smithy:{name:'Lò rèn',size:2,hp:520,cost:{wood:120},time:22,sight:4,h:72,age:2,desc:'Nâng cấp vũ khí và giáp'},
   workshop:{name:'Xưởng công thành',size:3,hp:700,cost:{wood:200,gold:50},time:32,train:['cata'],sight:4,h:52,age:3,desc:'Chế tạo máy bắn đá'},
   pen:{name:'Trại chăn nuôi',size:2,hp:300,cost:{wood:80},time:14,sight:3,h:30,desc:'Tự nuôi vịt, tối đa 4 con'},
+  dock:{name:'Bến thuyền',size:2,hp:600,cost:{wood:120},time:20,drop:1,naval:1,train:['fboat','wboat'],sight:5,h:32,desc:'Đóng thuyền; xây sát bờ, trên mặt nước'},
   market:{name:'Chợ',size:2,hp:450,cost:{wood:140},time:22,sight:4,h:44,age:2,desc:'Đổi tài nguyên lấy vàng và ngược lại'}
 };
 const TECH={
@@ -294,13 +298,13 @@ const AGES=[null,{name:'Thời Khai hoang',n:'I'},{name:'Thời Phong kiến',n:
 const CODES={LUAGAO:'Nhận 1000 lương',GOLIM:'Nhận 1000 gỗ',VANGBAC:'Nhận 1000 vàng',PHATTAI:'Nhận 1000 mỗi loại tài nguyên',XAYNHANH:'Xây xong ngay mọi công trình và nghiên cứu đang làm',SUONGTAN:'Xoá sương mù, nhìn thấy cả bản đồ (nhập lần nữa để tắt)'};
 const MAPS=[{name:'Đồng bằng',desc:'Đất rộng, vài hồ nước rải rác.'},{name:'Sông lớn',desc:'Một con sông chia đôi hai làng, chỉ qua được ở ba chỗ cạn.'},{name:'Rừng rậm',desc:'Rừng dày, gỗ nhiều nhưng đường đi hẹp.'}];
 const SAVE_KEY='suong-giang-save-v1',DAY=300;
-let curMap=0,PT=-1;
+let curMap=0,PT=-1,PNAV=false;
 const darkness=t=>{const p=t%DAY;return p<190?0:p<215?(p-190)/25:p<275?1:p<300?1-(p-275)/25:0};
 const ageOf=t=>G.teams[t].age, hpMul=t=>1+.25*(G.teams[t].age-1);
 const TRADE=[['food','gold',100,45],['wood','gold',100,45],['gold','food',60,100],['gold','wood',60,100]];
-const BUILD_LIST=['house','farm','pen','store','barracks','wall','gate','tower','stable','smithy','market','workshop'];
+const BUILD_LIST=['house','farm','pen','store','dock','barracks','wall','gate','tower','stable','smithy','market','workshop'];
 const CAP=12, POP_MAX=50;
-const RATE={wood:.85,food:1.0,gold:.75,farm:.7,meat:1.5};
+const RATE={wood:.85,food:1.0,gold:.75,farm:.7,meat:1.5,fish:1.3};
 const DIFF=[
   {name:'Dễ',desc:'Trại Son thu hoạch chậm, đánh muộn và ít quân. Hợp để làm quen.',gm:.7,tm:.7,maxVill:9,first:380,interval:180,base:3,grow:1,maxArmy:8,towers:0,towerAt:1e9,bonus:0},
   {name:'Vừa',desc:'Trại Son phát triển ngang bạn và kéo quân sang từng đợt lớn dần.',gm:1,tm:1,maxVill:15,first:280,interval:120,base:5,grow:2,maxArmy:18,towers:1,towerAt:300,bonus:0},
@@ -426,6 +430,13 @@ function mkBuilding(type,team,age){
       for(const [x,y] of [[.14,.86],[.86,.86],[.86,.14]])line(P(x,y,51),P(x,y,60),'#5b3a22',1.6);
       roof(0,0,1,1,59,.5,.5,.5,.5,76,thatchD,thatchL,'#8b6524',3);
       flag(P(.5,.5,76),12,tc.col,1);
+    }else if(type==='dock'){
+      for(const [x,y] of [[.15,.15],[1.85,.15],[.15,1.85],[1.85,1.85],[1,.15],[.15,1],[1,1.85],[1.85,1]])line(P(x,y,-5),P(x,y,8),'#5b3a22',2.6);
+      poly([P(.08,.08,7),P(1.92,.08,7),P(1.92,1.92,7),P(.08,1.92,7)],'#a67942');
+      for(let t=.3;t<1.9;t+=.22)line(P(.08,t,7),P(1.92,t,7),'rgba(43,29,20,.35)',.8);
+      box(.2,.2,.95,.95,7,19,bam,bamD,'#c9a460');roof(.12,.12,1.03,1.03,18,.575,.575,.575,.575,31,thatchD,thatch,'#8b6524',0);
+      for(const [x,y] of [[1.55,.5],[1.7,.75]]){const p=P(x,y,7);c.fillStyle='#8a5a33';c.strokeStyle=INK;c.lineWidth=1;c.beginPath();c.ellipse(p[0],p[1]-4,4,5,0,0,7);c.fill();c.stroke()}
+      flag(P(1.85,1.85,7),20,tc.col,-1);
     }else if(type==='workshop'){
       poly([P(.1,.1),P(2.9,.1),P(2.9,2.9),P(.1,2.9)],'#c5a26a');
       for(const [x,y] of [[.3,.3],[2.7,.3],[.3,2.0],[2.7,2.0]])line(P(x,y,0),P(x,y,22),'#5b3a22',3);
@@ -533,6 +544,10 @@ function initSprites(){
     c.fillStyle='#d9705a';c.beginPath();c.ellipse(-4,-7,6,3,0,0,7);c.fill();
     c.fillStyle='#f3ead2';c.beginPath();c.moveTo(7,-6);c.lineTo(15,-9);c.lineTo(17,-6);c.lineTo(15,-3);c.lineTo(7,-3);c.closePath();c.fill();c.stroke()});
   SPR.meat.ax=24;SPR.meat.ay=24;
+  SPR.fish=mk(48,30,c=>{c.translate(24,20);c.strokeStyle='rgba(235,250,245,.8)';c.lineWidth=1.3;for(const r of [5,10]){c.beginPath();c.ellipse(0,0,r*1.6,r*.7,0,0,7);c.stroke()}
+    c.fillStyle='#e8eef0';c.strokeStyle=INK;c.lineWidth=1;c.beginPath();c.ellipse(-2,-7,7,3,-.5,0,7);c.fill();c.stroke();c.beginPath();c.moveTo(4,-11);c.lineTo(9,-14);c.lineTo(8,-8);c.closePath();c.fill();c.stroke();c.fillStyle=INK;c.fillRect(-7,-6,1.2,1.2);
+    c.fillStyle='rgba(235,250,245,.9)';for(const [x,y] of [[-12,-3],[10,-2],[-6,-15]]){c.beginPath();c.arc(x,y,1.3,0,7);c.fill()}});
+  SPR.fish.ax=24;SPR.fish.ay=20;
 }
 
 /* ---------------- Âm thanh: tổng hợp bằng Web Audio, không dùng tệp ngoài ---------------- */
@@ -603,7 +618,7 @@ function syncSoundUI(){
 function drawUnit(c,type,team,px,py,o){
   const tc=TEAM[team],big=type==='ele'||type==='wele',hor=type==='horse'||type==='scout',wild=type==='wele';
   c.save();c.translate(px,py);
-  c.fillStyle='rgba(20,15,10,.26)';c.beginPath();c.ellipse(0,0,big?17:hor?13:type==='cata'?16:type==='tiger'?11:type==='duck'?5:8,big?7:hor?5:type==='cata'?6:type==='tiger'?4.5:type==='duck'?2.4:3.6,0,0,7);c.fill();
+  c.fillStyle='rgba(20,15,10,.26)';c.beginPath();c.ellipse(0,0,big?17:hor?13:type==='fboat'||type==='wboat'?17:type==='cata'?16:type==='tiger'?11:type==='duck'?5:8,big?7:hor?5:type==='cata'?6:type==='tiger'?4.5:type==='duck'?2.4:3.6,0,0,7);c.fill();
   c.scale(o.face||1,1);c.lineJoin='round';c.lineCap='round';
   const mv=o.moving,ph=o.anim*(big?7:11),bob=mv?Math.abs(Math.sin(ph))*1.5:0,leg=mv?Math.sin(ph)*3:0,atk=o.atk||0;
   if(big){
@@ -658,6 +673,21 @@ function drawUnit(c,type,team,px,py,o){
       c.fillStyle='#d9a441';c.strokeStyle=INK;c.lineWidth=1;c.beginPath();c.arc(7,-24,2.6,0,7);c.fill();c.stroke();c.beginPath();c.arc(7,-20,3.4,0,7);c.fill();c.stroke();
       if(o.work){c.fillStyle='#5fbf6a';c.fillRect(-1.2,-34,2.4,7);c.fillRect(-3.5,-31.7,7,2.4)}
     }
+    c.restore();return;
+  }
+  if(type==='fboat'||type==='wboat'){
+    const war=type==='wboat';c.translate(0,Math.sin(o.anim*2)*1);c.strokeStyle=INK;c.lineWidth=1.2;
+    if(mv){c.strokeStyle='rgba(235,250,245,.7)';c.lineWidth=1.4;c.beginPath();c.moveTo(-18,0);c.quadraticCurveTo(-24,2,-30,0);c.moveTo(-18,3);c.quadraticCurveTo(-23,6,-28,5);c.stroke();c.strokeStyle=INK;c.lineWidth=1.2}
+    c.fillStyle='#7a4a2a';c.beginPath();c.moveTo(-17,-6);c.lineTo(17,-7);c.quadraticCurveTo(15,1,8,2);c.lineTo(-10,2);c.quadraticCurveTo(-15,0,-17,-6);c.closePath();c.fill();c.stroke();
+    c.fillStyle='#a06a3e';c.fillRect(-15,-8.5,30,2.6);c.fillStyle=tc.col;c.fillRect(-15,-5,30,1.6);
+    if(war){c.fillStyle='#8a5a33';c.fillRect(-10,-15,11,7);c.strokeRect(-10,-15,11,7);
+      c.beginPath();c.moveTo(4,-8);c.lineTo(4,-40);c.stroke();c.fillStyle=tc.light;c.beginPath();c.moveTo(5,-38);c.quadraticCurveTo(16+atk*2,-27,5,-13);c.closePath();c.fill();c.stroke();
+      c.strokeStyle=tc.col;c.lineWidth=2;for(const y of [-33,-26,-19]){c.beginPath();c.moveTo(5,y);c.lineTo(11,y+1);c.stroke()}
+      c.fillStyle=tc.col;c.strokeStyle=INK;c.lineWidth=1;c.beginPath();c.moveTo(4,-40);c.lineTo(12,-38);c.lineTo(4,-36);c.closePath();c.fill();c.stroke()}
+    else{c.fillStyle='#c9a460';c.beginPath();c.moveTo(-11,-8);c.quadraticCurveTo(-4,-18,3,-8);c.closePath();c.fill();c.stroke();
+      c.fillStyle=tc.col;c.fillRect(7,-15,5,7);c.strokeRect(7,-15,5,7);c.fillStyle='#e8c39a';c.beginPath();c.arc(9.5,-17.5,2.6,0,7);c.fill();c.stroke();
+      c.fillStyle='#e2b85a';c.beginPath();c.moveTo(5.5,-18.5);c.lineTo(9.5,-23);c.lineTo(13.5,-18.5);c.closePath();c.fill();c.stroke();
+      c.strokeStyle='#5b3a22';c.lineWidth=1.2;c.beginPath();c.moveTo(12,-14);c.lineTo(22,-24);c.stroke();if(o.work){c.strokeStyle='rgba(235,235,235,.8)';c.lineWidth=.8;c.beginPath();c.moveTo(22,-24);c.lineTo(23,-2);c.stroke()}}
     c.restore();return;
   }
   if(type==='cata'){
@@ -736,7 +766,7 @@ function drawUnit(c,type,team,px,py,o){
   }
   c.restore();
 }
-function unitIcon(type){const c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');const s=type==='ele'||type==='wele'||type==='cata'?1.9:type==='horse'||type==='scout'||type==='tiger'?2.05:type==='duck'?3.2:2.5;x.scale(s,s);drawUnit(x,type,UD[type].wild?2:0,96/s/2-(type==='ele'||type==='wele'||type==='tiger'?2:0),96/s-5,{face:1,anim:0});return c.toDataURL()}
+function unitIcon(type){const c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');const s=type==='ele'||type==='wele'||type==='cata'||type==='fboat'||type==='wboat'?1.9:type==='horse'||type==='scout'||type==='tiger'?2.05:type==='duck'?3.2:2.5;x.scale(s,s);drawUnit(x,type,UD[type].wild?2:0,96/s/2-(type==='ele'||type==='wele'||type==='tiger'?2:0),96/s-5,{face:1,anim:0});return c.toDataURL()}
 function bldIcon(type){const sp=SPR.b[0][G?ageOf(0):1][type],c=document.createElement('canvas');c.width=c.height=96;const x=c.getContext('2d');const s=Math.min(92/sp.w,92/sp.h);x.drawImage(sp.c,(96-sp.w*s)/2,(96-sp.h*s)/2,sp.w*s,sp.h*s);return c.toDataURL()}
 function resIcon(k){const c=document.createElement('canvas');c.width=c.height=48;const x=c.getContext('2d');x.scale(2,2);x.lineJoin='round';x.strokeStyle=INK;x.lineWidth=1.5;
   if(k==='food'){x.fillStyle='#fbf6e4';x.beginPath();x.arc(12,11,7,Math.PI,0);x.closePath();x.fill();x.stroke();x.fillStyle='#b5562f';x.beginPath();x.moveTo(3,11);x.lineTo(21,11);x.quadraticCurveTo(19,20,12,20);x.quadraticCurveTo(5,20,3,11);x.closePath();x.fill();x.stroke();x.fillStyle='#f1d27a';x.fillRect(9,20,6,2)}
@@ -750,7 +780,7 @@ function initIcons(){for(const k of ['food','wood','gold','pop'])ICON[k]=resIcon
 
 /* ---------------- Bản đồ & tìm đường ---------------- */
 const inb=(x,y)=>x>=0&&y>=0&&x<N&&y<N;
-function pass(x,y){if(x<0||y<0||x>=N||y>=N)return false;const i=y*N+x;if(G.terr[i]===T_WATER||G.obj[i]!==0)return false;const id=G.bld[i];if(!id)return true;if(PT<0)return false;const b=G.ents.get(id);return !!b&&b.type==='gate'&&b.team===PT&&b.built}
+function pass(x,y){if(x<0||y<0||x>=N||y>=N)return false;const i=y*N+x;if(PNAV)return G.terr[i]===T_WATER&&G.obj[i]===0&&G.bld[i]===0;if(G.terr[i]===T_WATER||G.obj[i]!==0)return false;const id=G.bld[i];if(!id)return true;if(PT<0)return false;const b=G.ents.get(id);return !!b&&b.type==='gate'&&b.team===PT&&b.built}
 const PF={g:new Float32Array(N*N),f:new Float32Array(N*N),from:new Int32Array(N*N),st:new Uint32Array(N*N),cl:new Uint32Array(N*N),gen:0,heap:[]};
 const DX=[1,-1,0,0,1,1,-1,-1],DY=[0,0,1,-1,1,-1,1,-1];
 function hpush(n){const h=PF.heap,f=PF.f;let i=h.length;h.push(n);while(i>0){const p=(i-1)>>1;if(f[h[p]]<=f[n])break;h[i]=h[p];i=p}h[i]=n}
@@ -809,6 +839,10 @@ function genMap(seed){
   for(const [x,y] of [[12,31],[13,31],[12,32]])put(x,y,O_GOLD,700);
   for(const [x,y] of [[8,27],[9,27],[9,28],[10,27],[8,28],[10,28]])put(x,y,O_BERRY,140);
   for(const [x,y] of [[1,35],[2,36],[1,36],[2,37]])put(x,y,O_BERRY,140);
+  // cá: gần làng (nếu có nước) và rải rác trên sông hồ
+  const fishAt=(x,y)=>two(x,y,i=>{if(G.terr[i]===T_WATER&&G.obj[i]===0){let w=0;const fx=i%N,fy=(i/N)|0;for(let d=0;d<8;d++){const nx=fx+DX[d],ny=fy+DY[d];if(inb(nx,ny)&&G.terr[ny*N+nx]===T_WATER)w++}if(w>=4){G.obj[i]=O_FISH;G.amt[i]=220}}});
+  {const near=[];for(let y=0;y<N;y++)for(let x=0;x<N;x++){const d=Math.hypot(x-6.5,y-32.5);if(d>5&&d<14&&G.terr[y*N+x]===T_WATER)near.push([x,y,d])}near.sort((a,b)=>a[2]-b[2]);for(let k=0;k<near.length&&k<40;k+=9)fishAt(near[k][0],near[k][1])}
+  for(let k=0;k<10;k++){const x=(rnd()*N)|0,y=(rnd()*N)|0;if(G.terr[y*N+x]===T_WATER&&bd(x,y)>6)fishAt(x,y)}
   let placed=0,guard=0;
   while(placed<5&&guard++<200){const x=2+rnd()*36,y=2+rnd()*36;if(bd(x,y)<13)continue;const o=placed%5<3?O_GOLD:O_BERRY;for(let s=0;s<(o===O_GOLD?3:5);s++)put(x+(s%2),y+((s/2)|0),o,o===O_GOLD?700:140);placed++}
 }
@@ -825,7 +859,10 @@ function recalcCap(team){let c=0;for(const b of G.blds)if(b.team===team&&b.built
 function queuedPop(team){let q=0;for(const b of G.blds)if(b.team===team)for(const it of b.queue)q+=UD[it.type].pop;return q}
 function canAfford(team,cost){const r=G.teams[team].res;for(const k in cost)if(r[k]<cost[k])return false;return true}
 function pay(team,cost){const r=G.teams[team].res;for(const k in cost)r[k]-=cost[k]}
-function canPlace(type,tx,ty,team){const s=BD[type].size;for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!pass(x,y))return false;if(team===0&&!G.explored[y*N+x])return false}return true}
+function canPlace(type,tx,ty,team){const s=BD[type].size;
+  if(BD[type].naval){let shore=false;for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!inb(x,y))return false;const i=y*N+x;if(G.terr[i]!==T_WATER||G.obj[i]||G.bld[i])return false;if(team===0&&!G.explored[i])return false}
+    for(let y=ty-1;y<=ty+s;y++)for(let x=tx-1;x<=tx+s;x++)if(pass(x,y))shore=true;return shore}
+  for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!pass(x,y))return false;if(team===0&&!G.explored[y*N+x])return false}return true}
 function kill(e,src){
   if(e.dead)return;e.dead=true;G.ents.delete(e.id);
   const ST=G.stats;
@@ -884,11 +921,11 @@ function setOrder(u,o){u.order=o;u.path=null;u.pi=0}
 function faceTo(u,x,y){const sd=(x-u.x)-(y-u.y);if(Math.abs(sd)>.05)u.face=sd>0?1:-1}
 function farmFree(b,u){if(!b.built)return false;for(const v of G.units)if(v!==u&&v.team===b.team&&v.order&&v.order.type==='gather'&&v.order.res==='farm'&&v.order.bid===b.id)return false;return true}
 function freeFarm(u){let best=null,bd=1e9;for(const b of G.blds){if(b.team!==u.team||b.type!=='farm'||!farmFree(b,u))continue;const d=Math.hypot(b.tx+1-u.x,b.ty+1-u.y);if(d<bd){bd=d;best=b}}return best}
-function nearestDrop(u){let best=null,bd=1e9;for(const b of G.blds){if(b.team!==u.team||!b.built||!BD[b.type].drop)continue;const d=Math.hypot(b.tx+b.size/2-u.x,b.ty+b.size/2-u.y);if(d<bd){bd=d;best=b}}return best}
+function nearestDrop(u){let best=null,bd=1e9;for(const b of G.blds){if(b.team!==u.team||!b.built||!BD[b.type].drop||!!BD[b.type].naval!==!!UD[u.type].naval)continue;const d=Math.hypot(b.tx+b.size/2-u.x,b.ty+b.size/2-u.y);if(d<bd){bd=d;best=b}}return best}
 function gatherOrder(res,tx,ty,bid){return {type:'gather',res,tx:tx==null?-1:tx,ty:ty==null?-1:ty,bid:bid||0,ph:0,p:0,t:0,fail:0}}
 
 function updGather(u,o,dt){
-  const farm=o.res==='farm',rk=farm||o.res==='meat'?'food':o.res,ok=OBJ_OF[o.res];
+  const farm=o.res==='farm',rk=farm||o.res==='meat'||o.res==='fish'?'food':o.res,ok=OBJ_OF[o.res];
   if(o.ph===0){
     if(!o.p){
       o.p=1;u.pi=0;u.path=null;
@@ -929,7 +966,7 @@ function updGather(u,o,dt){
     u.work=true;o.t+=dt*RATE[o.res]*G.teams[u.team].gm;
     let got=0;
     while(o.t>=1&&u.carry<CAP){o.t-=1;u.carry++;got=1;if(!farm){const i=o.ty*N+o.tx;if(G.amt[i]>0)G.amt[i]--;if(G.amt[i]<=0){G.obj[i]=0;break}}}
-    if(got&&u.team===0)SND.play(farm||o.res==='food'||o.res==='meat'?'reap':o.res==='wood'?'chop':'mine',u.x,u.y);
+    if(got&&u.team===0)SND.play(farm||o.res==='food'||o.res==='meat'||o.res==='fish'?'reap':o.res==='wood'?'chop':'mine',u.x,u.y);
     if(u.carry>=CAP){o.ph=2;o.p=0}
   }else{
     if(!o.p){o.p=1;const d=nearestDrop(u);if(!d){u.order=null;return}o.drop=d.id;o.dgoal=rectOf(d);u.path=pathFor(u,o.dgoal);u.pi=0}
@@ -1002,7 +1039,7 @@ function updUnit(u,dt){
 }
 function spawnFrom(b,type){
   const s=b.size;let best=null,bd=1e9;const rx=b.rally?b.rally.x+.5:b.tx+s+(b.team?-s-1:1),ry=b.rally?b.rally.y+.5:b.ty+s+(b.team?-s-1:1);
-  for(let r=1;r<=4&&!best;r++)for(let y=b.ty-r;y<b.ty+s+r;y++)for(let x=b.tx-r;x<b.tx+s+r;x++){if(!pass(x,y))continue;const d=Math.hypot(x+.5-rx,y+.5-ry);if(d<bd){bd=d;best=[x,y]}}
+  PNAV=!!UD[type].naval;for(let r=1;r<=4&&!best;r++)for(let y=b.ty-r;y<b.ty+s+r;y++)for(let x=b.tx-r;x<b.tx+s+r;x++){if(!pass(x,y))continue;const d=Math.hypot(x+.5-rx,y+.5-ry);if(d<bd){bd=d;best=[x,y]}}PNAV=false;
   if(!best)return null;
   const u=addUnit(type,b.team,best[0]+.5,best[1]+.5);
   if(b.rally){const r=b.rally,i=r.y*N+r.x;if(type==='vil'&&G.obj[i])u.order=gatherOrder(RES_OF[G.obj[i]],r.x,r.y);else{const f=freeNear(r.x,r.y,6);if(f)u.order={type:'move',goal:{t:0,x:f[0],y:f[1]}}}}
@@ -1082,7 +1119,8 @@ function aiTick(){
   const A=G.ai,c=A.cfg,T=G.teams[1];
   const hall=G.blds.find(b=>b.team===1&&b.type==='hall');if(!hall)return;
   const [hx,hy]=centerOf(hall);
-  const vils=[],army=[];for(const u of G.units)if(u.team===1)(u.type==='vil'?vils:army).push(u);
+  const vils=[],army=[],boats=[];for(const u of G.units)if(u.team===1)(u.type==='vil'?vils:u.type==='fboat'?boats:army).push(u);
+  for(const f of boats)if(!f.order)setOrder(f,gatherOrder('fish'));
   const cnt={},unb={};for(const b of G.blds)if(b.team===1){cnt[b.type]=(cnt[b.type]||0)+1;if(!b.built)unb[b.type]=(unb[b.type]||0)+1}
   const n=t=>cnt[t]||0;
   // phân thợ xây
@@ -1117,6 +1155,8 @@ function aiTick(){
   if(c.maxArmy>12&&n('barracks')&&n('smithy')===0&&G.time>380&&T.res.wood>200)place('smithy');
   for(const b of G.blds)if(b.team===1&&b.type==='smithy'&&b.built&&!b.rs&&T.res.food>260)for(const k of ['blade','armor','arrow'])if(!T.tech[k]&&canAfford(1,TECH[k].cost)){research(b,k);break}
   if(c.maxArmy>12&&T.age>=3&&n('workshop')===0&&T.res.wood>260)place('workshop');
+  if(T.age>=2&&n('dock')===0&&T.res.wood>220&&!A.noDock){let sp=null;for(let r=3;r<=14&&!sp;r++)for(let dy=-r;dy<=r&&!sp;dy++)for(let dx=-r;dx<=r;dx++){if(Math.max(Math.abs(dx),Math.abs(dy))!==r)continue;const x=Math.round(hx+dx),y=Math.round(hy+dy);if(canPlace('dock',x,y,1)){sp=[x,y];break}}
+    if(sp){pay(1,BD.dock.cost);addBld('dock',1,sp[0],sp[1],false)}else A.noDock=1}
   // chòi canh
   if(G.time>c.towerAt&&n('tower')<c.towers&&!unb.tower)place('tower');
   // luyện quân
@@ -1127,10 +1167,13 @@ function aiTick(){
   if(G.blds.some(b=>b.team===1&&b.type==='workshop'&&b.built)){const nc=army.filter(u=>u.type==='cata').length;if(nc<2){addR(UD.cata.cost);resPop+=3*(2-nc)}}
   const okR=c=>Object.keys(c).every(k=>T.res[k]-c[k]>=resv[k]);
   const hasStable=G.blds.some(b=>b.team===1&&b.type==='stable'&&b.built),mounted=army.filter(u=>u.type==='horse'||u.type==='ele').length;
-  for(const b of G.blds){if(b.team!==1||!(b.type==='barracks'||b.type==='stable'||b.type==='workshop')||!b.built||b.queue.length>=(c.gm>1?2:1))continue;
+  for(const b of G.blds){if(b.team!==1||!(b.type==='barracks'||b.type==='stable'||b.type==='workshop'||b.type==='dock')||!b.built||b.queue.length>=(c.gm>1?2:1))continue;
     const armyPop=army.reduce((a,u)=>a+UD[u.type].pop,0);
     const room=c.maxArmy+2-(b.type==='barracks'&&hasStable&&mounted<6?6:0)-(b.type!=='workshop'?resPop:0);if(armyPop+queuedPop(1)>=room)continue;
     let type;
+    if(b.type==='dock'){let fishLeft=false;for(let i=0;i<N*N&&!fishLeft;i++)if(G.obj[i]===O_FISH)fishLeft=true;
+      if(fishLeft&&boats.length+b.queue.filter(q=>q.type==='fboat').length<2&&canAfford(1,UD.fboat.cost))enqueue(b,'fboat');
+      else if(army.filter(u=>u.type==='wboat').length+b.queue.filter(q=>q.type==='wboat').length<3&&canAfford(1,UD.wboat.cost)&&okR(UD.wboat.cost))enqueue(b,'wboat');continue}
     if(b.type==='workshop'){if(army.filter(u=>u.type==='cata').length+b.queue.length<2&&canAfford(1,UD.cata.cost))enqueue(b,'cata');continue}
     if(b.type==='stable'){type=T.age>=3&&(A.flip2=(A.flip2||0)+1)%3===0&&T.res.gold>170&&T.res.food>220?'ele':'horse';if(canAfford(1,UD[type].cost)&&okR(UD[type].cost))enqueue(b,type);continue}
     type=(A.flip++%5<3)?'spear':(T.age>=2&&A.flip%3===0?'xbow':'archer');
@@ -1154,7 +1197,7 @@ function step(dt){
   if(G.over)return;
   G.time+=dt;G.tick++;
   const T=G.teams;T[0].pop=0;T[1].pop=0;for(const u of G.units)T[u.team].pop+=UD[u.type].pop;
-  const us=G.units.slice();for(const u of us)if(!u.dead){PT=u.team;updUnit(u,dt)}PT=-1;
+  const us=G.units.slice();for(const u of us)if(!u.dead){PT=u.team;PNAV=!!UD[u.type].naval;updUnit(u,dt)}PT=-1;PNAV=false;
   // tự hồi máu khi đã yên ổn: dân làng sau 8 giây (0,6 máu/giây), lính sau 10 giây (1% máu/giây), công trình sau 10 giây (0,4%/giây)
   for(const u of G.units){if(u.hp>=u.max||UD[u.type].wild)continue;const vil=u.type==='vil';if(G.time-u.hitT>(vil?8:10))u.hp=Math.min(u.max,u.hp+(vil?.6:u.max*.01)*dt)}
   for(const b of G.blds)if(b.built&&b.hp<b.max&&G.time-b.hitT>10)b.hp=Math.min(b.max,b.hp+b.max*.004*dt);
@@ -1247,7 +1290,7 @@ function render(){
       if(e.rally){const wx=(e.rally.x-e.rally.y)*HW,wy=(e.rally.x+e.rally.y+1)*HH;ctx.beginPath();ctx.moveTo(wx,wy);ctx.lineTo(wx,wy-22);ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#d9a441';ctx.beginPath();ctx.moveTo(wx,wy-22);ctx.lineTo(wx+12,wy-18);ctx.lineTo(wx,wy-13);ctx.closePath();ctx.fill();ctx.stroke();ctx.lineWidth=2}}
   }
   for(const f of G.fx)if(f.type==='ping'){const a=(now-f.rt)/500;if(a<1){const wx=(f.x-f.y)*HW,wy=(f.x+f.y)*HH;ctx.strokeStyle=f.col;ctx.globalAlpha=1-a;ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(wx,wy,22*(1-a)+5,11*(1-a)+2.5,0,0,7);ctx.stroke();ctx.globalAlpha=1}}
-  if(placing)for(const [gx,gy] of ghostTiles()){const s=BD[placing.type].size;for(let y=0;y<s;y++)for(let x=0;x<s;x++){const tx=gx+x,ty=gy+y;diamond(ctx,tx,ty,1);ctx.fillStyle=pass(tx,ty)&&ex[ty*N+tx]?'rgba(90,200,120,.55)':'rgba(220,70,50,.6)';ctx.fill()}}
+  if(placing)for(const [gx,gy] of ghostTiles()){const s=BD[placing.type].size;for(let y=0;y<s;y++)for(let x=0;x<s;x++){const tx=gx+x,ty=gy+y;diamond(ctx,tx,ty,1);ctx.fillStyle=(BD[placing.type].naval?canPlace(placing.type,gx,gy,0):pass(tx,ty))&&ex[ty*N+tx]?'rgba(90,200,120,.55)':'rgba(220,70,50,.6)';ctx.fill()}}
   // gom vật thể rồi sắp theo chiều sâu
   for(const b of G.blds){if(b.team!==0&&!b.seen)continue;const wx=(b.tx-b.ty)*HW,wy=(b.tx+b.ty)*HH;if(wx<vx0-100||wx>vx1+100||wy<vy0-80||wy>vy1+20)continue;list.push([b.type==='farm'?b.tx+b.ty+.5:b.tx+b.ty+b.size,1,b,wx,wy])}
   for(const u of G.units){if(u.team!==0&&!vis[(u.y|0)*N+(u.x|0)])continue;const wx=(u.x-u.y)*HW,wy=(u.x+u.y)*HH;if(wx<vx0||wx>vx1||wy<vy0||wy>vy1)continue;list.push([u.x+u.y,2,u,wx,wy])}
@@ -1255,7 +1298,7 @@ function render(){
   for(const it of list)if(it[1]===2){const u=it[2],ux=u.x|0,uy=u.y|0;for(const [dx,dy] of [[1,1],[1,0],[0,1],[2,2],[2,1],[1,2]]){const x=ux+dx,y=uy+dy;if(x<N&&y<N)hideT[y*N+x]=1}}
   list.sort((a,b)=>a[0]-b[0]);
   for(const it of list){
-    if(it[1]===0){const o=G.obj[it[2]];const sp=o===O_TREE?SPR.trees[(G.tvar[it[2]]+it[2])%3]:o===O_GOLD?SPR.gold:o===O_MEAT?SPR.meat:SPR.berry;if(o===O_TREE&&hideT[it[2]])ctx.globalAlpha=.42;ctx.drawImage(sp.c,it[3]-sp.ax,it[4]-sp.ay,sp.w,sp.h);ctx.globalAlpha=1}
+    if(it[1]===0){const o=G.obj[it[2]];const sp=o===O_TREE?SPR.trees[(G.tvar[it[2]]+it[2])%3]:o===O_GOLD?SPR.gold:o===O_MEAT?SPR.meat:o===O_FISH?SPR.fish:SPR.berry;if(o===O_TREE&&hideT[it[2]])ctx.globalAlpha=.42;ctx.drawImage(sp.c,it[3]-sp.ax,it[4]-sp.ay,sp.w,sp.h);ctx.globalAlpha=1}
     else if(it[1]===1){const b=it[2],sp=SPR.b[b.team][G.teams[b.team].age][b.type];if(!b.built)ctx.globalAlpha=.4+.45*b.prog;ctx.drawImage(sp.c,it[3]-sp.ax,it[4]-sp.ay,sp.w,sp.h);ctx.globalAlpha=1;
       if(b.built&&b.hp<b.max*.5){const cx=it[3],cy=it[4]+b.size*HH-BD[b.type].h*.5;ctx.fillStyle='rgba(60,50,45,.5)';for(let k=0;k<3;k++){const a=(now/900+k/3)%1;ctx.globalAlpha=.5*(1-a);ctx.beginPath();ctx.arc(cx+Math.sin(k*2+a*3)*6,cy-a*26,4+a*7,0,7);ctx.fill()}ctx.globalAlpha=1}}
     else{const u=it[2];drawUnit(ctx,u.type,u.team,it[3],it[4],{face:u.face,anim:u.anim,moving:u.moving,work:u.work,carry:u.carry,ck:u.ck,atk:Math.max(0,1-(t-u.atkT)/.25)})}
@@ -1291,7 +1334,7 @@ function render(){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   if(gest&&gest.box&&gest.moved){ctx.strokeStyle='#ffe9a8';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.fillStyle='rgba(255,233,168,.14)';const x=Math.min(gest.sx,gest.x),y=Math.min(gest.sy,gest.y),w=Math.abs(gest.x-gest.sx),h=Math.abs(gest.y-gest.sy);ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);ctx.setLineDash([])}
 }
-const MCOL=['#8dab5b','#3d8b96','#c2a264'],MOBJ=[null,'#3d6b38','#f2c230','#b23a7a','#a8452e'];
+const MCOL=['#8dab5b','#3d8b96','#c2a264'],MOBJ=[null,'#3d6b38','#f2c230','#b23a7a','#a8452e','#bfe6ef'];
 let lastAlert=-99,alertPing=null;
 function drawMini(){
   const m=$('mini'),c=m.getContext('2d'),s=mw/(2*N);
@@ -1361,7 +1404,7 @@ function refreshPanel(){
     else if(e.type==='farm'&&e.team===0)sub=farmFree(e,null)?'Chưa có người làm — chọn dân làng rồi chạm vào ruộng':'Đang được canh tác';
     else sub=d.desc+' · '+Math.ceil(e.hp)+'/'+e.max;
   }else if(sel.length===1){const d=UD[e.type];name=d.name+(e.team===1?' · '+TEAM[1].name:'');hp=e.hp/e.max;
-    if(e.team===0&&e.type==='vil'){const o=e.order;sub=!o?'Đang rảnh':o.type==='gather'?(o.ph===2?'Mang về kho':o.res==='farm'?'Làm ruộng':o.res==='wood'?'Đốn gỗ':o.res==='gold'?'Đào vàng':o.res==='meat'?'Xẻ thịt':'Hái quả'):o.type==='build'?'Đang xây dựng':o.type==='attack'?'Đang đánh':'Đang đi';if(e.carry>0)sub+=' · mang '+e.carry+' '+RNAME[e.ck].toLowerCase()}
+    if(e.team===0&&e.type==='vil'){const o=e.order;sub=!o?'Đang rảnh':o.type==='gather'?(o.ph===2?'Mang về kho':o.res==='farm'?'Làm ruộng':o.res==='wood'?'Đốn gỗ':o.res==='gold'?'Đào vàng':o.res==='meat'?'Xẻ thịt':o.res==='fish'?'Đánh cá':'Hái quả'):o.type==='build'?'Đang xây dựng':o.type==='attack'?'Đang đánh':'Đang đi';if(e.carry>0)sub+=' · mang '+e.carry+' '+RNAME[e.ck].toLowerCase()}
     else sub=(d.desc||'')+' · '+Math.ceil(e.hp)+'/'+e.max+' máu';
   }else{const c={};let h=0,m=0;for(const u of sel){c[u.type]=(c[u.type]||0)+1;h+=u.hp;m+=u.max}name=sel.length+' đơn vị';sub=Object.keys(c).map(k=>c[k]+' '+UD[k].name).join(', ');hp=h/m}
   $('pname').textContent=name;$('psub').textContent=sub;$('php').firstChild.style.width=(clamp(hp,0,1)*100)+'%';$('php').firstChild.style.background=e.team?'#c4452c':'';
@@ -1418,12 +1461,12 @@ function command(pick){
     }
     return false;
   }
-  if(pick.res){const r=pick.res;let any=false;for(const u of us){if(u.type==='vil'){const o=gatherOrder(r.kind,r.tx,r.ty);o.user=1;setOrder(u,o);any=true}}
+  if(pick.res){const r=pick.res;let any=false;for(const u of us){if(r.kind==='fish'?u.type==='fboat':u.type==='vil'){const o=gatherOrder(r.kind,r.tx,r.ty);o.user=1;setOrder(u,o);any=true}}
     if(!any){moveGroup(us,r.tx,r.ty)}ping(r.tx+.5,r.ty+.5,any?'#b6f08a':'#fff6d0');return true}
   if(pick.out)return true;
   moveGroup(us,pick.ground.tx,pick.ground.ty);ping(pick.ground.tx+.5,pick.ground.ty+.5);return true;
 }
-function moveGroup(us,tx,ty){const tiles=spiralFree(tx,ty,us.length);us.forEach((u,i)=>{const t=tiles[i]||tiles[0];if(t)setOrder(u,{type:'move',goal:{t:0,x:t[0],y:t[1]}})})}
+function moveGroup(us,tx,ty){for(const nav of [false,true]){const g=us.filter(u=>!!UD[u.type].naval===nav);if(!g.length)continue;PNAV=nav;const tiles=spiralFree(tx,ty,g.length);PNAV=false;g.forEach((u,i)=>{const t=tiles[i]||tiles[0];if(t)setOrder(u,{type:'move',goal:{t:0,x:t[0],y:t[1]}})})}}
 function setRally(pick){const b=sel[0];if(!b||b.k!==1)return;let tx,ty;if(pick.res){tx=pick.res.tx;ty=pick.res.ty}else if(pick.ground){tx=pick.ground.tx;ty=pick.ground.ty}else if(pick.ent){const c=pick.ent.k?centerOf(pick.ent):[pick.ent.x,pick.ent.y];tx=c[0]|0;ty=c[1]|0}
   b.rally={x:tx,y:ty};ping(tx+.5,ty+.5,'#ffe08a');toast('Đã đặt điểm tập kết')}
 let lastTap={t:0,type:null};
