@@ -81,10 +81,36 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
   padding:calc(12px + var(--sat)) calc(12px + var(--sar)) calc(12px + var(--sab)) calc(12px + var(--sal));background:rgba(12,18,22,.8)}
 .ov.hid{display:none}
 .hid{display:none!important}
-#ovStart{background:
-  radial-gradient(circle at 50% 18%,rgba(217,164,65,.20),transparent 46%),
-  repeating-radial-gradient(circle at 50% 18%,rgba(241,227,194,.05) 0 2px,transparent 2px 26px),
-  linear-gradient(#16242b,#0c1316)}
+#ovStart{background:linear-gradient(180deg,rgba(9,14,18,.62) 0%,rgba(9,14,18,.18) 34%,rgba(9,14,18,.28) 60%,rgba(9,14,18,.78) 100%);overflow-y:auto;align-items:flex-start}
+#ovStart::before{content:'';position:fixed;inset:-25%;pointer-events:none;
+  background:radial-gradient(ellipse 38% 12% at 25% 55%,rgba(232,238,232,.30),transparent 70%),radial-gradient(ellipse 34% 10% at 72% 38%,rgba(232,238,232,.24),transparent 70%),radial-gradient(ellipse 45% 14% at 55% 78%,rgba(232,238,232,.22),transparent 70%);
+  animation:mist 28s ease-in-out infinite alternate}
+@keyframes mist{from{transform:translateX(-7%)}to{transform:translateX(7%)}}
+.start{position:relative;width:100%;max-width:420px;margin:auto;display:flex;flex-direction:column;gap:10px;padding:4px 0}
+.hero{text-align:center;color:#fbeed0;text-shadow:0 2px 0 rgba(0,0,0,.55),0 0 18px rgba(0,0,0,.45)}
+.hero .emb{width:62px;height:62px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.45))}
+.hero h1{font-family:'Lora',Georgia,'Times New Roman',serif;font-size:40px;line-height:1;margin:6px 0 2px;letter-spacing:1px}
+.hero h1 span{color:#f2a37f}
+.hero .tag{font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#ecd39e}
+.cont{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 14px;background:var(--cham);color:#fff;min-height:58px}
+.cont svg{width:30px;height:30px;flex:none}
+.cont b{display:block;font-size:16px;letter-spacing:.02em}
+.cont small{display:block;font-size:12px;font-weight:600;opacity:.92;line-height:1.3}
+.setup{background:var(--paper);padding:12px 12px 6px;background-image:radial-gradient(rgba(120,80,30,.10) 1px,transparent 1.3px);background-size:7px 7px}
+.setup .row{display:grid;grid-template-columns:58px 1fr;align-items:center;gap:8px}
+.setup .lbl{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6b4a2c;text-align:left}
+.setup .seg{margin:0;gap:6px}
+.setup .seg button{min-height:44px;font-size:14px;padding:4px 2px;line-height:1.15}
+.setup .desc{font-size:12px;line-height:1.35;color:#5a4028;margin:4px 0 10px 66px;min-height:16px;text-align:left}
+.start>#btnStart{margin-top:0;min-height:58px;font-size:19px;letter-spacing:.08em}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.actions .big{margin-top:0;min-height:48px;font-size:15px}
+.howcard{text-align:left}.howcard h2{text-align:center}
+.howlist{margin:4px 0 0;padding-left:18px;font-size:13px;line-height:1.5}.howlist li{margin:4px 0}.howlist b{color:var(--son)}
+body.menu #top,body.menu #quick,body.menu #panel,body.menu #mini,body.menu #sky,body.menu #groups,body.menu #goal,body.menu #toast{display:none!important}
+@media (max-height:640px){.hero .emb{display:none}.hero h1{font-size:32px}}
+@media (max-width:380px){.setup .seg button{font-size:12.5px}.setup .row{grid-template-columns:50px 1fr}.setup .desc{margin-left:58px}}
+@media (prefers-reduced-motion:reduce){#ovStart::before{animation:none}}
 .card{background:var(--paper);border:3px solid var(--ink);border-radius:26px 6px 26px 6px;box-shadow:6px 7px 0 rgba(0,0,0,.55);
   width:100%;max-width:440px;max-height:100%;overflow:auto;padding:18px 18px 16px;text-align:center;
   background-image:radial-gradient(rgba(120,80,30,.10) 1px,transparent 1.3px);background-size:7px 7px}
@@ -98,7 +124,6 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .seg button{flex:1;min-height:52px;font-weight:800;font-size:15px;background:#f8eed4}
 .seg button.on{background:var(--cham);color:#fff}
 .seg button small{display:block;font-weight:600;font-size:10.5px;opacity:.85}
-#modeDesc,#mapDesc,#diffDesc{font-size:12.5px;min-height:34px;color:#5a4028}
 .big small{display:block;font-size:12px;font-weight:600;letter-spacing:0;margin-top:4px;line-height:1.35;opacity:.85}
 .big{display:block;width:100%;min-height:52px;font-size:17px;font-weight:800;margin-top:10px;background:var(--son);color:#fff;letter-spacing:.04em}
 .big.alt{background:#f8eed4;color:var(--ink)}
@@ -173,8 +198,9 @@ table.st td:last-child{text-align:right;font-weight:800}
 </div>
 
 <div class="ov" id="ovStart">
-  <div class="card">
-    <svg class="emb" viewBox="0 0 96 96" aria-hidden="true">
+  <div class="start">
+    <header class="hero">
+      <svg class="emb" viewBox="0 0 96 96" aria-hidden="true">
       <circle cx="48" cy="48" r="45" fill="#d9a441" stroke="#2b1d14" stroke-width="3"/>
       <circle cx="48" cy="48" r="37" fill="none" stroke="#2b1d14" stroke-width="1.5" stroke-dasharray="3 4"/>
       <path d="M10 62 q10 -9 19 0 t19 0 t19 0 t19 0 v16 q-38 22 -76 0z" fill="#2f66a0" stroke="#2b1d14" stroke-width="2.4" stroke-linejoin="round"/>
@@ -183,33 +209,33 @@ table.st td:last-child{text-align:right;font-weight:800}
       <path d="M35 50 L48 22 L61 50 M48 22 V50" fill="none" stroke="#2b1d14" stroke-width="1.2"/>
       <rect x="45" y="50" width="6" height="9" fill="#c4452c" stroke="#2b1d14" stroke-width="2"/>
     </svg>
-    <h1>SƯƠNG <span>GIANG</span></h1>
-    <div class="tag">Dựng làng · Giữ đất</div>
-    <p>Sương mù phủ kín đôi bờ sông. Hãy dẫn dắt <b>Làng Chàm</b> khai hoang, luyện quân và san phẳng đình của <b>Trại Son</b> bên kia bờ.</p>
-    <div class="seg" id="segDiff">
-      <button class="leaf" data-d="0">Dễ<small>Thong thả</small></button>
-      <button class="leaf on" data-d="1">Vừa<small>Cân sức</small></button>
-      <button class="leaf" data-d="2">Khó<small>Khốc liệt</small></button>
-    </div>
-    <div id="diffDesc"></div>
-    <div class="seg" id="segMap">
-      <button class="leaf on" data-m="0">Đồng bằng</button>
-      <button class="leaf" data-m="1">Sông lớn</button>
-      <button class="leaf" data-m="2">Rừng rậm</button>
-    </div>
-    <div id="mapDesc"></div>
-    <div class="seg" id="segMode">
-      <button class="leaf on" data-o="0">1 đấu 1</button>
-      <button class="leaf" data-o="1">1 đấu 2</button>
-      <button class="leaf" data-o="2">2 đấu 2</button>
-    </div>
-    <div id="modeDesc"></div>
+      <h1>SƯƠNG <span>GIANG</span></h1>
+      <div class="tag">Dựng làng · Giữ đất</div>
+    </header>
+    <button class="cont leaf hid" id="btnContinue"></button>
+    <section class="setup leaf" aria-label="Thiết lập trận">
+      <div class="row"><span class="lbl">Độ khó</span>
+        <div class="seg" id="segDiff"><button class="leaf" data-d="0">Dễ</button><button class="leaf on" data-d="1">Vừa</button><button class="leaf" data-d="2">Khó</button></div></div>
+      <p class="desc" id="diffDesc"></p>
+      <div class="row"><span class="lbl">Bản đồ</span>
+        <div class="seg" id="segMap"><button class="leaf on" data-m="0">Đồng bằng</button><button class="leaf" data-m="1">Sông lớn</button><button class="leaf" data-m="2">Rừng rậm</button></div></div>
+      <p class="desc" id="mapDesc"></p>
+      <div class="row"><span class="lbl">Chế độ</span>
+        <div class="seg" id="segMode"><button class="leaf on" data-o="0">1 đấu 1</button><button class="leaf" data-o="1">1 đấu 2</button><button class="leaf" data-o="2">2 đấu 2</button></div></div>
+      <p class="desc" id="modeDesc"></p>
+    </section>
     <button class="big leaf" id="btnStart">VÀO TRẬN</button>
-    <button class="big alt leaf" id="btnCamp">MÀN CHƠI CỐT TRUYỆN</button>
-    <button class="big alt leaf hid" id="btnContinue">Chơi tiếp ván đã lưu</button>
-    <details class="how" id="how">
-      <summary><b>Cách chơi</b></summary>
-      <ul>
+    <div class="actions">
+      <button class="big alt leaf" id="btnCamp">Màn chơi</button>
+      <button class="big alt leaf" id="btnHow">Cách chơi</button>
+    </div>
+  </div>
+</div>
+
+<div class="ov hid" id="ovHow">
+  <div class="card howcard">
+    <h2>Cách chơi</h2>
+    <ul class="howlist">
         <li><b>Điện thoại:</b> chạm để chọn, chạm đất / cây / mỏ / địch để ra lệnh. Kéo để di chuyển màn hình, chụm hai ngón để thu phóng. Giữ rồi kéo (hoặc bật nút khoanh vùng) để chọn nhiều; chạm đúp một đơn vị để chọn cả loại.</li>
         <li><b>Máy tính:</b> chuột trái chọn / kéo khung, chuột phải ra lệnh, lăn chuột thu phóng, WASD hoặc phím mũi tên để di chuyển màn hình.</li>
         <li>Dân làng thu <b>lương, gỗ, vàng</b> rồi mang về Đình làng hoặc Kho lẫm. Xây Nhà sàn để tăng dân số, Trại lính để luyện quân.</li>
@@ -224,7 +250,7 @@ table.st td:last-child{text-align:right;font-weight:800}
         <li>Săn <b>hươu</b> và <b>voi rừng</b> để lấy thịt (voi rừng sẽ đánh trả). Trong menu Tạm dừng có ô nhập <b>mã hỗ trợ</b>.</li>
         <li>Phá <b>Đình làng</b> của địch để thắng. Mất đình là thua.</li>
       </ul>
-    </details>
+    <button class="big leaf" id="howClose">Đã hiểu</button>
   </div>
 </div>
 
@@ -619,7 +645,7 @@ const SND={ctx:null,sfxOn:true,musicOn:true,last:{},nb:null,nextNote:0,step:0,
     g.gain.setValueAtTime(o.vol||.3,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(fl);fl.connect(g);g.connect(this.fx);s.start(t,Math.random()*.3);s.stop(t+dur+.03)},
   GAP:{chop:.16,mine:.18,reap:.25,hammer:.2,sword:.08,arrow:.09,thud:.15,die:.1,drum:4,coin:.05,click:.04,train:.2,built:.3,win:2,lose:2},
   play(n,x,y){
-    if(!this.ctx||!this.sfxOn||this.ctx.state!=='running')return;
+    if(!this.ctx||!this.sfxOn||this.ctx.state!=='running'||G&&G.demo)return;
     if(x!=null){const s=t2s(x,y);if(s[0]<-40||s[0]>cw+40||s[1]<-40||s[1]>ch+40)return}
     const now=this.ctx.currentTime;if(now-(this.last[n]||-9)<(this.GAP[n]||.05))return;this.last[n]=now;
     const r=()=>.92+Math.random()*.16;
@@ -645,7 +671,7 @@ const SND={ctx:null,sfxOn:true,musicOn:true,last:{},nb:null,nextNote:0,step:0,
   PAT:[0,2,3,4,3,2,1,2,4,5,4,3,2,1,0,1,2,4,5,6,5,4,2,3,4,3,2,1,2,1,0,0],
   music(){
     const a=this.ctx;if(!a||a.state!=='running')return;
-    const on=this.musicOn&&started&&!paused&&G&&!G.over;
+    const on=this.musicOn&&G&&!G.over&&(started&&!paused||G.demo);
     this.mu.gain.setTargetAtTime(on?.15:0,a.currentTime,.5);
     if(!on){this.nextNote=a.currentTime+.3;return}
     while(this.nextNote<a.currentTime+.6){
@@ -1330,7 +1356,7 @@ function newGame(diff){
   sel=[];placing=null;rallyMode=false;panelKey='#';paused=false;started=true;lastAlert=-99;
   for(const k in BD)ICON[k]=bldIcon(k);groups=[[],[],[]];renderGroups();
   cam.z=cw<700?.8:1.1;centerOn(6.5,31.5);
-  updFog();refreshPanel();updateTop();
+  updFog();refreshPanel();updateTop();document.body.classList.remove('menu');
 }
 function endGame(res){if(G.over)return;G.over=res;dropSave();SND.play(res==='win'?'win':'lose');const g=G;setTimeout(()=>{if(G===g)showEnd()},600)}
 
@@ -1441,7 +1467,7 @@ function drawMini(){
 
 /* ---------------- Giao diện ---------------- */
 let lastToast='',lastToastT=0,touchUI=matchMedia('(pointer:coarse)').matches;
-function toast(msg,warn){const now=performance.now();if(msg===lastToast&&now-lastToastT<1500)return;lastToast=msg;lastToastT=now;const box=$('toast'),d=document.createElement('div');d.textContent=msg;if(warn)d.className='warn';box.appendChild(d);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>d.remove(),2600)}
+function toast(msg,warn){if(G&&G.demo)return;const now=performance.now();if(msg===lastToast&&now-lastToastT<1500)return;lastToast=msg;lastToastT=now;const box=$('toast'),d=document.createElement('div');d.textContent=msg;if(warn)d.className='warn';box.appendChild(d);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>d.remove(),2600)}
 function alertAttack(x,y){if(G.time-lastAlert>12){lastAlert=G.time;alertPing={x,y,t:performance.now()};SND.play('drum');toast('⚔ Làng đang bị tấn công!',1)}}
 function costHtml(cost){let h='';for(const k in cost)h+=`<span><img src="${ICON[k]}" alt="${RNAME[k]}">${cost[k]}</span>`;return h?`<span class="cost">${h}</span>`:''}
 function updateTop(){
@@ -1687,7 +1713,7 @@ function setPause(v){if(!G||G.over||!started)return;paused=v;$('codeMsg').textCo
 $('btnPause').addEventListener('click',()=>setPause(true));
 $('btnResume').addEventListener('click',()=>setPause(false));
 $('btnRestart').addEventListener('click',restartCurrent);
-function toMenu(){if(G&&started&&!G.over)saveGame(true);started=false;paused=false;syncContinue();$('ovPause').classList.add('hid');$('ovEnd').classList.add('hid');$('ovStart').classList.remove('hid')}
+function toMenu(){if(G&&started&&!G.over)saveGame(true);started=false;paused=false;syncContinue();startDemo();$('ovPause').classList.add('hid');$('ovEnd').classList.add('hid');$('ovStart').classList.remove('hid')}
 $('btnMenu').addEventListener('click',toMenu);$('btnMenu2').addEventListener('click',toMenu);
 $('btnAgain').addEventListener('click',restartCurrent);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&started&&!G.over){saveGame(true);if(!paused)setPause(true)}});
@@ -1734,6 +1760,9 @@ let curMission=null;
 function campDone(){try{return JSON.parse(localStorage.getItem('sg-camp')||'[]')}catch(e){return []}}
 function startMission(i){const m=CAMP[i];curMission=i;curMap=m.map;curMode=m.mode;$('ovCamp').classList.add('hid');$('ovStart').classList.add('hid');$('ovEnd').classList.add('hid');$('ovPause').classList.add('hid');
   newGame(m.diff);G.mission=i;m.setup();recalcCap(0);updFog();refreshPanel();updateTop();toast('Mục tiêu: '+m.goal)}
+function startDemo(){const pm=curMap,pd=curDiff,po=curMode;curMap=0;curMode=0;newGame(1);curMap=pm;curDiff=pd;curMode=po;
+  G.demo=true;G.reveal=true;G.ais[0]={cfg:DIFF[1],di:1,nextWave:200,waveSize:4,waves:0,needFarm:0,flip:0,lastWave:-1};G.aiTeams.unshift(0);started=false;
+  updFog();cam.z=cw<700?.72:.95;centerOn(20,20);document.body.classList.add('menu')}
 function restartCurrent(){$('ovPause').classList.add('hid');$('ovEnd').classList.add('hid');if(curMission!=null)startMission(curMission);else newGame(curDiff)}
 function renderCamp(){const done=campDone();$('campList').innerHTML=CAMP.map((m,i)=>`<button class="big alt leaf" data-c="${i}">${i+1}. ${m.name}${done.includes(i)?' ✓':''}<small>${m.desc}</small></button>`).join('')}
 function saveGame(silent){
@@ -1760,9 +1789,9 @@ function loadGame(){
   if(o.cam){cam.x=o.cam.x;cam.y=o.cam.y;cam.z=o.cam.z;clampCam()}
   for(const k in BD)ICON[k]=bldIcon(k);
   $('ovStart').classList.add('hid');$('ovPause').classList.add('hid');$('ovEnd').classList.add('hid');
-  updFog();refreshPanel();updateTop();miniDirty=true;toast('Đã mở lại ván lưu lúc '+fmtTime(G.time));return true;
+  document.body.classList.remove('menu');updFog();refreshPanel();updateTop();miniDirty=true;toast('Đã mở lại ván lưu lúc '+fmtTime(G.time));return true;
 }
-function syncContinue(){const o=readSave(),b=$('btnContinue');if(o&&o.v===1&&o.ais){b.classList.remove('hid');b.textContent='Chơi tiếp ván đã lưu · '+fmtTime(o.time)+' · '+DIFF[o.diff].name+' · '+MAPS[o.mapKind||0].name+' · '+MODES[o.mode||0].name}else b.classList.add('hid')}
+function syncContinue(){const o=readSave(),b=$('btnContinue');if(o&&o.v===1&&o.ais){b.classList.remove('hid');b.innerHTML='<svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="13" fill="#fbeed0" stroke="#2b1d14" stroke-width="2"/><path d="M12 9.5v11l9-5.5z" fill="#2f66a0"/></svg><span><b>Chơi tiếp ván đã lưu</b><small>'+(o.mission!=null?'Màn '+CAMP[o.mission].name+' · ':'')+fmtTime(o.time)+' · '+DIFF[o.diff].name+' · '+MAPS[o.mapKind||0].name+' · '+MODES[o.mode||0].name+'</small></span>'}else b.classList.add('hid')}
 function setMode(m){curMode=m;for(const b of $('segMode').children)b.classList.toggle('on',+b.dataset.o===m);$('modeDesc').textContent=MODES[m].desc}
 function setMap(m){curMap=m;for(const b of $('segMap').children)b.classList.toggle('on',+b.dataset.m===m);$('mapDesc').textContent=MAPS[m].desc}
 function setDiff(d){curDiff=d;for(const b of $('segDiff').children)b.classList.toggle('on',+b.dataset.d===d);$('diffDesc').textContent=DIFF[d].desc}
@@ -1784,6 +1813,7 @@ function frame(ts){
     if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;
     if(mx||my){cam.x+=mx*sp;cam.y+=my*sp;clampCam()}
   }
+  if(G&&G.demo&&!started){if(G.over)startDemo();else{step(Math.min(dt,.05));const k=performance.now()/1000*.035;centerOn(20+Math.cos(k)*8,20+Math.sin(k)*8)}}
   render();SND.music();SND.weather(!!(G&&started&&!paused&&!G.over&&G.rain>G.time));
   if(ts-uiT>200){uiT=ts;updateTop();refreshPanel()}
   if(ts-miniT>250||miniDirty){miniT=ts;miniDirty=false;drawMini()}
@@ -1808,7 +1838,8 @@ function boot(){
   $('btnSound').addEventListener('click',()=>{SND.init();const on=!(SND.sfxOn||SND.musicOn);SND.sfxOn=SND.musicOn=on;SND.save();syncSoundUI();toast(on?'Đã bật âm thanh':'Đã tắt âm thanh')});
   $('btnSfx').addEventListener('click',()=>{SND.sfxOn=!SND.sfxOn;SND.save();syncSoundUI()});
   $('btnMusic').addEventListener('click',()=>{SND.musicOn=!SND.musicOn;SND.save();syncSoundUI()});
-  setDiff(1);if(window.innerHeight>=760)$('how').open=true;requestAnimationFrame(frame);
+  $('btnHow').addEventListener('click',()=>$('ovHow').classList.remove('hid'));$('howClose').addEventListener('click',()=>$('ovHow').classList.add('hid'));
+  setDiff(1);startDemo();requestAnimationFrame(frame);
 }
 /* Móc gỡ lỗi / kiểm thử */
 window.SG={get G(){return G},cam,t2s,s2t,
