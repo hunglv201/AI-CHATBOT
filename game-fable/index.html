@@ -461,7 +461,7 @@ const TECH={
   arrow:{name:'Tên đầu đồng',desc:'+2 sát thương cho cung thủ và chòi canh',cost:{wood:100,gold:60},time:25,ic:'archer'},
   armor:{name:'Giáp mây',desc:'Quân lính bị trúng đòn mất ít hơn 2 máu',cost:{food:120,gold:80},time:30,ic:'horse',age:3}};
 const AGES=[null,{name:'Thời Khai hoang',n:'I'},{name:'Thời Phong kiến',n:'II',cost:{food:300,gold:100},time:35},{name:'Thời Thịnh trị',n:'III',cost:{food:600,gold:350},time:55}];
-const CODES={LUAGAO:'Nhận 1000 lương',GOLIM:'Nhận 1000 gỗ',VANGBAC:'Nhận 1000 vàng',PHATTAI:'Nhận 1000 mỗi loại tài nguyên',XAYNHANH:'Xây xong ngay mọi công trình và nghiên cứu đang làm',SUONGTAN:'Xoá sương mù, nhìn thấy cả bản đồ (nhập lần nữa để tắt)'};
+const CODES={LUAGAO:'Nhận 1000 lương',GOLIM:'Nhận 1000 gỗ',VANGBAC:'Nhận 1000 vàng',PHATTAI:'Nhận 1000 mỗi loại tài nguyên',XAYNHANH:'Xây xong ngay mọi công trình và nghiên cứu đang làm',SUONGTAN:'Xoá sương mù, nhìn thấy cả bản đồ (nhập lần nữa để tắt)',DOIAO:'Lính khoác ngẫu nhiên một bộ trang phục (nhập lại để đổi bộ khác)'};
 const MAPS=[{name:'Đồng bằng',desc:'Đất rộng, vài hồ nhỏ, đi lại dễ.'},{name:'Sông lớn',desc:'Sông chia đôi hai bờ, nhiều chỗ cạn để lội qua.'},{name:'Rừng rậm',desc:'Rừng dày, gỗ nhiều, luôn có lối mòn xuyên rừng.'},{name:'Hồ lớn',desc:'Hồ rộng giữa bản đồ, đảo vàng có lối cạn. Hợp đánh cá, thuyền chiến.'},{name:'Vịnh biển',desc:'Hai vịnh biển ở hai mép, nhiều cá. Đường bộ vòng quanh vịnh.'},{name:'Thảo nguyên',desc:'Đồng cỏ thoáng, ít cây, nhiều hươu voi và mỏ vàng.'},{name:'Ngẫu nhiên',desc:'Bốc thăm một trong sáu kiểu bản đồ.'}];
 const SAVE_KEY='suong-giang-save-v1',DAY=300;
 let curMap=0,curMode=0,curSize=1,PT=-1,PNAV=false;
@@ -2373,6 +2373,10 @@ function showEnd(){
 function useCode(raw){
   const k=String(raw||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/gi,'d').replace(/[^a-z0-9]/gi,'').toUpperCase(),msg=$('codeMsg');
   if(!G||!CODES[k]){msg.style.color='#c4452c';msg.textContent='Mã không đúng. Xem danh sách mã bên dưới.';return}
+  if(k==='DOIAO'){const ks=Object.keys(SKINS).filter(x=>x!==curSkin&&x!=='goc');const pick=ks[(Math.random()*ks.length)|0];curSkin=pick;try{localStorage.setItem('sg-skin',pick)}catch(e){}
+    if(window.CARTOON){window.CARTOON=false;try{localStorage.setItem('sg-cartoon','0')}catch(e){}$('btnStyle').setAttribute('aria-pressed','false')}
+    for(const x in PORT)delete PORT[x];for(const x in UD)ICON[x]=unitIcon(x);panelKey='';
+    msg.style.color='#2f66a0';msg.textContent='Đã dùng mã DOIAO: lính của bạn khoác bộ '+SKINS[pick].name+'. Nhập lại để đổi bộ khác.';SND.play('coin');$('codeIn').value='';return}
   const r=G.teams[0].res;G.cheated=true;
   if(k==='LUAGAO')r.food+=1000;else if(k==='GOLIM')r.wood+=1000;else if(k==='VANGBAC')r.gold+=1000;else if(k==='PHATTAI'){r.food+=1000;r.wood+=1000;r.gold+=1000}
   else if(k==='XAYNHANH'){for(const b of G.blds)if(b.team===0){if(!b.built){b.built=true;b.prog=1;b.hp=b.max;G.stats.built++}if(b.rs)b.rs.t=1e4}recalcCap(0)}
@@ -2484,7 +2488,7 @@ function boot(){
   $('btnContinue').addEventListener('click',()=>loadGame());
   $('btnSave').addEventListener('click',()=>saveGame(false));
   syncContinue();
-  const CS={LUAGAO:'+1000 lương',GOLIM:'+1000 gỗ',VANGBAC:'+1000 vàng',PHATTAI:'+1000 mỗi loại',XAYNHANH:'Xây xong ngay',SUONGTAN:'Bật/tắt sương mù'};
+  const CS={LUAGAO:'+1000 lương',GOLIM:'+1000 gỗ',VANGBAC:'+1000 vàng',PHATTAI:'+1000 mỗi loại',XAYNHANH:'Xây xong ngay',SUONGTAN:'Bật/tắt sương mù',DOIAO:'Trang phục ngẫu nhiên'};
   $('codeList').innerHTML=Object.keys(CODES).map(k=>`<button class="leaf" data-code="${k}" title="${CODES[k]}">${k}<small>${CS[k]}</small></button>`).join('');
   $('codeList').addEventListener('click',e=>{const b=e.target.closest('[data-code]');if(b)useCode(b.dataset.code)});
   $('codeGo').addEventListener('click',()=>useCode($('codeIn').value));
