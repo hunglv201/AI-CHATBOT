@@ -2209,21 +2209,28 @@ function newGame(diff){
   // thú rừng: một đàn hươu gần mỗi làng, thêm hươu và voi rừng rải rác (đặt đối xứng cho công bằng)
   const herd=(type,cx,cy,n)=>{for(const [px,py] of [[cx,cy],[N-1-cx,N-1-cy]])for(let k=0;k<n;k++){const f=freeNear(clamp(Math.round(px+(G.rnd()-.5)*3),0,N-1),clamp(Math.round(py+(G.rnd()-.5)*3),0,N-1),4);if(f){const a=addUnit(type,2,f[0]+.5,f[1]+.5);a.hx=a.x;a.hy=a.y;a.face=G.rnd()<.5?1:-1}}};
   const spot=(minD,maxD)=>{for(let g=0;g<200;g++){const x=1+G.rnd()*(N-2),y=1+G.rnd()*(N-2),d=Math.hypot(x-6.5,y-(N-7.5)),d2=Math.min(Math.hypot(x-(N-6.5),y-7.5),Math.hypot(x-6.5,y-6.5),Math.hypot(x-(N-6.5),y-(N-6.5)));if(d>=minD&&d<=maxD&&d2>minD&&pass(x|0,y|0))return [x|0,y|0]}return null};
-  const am=N/40*(G.mapKind===5?1.8:1);let p=spot(6,9);if(p)herd('deer',p[0],p[1],4);
-  for(let k=0;k<Math.round(2*am);k++){p=spot(12,22*am);if(p)herd('deer',p[0],p[1],3)}
-  for(let k=0;k<Math.round(2*am);k++){p=spot(11,20*am);if(p)herd('wele',p[0],p[1],1)}
-  for(let k=0;k<Math.round(am);k++){p=spot(14,22*am);if(p)herd('tiger',p[0],p[1],1)}
-  for(let k=0;k<Math.round((G.mapKind===5?2.5:1.2)*am);k++){p=spot(12,22*am);if(p)herd('buff',p[0],p[1],G.mapKind===5?4:3)}
-  for(let k=0;k<Math.round((G.mapKind===2?2.5:1.4)*am);k++){p=spot(11,22*am);if(p)herd('boar',p[0],p[1],2)}
-  for(let k=0;k<Math.round(1.5*am);k++){p=spot(10,16*am);if(p)herd('monkey',p[0],p[1],3)}
-  for(let k=0;k<Math.round((G.mapKind===2?1.5:.8)*am);k++){p=spot(15,24*am);if(p)herd('bear',p[0],p[1],1)}
-  for(let k=0;k<Math.round(2*am);k++){p=spot(9,24*am);if(p)herd('snake',p[0],p[1],1)}
-  for(let k=0;k<Math.round((G.mapKind===5?1.5:.7)*am);k++){p=spot(15,24*am);if(p)herd('rhino',p[0],p[1],1)}
-  for(let k=0;k<Math.round(.8*am);k++){p=spot(16,24*am);if(p)herd('wolf',p[0],p[1],3)}
-  for(let k=0;k<Math.round(1.2*am);k++){p=spot(11,22*am);if(p)herd('peacock',p[0],p[1],2)}
-  {const shore=[];for(let y=2;y<N-2;y++)for(let x=2;x<N-2;x++){if(!pass(x,y))continue;for(let d=0;d<4;d++)if(G.terr[(y+DY[d])*N+x+DX[d]]===T_WATER){shore.push([x,y]);break}}for(let k=0;k<Math.min(shore.length>>5,Math.round(2*am));k++){const q=shore[(G.rnd()*shore.length)|0];if(q)herd('turtle',q[0],q[1],1)}}
-  {const shore=[];for(let y=2;y<N-2;y++)for(let x=2;x<N-2;x++){if(!pass(x,y))continue;let w=0;for(let d=0;d<4;d++)if(G.terr[(y+DY[d])*N+x+DX[d]]===T_WATER)w++;const d0=Math.min(Math.hypot(x-6.5,y-(N-7.5)),Math.hypot(x-(N-6.5),y-7.5),Math.hypot(x-6.5,y-6.5),Math.hypot(x-(N-6.5),y-(N-6.5)));if(w&&d0>14)shore.push([x,y])}
-   const nc=Math.min(Math.round(shore.length/60),Math.round((G.mapKind===1||G.mapKind===3?2.5:1.2)*am));for(let k=0;k<nc;k++){const q=shore[(G.rnd()*shore.length)|0];if(q)herd('croc',q[0],q[1],1)}}
+  // phân bổ thú theo môi trường sống và kiểu bản đồ
+  const am=N/40;
+  const hab=(x,y)=>{let tr=0,wa=0,op=0;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const nx=x+dx,ny=y+dy;if(!inb(nx,ny))continue;const i=ny*N+nx;if(G.obj[i]===O_TREE)tr++;else if(G.terr[i]===T_WATER)wa++;else op++}return {tr,wa,op}};
+  const OK={forest:h=>h.tr>=6,edge:h=>h.tr>=2&&h.tr<=9,water:h=>h.wa>=2&&h.wa<=12,open:h=>h.tr<=1&&h.wa===0,grass:h=>h.tr<=3&&h.wa<=1,any:()=>true};
+  const spotIn=(where,minD,maxD)=>{for(let g=0;g<400;g++){const p=spot(minD,maxD);if(!p)return null;if(OK[where](hab(p[0],p[1])))return p}return where==='water'||where==='forest'?null:spot(minD,maxD)};
+  // [loài, nơi ở, đàn, khoảng cách tối thiểu tới làng, số đàn theo kiểu bản đồ: Đồng bằng, Sông, Rừng, Hồ, Vịnh, Thảo nguyên]
+  const FAUNA=[
+    ['deer','grass',3,12,[3,2.5,2,2.5,2,5]],
+    ['buff','open',3,12,[1,1.5,0,1,.5,5]],
+    ['wele','edge',1,11,[2,2,2.5,2,1.5,3]],
+    ['rhino','open',1,15,[.5,.5,0,.5,0,2]],
+    ['tiger','forest',1,14,[1,1,2,1,1,.5]],
+    ['bear','forest',1,15,[.5,.5,2,.5,.5,0]],
+    ['boar','forest',2,11,[1.2,1,3,1,1,.5]],
+    ['monkey','forest',3,10,[1.2,1,3,1.5,2,0]],
+    ['snake','edge',1,9,[1.5,2,3,2,1.5,1]],
+    ['wolf','grass',3,16,[1,.5,1,.5,.5,2]],
+    ['peacock','edge',2,11,[1,1,1.5,1,1.5,1]],
+    ['turtle','water',1,8,[1,2,0,3,2.5,.5]],
+    ['croc','water',1,14,[.5,2.5,.5,2.5,1,0]]];
+  {const p=spotIn('grass',6,9);if(p)herd('deer',p[0],p[1],4)}
+  for(const [type,where,n,minD,per] of FAUNA){const k0=per[G.mapKind]||0,cnt=Math.round(k0*am);for(let k=0;k<cnt;k++){const p=spotIn(where,minD,26*am);if(p)herd(type,p[0],p[1],n)}}
   sel=[];placing=null;rallyMode=false;panelKey='#';paused=false;started=true;lastAlert=-99;
   for(const k in BD)ICON[k]=bldIcon(k);groups=[[],[],[]];renderGroups();$('autoChip').classList.add('hid');$('btnAuto').setAttribute('aria-pressed','false');
   cam.z=cw<500?1:cw<900?.9:1.1;centerOn(7.5,N-9.5);
