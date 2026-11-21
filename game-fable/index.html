@@ -253,6 +253,12 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
 @keyframes smk{0%{transform:translateY(40px) scaleX(.6);opacity:0}30%{opacity:.35}100%{transform:translateY(-160px) scaleX(1.4);opacity:0}}
 #autoChip{position:fixed;z-index:6;left:calc(66px + var(--sal));top:calc(108px + var(--sat));white-space:nowrap;display:flex;align-items:center;gap:6px;padding:5px 12px;font-weight:800;font-size:13px;background:var(--jade);color:#fff}#autoChip small{font-weight:600;font-size:10.5px;opacity:.85}#autoChip .dot{width:8px;height:8px;border-radius:50%;background:#bff5c8;animation:blink 1.2s ease-in-out infinite}@keyframes blink{50%{opacity:.25}}body.menu #autoChip{display:none}
 .pause .toggles{grid-template-columns:repeat(3,1fr);gap:6px}.pause .tog{min-height:38px;font-size:12.5px;gap:5px;padding:0 4px}.pause .tog .sw{transform:scale(.85)}
+.scard{max-width:460px;padding:12px 14px}.scard h2{margin:0 0 6px}.scard .note{font-size:11px;color:#5a4028;margin:4px 0 0;line-height:1.35}
+#scoreRel .rel{margin:6px 0}#scoreRel .lb{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;margin-bottom:3px}
+#scoreRel .bar{display:flex;height:16px;border-radius:8px;overflow:hidden;border:1.5px solid rgba(43,29,20,.8)}#scoreRel .bar i{display:block;height:100%;transition:width .4s}
+#scoreRel .verdict{font-size:13px;font-weight:800;text-align:center;margin:6px 0 2px}
+#scoreTab td,#scoreTab th{font-size:12px;padding:3px 4px;text-align:right}#scoreTab th{font-weight:800;color:#5a4028;border-bottom:1.5px solid #8a6a44}#scoreTab td:first-child,#scoreTab th:first-child{text-align:left}#scoreTab tr.tot td{font-weight:800;border-top:1.5px solid #8a6a44}
+#qScore .bd{background:var(--jade);font-size:9.5px;min-width:26px}
 </style>
 </head>
 <body>
@@ -284,6 +290,7 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
     <span class="bd" id="bdArmy"></span></button>
   <button class="qb leaf" id="qBox" aria-label="Khoanh vùng chọn" title="Khoanh vùng chọn">
     <svg viewBox="0 0 26 26"><rect x="4" y="5" width="18" height="16" rx="2" fill="none" stroke="#2b1d14" stroke-width="2" stroke-dasharray="4 3"/><circle cx="10" cy="11" r="2" fill="#2f66a0"/><circle cx="16" cy="15" r="2" fill="#2f66a0"/></svg></button>
+  <button class="qb leaf" id="qScore" aria-label="So sánh sức mạnh" title="So sánh sức mạnh"><svg viewBox="0 0 26 26"><path d="M13 3v20M6 23h14" stroke="#2b1d14" stroke-width="2" stroke-linecap="round"/><path d="M3 9h20" stroke="#2b1d14" stroke-width="1.8" stroke-linecap="round"/><path d="M3 9l-2 6h6zM23 9l-2 6h6z" fill="#d9a441" stroke="#2b1d14" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="bd" id="bdScore"></span></button>
   <button class="qb leaf" id="qHome" aria-label="Về đình làng" title="Về đình làng (H)">
     <svg viewBox="0 0 26 26"><path d="M2 12 q11 -3 11 -9 q0 6 11 9 l-3 1 H5z" fill="#b5562f" stroke="#2b1d14" stroke-width="1.5" stroke-linejoin="round"/><rect x="6" y="13" width="14" height="9" fill="#8a4b32" stroke="#2b1d14" stroke-width="1.5"/><rect x="11" y="16" width="4" height="6" fill="#2b1d14"/></svg></button>
   <button class="qb leaf" id="btnSound" aria-label="Bật hoặc tắt âm thanh" title="Âm thanh"><svg viewBox="0 0 20 20"><path d="M3 7h3l5-4v14l-5-4H3z" fill="#2b1d14"/><path class="w" d="M13.5 6.5q2.5 3.5 0 7M15.5 4.5q4.5 5.5 0 11" fill="none" stroke="#2b1d14" stroke-width="1.8" stroke-linecap="round"/><path class="x" d="M13 7l5 6M18 7l-5 6" stroke="#c4452c" stroke-width="2.2" stroke-linecap="round"/></svg></button>
@@ -347,6 +354,15 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
     <div class="grid" id="skinList"></div>
     <p id="skinDesc"></p>
     <button class="big leaf" id="skinClose">XONG</button>
+  </div>
+</div>
+<div class="ov hid" id="ovScore">
+  <div class="card scard">
+    <h2>Tương quan lực lượng</h2>
+    <div id="scoreRel"></div>
+    <table class="st" id="scoreTab"></table>
+    <p class="note" id="scoreNote">Điểm = Đời (thời + công nghệ) + Quân (giá trị quân còn sống) + Nhà + Kinh tế (tài nguyên đã thu, dân) + Chiến công (địch đã hạ).</p>
+    <button class="big leaf" id="scoreClose">ĐÓNG</button>
   </div>
 </div>
 <div class="ov hid" id="ovHow">
@@ -1650,7 +1666,7 @@ function canPlace(type,tx,ty,team){const s=BD[type].size;
 function kill(e,src){
   if(e.dead)return;e.dead=true;G.ents.delete(e.id);
   const ST=G.stats;
-  if(e.k===0){SND.play('die',e.x,e.y);if(UD[e.type].hero)toast(e.team===0?UD[e.type].name+' đã tử trận! Có thể luyện lại ở Đình làng.':'Đã hạ '+UD[e.type].name+' của '+TEAM[e.team].name+'!',e.team===0);G.units.splice(G.units.indexOf(e),1);G.fx.push({t:G.time,x:e.x,y:e.y,type:'die',team:e.team});if(!UD[e.type].meat&&!UD[e.type].naval&&e.type!=='cata'){const C=G.corpses||(G.corpses=[]);if(C.length>=30)C.shift();C.push({type:e.type,team:e.team,x:e.x,y:e.y,face:e.face||1,t:G.time,age:G.teams[e.team]?G.teams[e.team].age:1})}if(e.team===0&&!UD[e.type].stock)ST.lost++;else if(foe(0,e.team)&&src&&src.team===0)ST.kills++;
+  if(e.k===0){SND.play('die',e.x,e.y);if(UD[e.type].hero)toast(e.team===0?UD[e.type].name+' đã tử trận! Có thể luyện lại ở Đình làng.':'Đã hạ '+UD[e.type].name+' của '+TEAM[e.team].name+'!',e.team===0);G.units.splice(G.units.indexOf(e),1);G.fx.push({t:G.time,x:e.x,y:e.y,type:'die',team:e.team});if(!UD[e.type].meat&&!UD[e.type].naval&&e.type!=='cata'){const C=G.corpses||(G.corpses=[]);if(C.length>=30)C.shift();C.push({type:e.type,team:e.team,x:e.x,y:e.y,face:e.face||1,t:G.time,age:G.teams[e.team]?G.teams[e.team].age:1})}if(e.team===0&&!UD[e.type].stock)ST.lost++;else if(foe(0,e.team)&&src&&src.team===0)ST.kills++;if(src&&G.teams[src.team]&&foe(src.team,e.team))G.teams[src.team].kills=(G.teams[src.team].kills||0)+1;
     if(UD[e.type].meat){const f=freeNear(e.x|0,e.y|0,4);if(f){const i=f[1]*N+f[0];G.obj[i]=O_MEAT;G.amt[i]=UD[e.type].meat;miniDirty=true;
       for(const v of G.units)if(v.type==='vil'&&v.order&&v.order.type==='attack'&&v.order.id===e.id)setOrder(v,gatherOrder('meat',f[0],f[1]))}}}
   else{SND.play('thud',e.tx+e.size/2,e.ty+e.size/2);G.blds.splice(G.blds.indexOf(e),1);for(let y=e.ty;y<e.ty+e.size;y++)for(let x=e.tx;x<e.tx+e.size;x++)G.bld[y*N+x]=0;
@@ -1760,7 +1776,7 @@ function updGather(u,o,dt){
     if(r===2){o.p=0;return}
     if(r===1){
       const d=G.ents.get(o.drop);
-      if(d&&adjRect(u,o.dgoal)){G.teams[u.team].res[u.ck]+=u.carry;if(u.team===0)G.stats.gath[u.ck]+=u.carry;else G.stats.aiGath+=u.carry;u.carry=0;
+      if(d&&adjRect(u,o.dgoal)){G.teams[u.team].res[u.ck]+=u.carry;G.teams[u.team].gath=(G.teams[u.team].gath||0)+u.carry;if(u.team===0)G.stats.gath[u.ck]+=u.carry;else G.stats.aiGath+=u.carry;u.carry=0;
         if(o.last){u.order=null;return}o.ph=0;o.p=0;o.fail=0}
       else{o.p=0;if(++o.fail>6)u.order=null}
     }
@@ -1921,6 +1937,16 @@ function findSpot(team,type,cx,cy){
     for(const [x,y] of c){let ok=true;for(let yy=y-1;yy<=y+s&&ok;yy++)for(let xx=x-1;xx<=x+s;xx++)if(!pass(xx,yy)){ok=false;break}if(ok)return [x,y]}}
   return null;
 }
+// tự chơi = 70% sức máy đối thủ: cùng cách chơi, nhưng thu hoạch, luyện quân chậm hơn và ít dân, ít quân hơn
+const AUTO_K=.7;
+// điểm sức mạnh: đời + quân + nhà + kinh tế + chiến công
+const costV=c=>(c.food||0)+(c.wood||0)+(c.gold||0);
+function scoreOf(t){const T=G.teams[t];let army=0,vil=0,bld=0;for(const u of G.units)if(u.team===t){if(u.type==='vil'||u.type==='fboat')vil+=costV(UD[u.type].cost);else if(!UD[u.type].wild&&!UD[u.type].stock)army+=costV(UD[u.type].cost)*(u.hp/u.max)}
+  for(const b of G.blds)if(b.team===t&&b.built)bld+=b.type==='hall'?600:costV(BD[b.type].cost);
+  const age=(T.age-1)*500+Object.keys(T.tech||{}).length*120,eco=Math.round(((T.gath||0)+vil)/4),war=(T.kills||0)*40;
+  const r={age:Math.round(age),army:Math.round(army/2),bld:Math.round(bld/3),eco,war};r.total=r.age+r.army+r.bld+r.eco+r.war;return r}
+function autoInit(){const e=DIFF[G.diff],T=G.teams[0];G.ais[0]={cfg:Object.assign({},DIFF[2],{gm:1.01,maxVill:Math.round(DIFF[2].maxVill*AUTO_K),maxArmy:Math.round(DIFF[2].maxArmy*AUTO_K),interval:160,grow:2}),di:G.diff,nextWave:G.time+450,waveSize:8,waves:0,needFarm:0,flip:0,lastWave:-1};T.gm=e.gm*AUTO_K;T.tm=e.tm*AUTO_K}
+function autoOff(){const T=G.teams[0];T.gm=1;T.tm=1;delete G.ais[0]}
 function aiTick(tm){
   const A=G.ais[tm],c=A.cfg,T=G.teams[tm];
   const hall=G.blds.find(b=>b.team===tm&&b.type==='hall');if(!hall)return;
@@ -2028,7 +2054,7 @@ function step(dt){
       let nx=a.x-px,ny=a.y-py;if((nx|0)===(a.x|0)&&(ny|0)===(a.y|0)){a.x=nx;a.y=ny}nx=b.x+px;ny=b.y+py;if((nx|0)===(b.x|0)&&(ny|0)===(b.y|0)){b.x=nx;b.y=ny}}}}}
   if(G.tick%5===0)updFog();
   G.aiTeams.forEach((t,i)=>{if(G.tick%20===(7+i*5)%20)aiTick(t)});
-  if(G.auto&&!G.demo&&G.tick%20===2){if(!G.ais[0])G.ais[0]={cfg:Object.assign({},DIFF[2],{gm:1.01,interval:150,grow:3}),di:2,nextWave:G.time+420,waveSize:10,waves:0,needFarm:0,flip:0,lastWave:-1};aiTick(0)}
+  if(G.auto&&!G.demo&&G.tick%20===2){if(!G.ais[0])autoInit();aiTick(0)}
   if(G.fx.length>120)G.fx.splice(0,G.fx.length-120);
   if(G.dmgn&&G.dmgn.length&&G.time-G.dmgn[0].t>1)G.dmgn=G.dmgn.filter(d=>G.time-d.t<1);
   if(G.tick%100===0){const T0=G.teams[0];let a0=0,ae=0;for(const u of G.units){if(UD[u.type].mil||UD[u.type].hero){if(u.team===0)a0++;else if(foe(0,u.team))ae++}}const S=G.stats.gath;(G.hist||(G.hist=[])).push([Math.round(G.time),T0.pop,a0,ae,S.food+S.wood+S.gold])}
@@ -2312,6 +2338,7 @@ function updateTop(){
   {const dk=darkness(G.time),p=G.time%DAY,r=G.rain>G.time;$('sky').textContent=['Xuân','Hạ','Thu','Đông'][Math.floor(G.time/240)%4]+' · '+(dk>.5?'☾ Đêm':p>=190&&p<215?'☾ Chiều tối':p>=275?'☀ Rạng sáng':'☀ Ngày')+(r?' · mưa':'')}
   {const T0=G.teams[0].res,pv=updateTop.pv||(updateTop.pv={food:T0.food,wood:T0.wood,gold:T0.gold,t:0}),nowp=performance.now();
    if(nowp-pv.t>700){for(const k of ['food','wood','gold']){const d=Math.floor(T0[k])-Math.floor(pv[k]);if(d>0&&d<5000){const chip=$(k==='food'?'rFood':k==='wood'?'rWood':'rGold').parentNode,e=document.createElement('span');e.className='resup';e.textContent='+'+d;chip.appendChild(e);chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');setTimeout(()=>e.remove(),900)}pv[k]=T0[k]}pv.t=nowp}}
+  if(G.tick%40===0||!updateTop.sc){const mine=scoreOf(0).total,en=G.aiTeams.filter(t=>foe(0,t)).reduce((a,t)=>a+scoreOf(t).total,0);updateTop.sc=1;$('bdScore').textContent=Math.round(mine/Math.max(1,mine+en)*100)+'%';$('bdScore').style.background=mine>=en?'':'var(--son)'}
   const T=G.teams[0],r=T.res;$('rFood').textContent=Math.floor(r.food);$('rWood').textContent=Math.floor(r.wood);$('rGold').textContent=Math.floor(r.gold);
   $('rPop').textContent=T.pop+'/'+T.cap;$('chipPop').classList.toggle('low',T.pop>=T.cap);
   let idle=0,army=0;for(const u of G.units)if(u.team===0){if(u.type==='vil'){if(!u.order&&!u.inB)idle++}else if(UD[u.type].mil||UD[u.type].heal)army++}
@@ -2599,6 +2626,7 @@ function showEnd(){
   $('endTitle').textContent=ms?(win?'Hoàn thành: ':'Thất bại: ')+ms.name:win?'Đại thắng!':'Thất thủ…';$('endTitle').style.color=win?'#2f66a0':'#c4452c';
   $('endSub').textContent=G.endMsg||(win?'Đình của các trại giặc đã sụp đổ. Sương Giang từ nay yên bình.':'Đình làng đã bị san phẳng. Hãy dựng lại cơ đồ và thử lần nữa!');
   const rows=[['Độ khó',DIFF[G.diff].name],['Thời gian trận',fmtTime(G.time)],['Lương / Gỗ / Vàng đã thu',S.gath.food+' / '+S.gath.wood+' / '+S.gath.gold],['Đơn vị đã luyện',S.trained],['Công trình đã xây',S.built],['Địch bị hạ',S.kills],['Công trình địch bị phá',S.razed],['Đơn vị tổn thất',S.lost],['Công trình bị mất',S.lostB]];
+  {const m=scoreOf(0).total,e=G.aiTeams.filter(t=>foe(0,t)).reduce((a,t)=>a+scoreOf(t).total,0);rows.unshift(['Điểm ta / địch',m+' / '+e])}
   if(G.cheated)rows.push(['Mã hỗ trợ','Đã dùng']);
   $('endStats').innerHTML=rows.map(r=>`<tr><td>${r[0].replace('Lương / Gỗ / Vàng đã thu','Thu L/G/V').replace('Công trình địch bị phá','Phá nhà địch').replace('Công trình đã xây','Đã xây').replace('Đơn vị đã luyện','Đã luyện').replace('Đơn vị tổn thất','Mất quân').replace('Công trình bị mất','Mất nhà').replace('Thời gian trận','Thời gian')}</td><td>${r[1]}</td></tr>`).join('');
   {const H=(G.hist||[]).concat([[Math.round(G.time),G.teams[0].pop,G.units.filter(u=>u.team===0&&(UD[u.type].mil||UD[u.type].hero)).length,G.units.filter(u=>foe(0,u.team)&&(UD[u.type].mil||UD[u.type].hero)).length,S.gath.food+S.gath.wood+S.gath.gold]]);
@@ -2751,7 +2779,7 @@ function boot(){
   $('btnSound').addEventListener('click',()=>{SND.init();const on=!(SND.sfxOn||SND.musicOn);SND.sfxOn=SND.musicOn=on;SND.save();syncSoundUI();toast(on?'Đã bật âm thanh':'Đã tắt âm thanh')});
   $('btnSfx').addEventListener('click',()=>{SND.sfxOn=!SND.sfxOn;SND.save();syncSoundUI()});
   $('btnMusic').addEventListener('click',()=>{SND.musicOn=!SND.musicOn;SND.save();syncSoundUI()});
-  const setAuto=v=>{if(!G)return;G.auto=!!v;$('btnAuto').setAttribute('aria-pressed',G.auto);$('autoChip').classList.toggle('hid',!G.auto);toast(G.auto?'Máy đang tự chơi cho bạn: dân tự thu hoạch, xây nhà, luyện quân, đánh địch':'Đã tắt tự động chơi, bạn điều khiển lại')};window.__setAuto=setAuto;
+  const setAuto=v=>{if(!G)return;G.auto=!!v;if(G.auto)autoInit();else autoOff();$('btnAuto').setAttribute('aria-pressed',G.auto);$('autoChip').classList.toggle('hid',!G.auto);toast(G.auto?'Máy tự chơi cho bạn (bằng 70% sức đối thủ)':'Đã tắt tự động chơi, bạn điều khiển lại')};window.__setAuto=setAuto;
   $('btnAuto').addEventListener('click',()=>setAuto(!G.auto));$('autoChip').addEventListener('click',()=>setAuto(false));
   $('btnVoice').setAttribute('aria-pressed',SND.voiceOn);$('btnVoice').addEventListener('click',()=>{SND.voiceOn=!SND.voiceOn;SND.save();$('btnVoice').setAttribute('aria-pressed',SND.voiceOn);if(SND.voiceOn)SND.voice('sel','spear')});
   try{if(window.speechSynthesis)speechSynthesis.getVoices()}catch(e){}
@@ -2760,6 +2788,16 @@ function boot(){
   const syncStyle=()=>{$('btnStyle').setAttribute('aria-pressed',!!window.CARTOON)};syncStyle();
   $('btnStyle').addEventListener('click',()=>{window.CARTOON=!window.CARTOON;try{localStorage.setItem('sg-cartoon',window.CARTOON?'1':'0')}catch(e){}syncStyle();SPR.trees=[];SPR.b=[];initSprites();for(const k in BD)ICON[k]=bldIcon(k);for(const k in PORT)delete PORT[k];for(const k in UD)ICON[k]=unitIcon(k);panelKey='';pStatKey='';pMultiKey='';if(G)refreshPanel()});
   $('btnHow').addEventListener('click',()=>$('ovHow').classList.remove('hid'));
+  const showScore=()=>{if(!G)return;const ts=[0].concat(G.aiTeams.filter(t=>t!==0)),S={};for(const t of ts)S[t]=scoreOf(t);
+    const mine=S[0].total+(S[4]?S[4].total:0),enemy=ts.filter(t=>foe(0,t)).reduce((a,t)=>a+S[t].total,0),tot=Math.max(1,mine+enemy),pct=Math.round(mine/tot*100);
+    const diff=enemy?Math.round((mine/enemy-1)*100):100;
+    $('scoreRel').innerHTML=`<div class="rel"><div class="lb"><span style="color:#2f66a0">Phe ta ${mine}</span><span style="color:#c4452c">${enemy} Phe địch</span></div><div class="bar"><i style="width:${pct}%;background:linear-gradient(#5f93d0,#2f66a0)"></i><i style="width:${100-pct}%;background:linear-gradient(#e0705a,#c4452c)"></i></div></div>
+      <div class="verdict" style="color:${diff>=0?'#2f66a0':'#c4452c'}">${Math.abs(diff)<8?'Hai bên ngang ngửa':diff>0?'Ta mạnh hơn địch '+diff+'%':'Địch mạnh hơn ta '+Math.round((enemy/Math.max(1,mine)-1)*100)+'%'}${G.auto?' · đang tự chơi (70%)':''}</div>`;
+    const rowsK=[['age','Đời'],['army','Quân'],['bld','Nhà'],['eco','Kinh tế'],['war','Chiến công']];
+    $('scoreTab').innerHTML='<tr><th></th>'+ts.map(t=>`<th style="color:${TEAM[t].col}">${t===0?'Ta':TEAM[t].name}</th>`).join('')+'</tr>'+rowsK.map(([k,n])=>'<tr><td>'+n+'</td>'+ts.map(t=>'<td>'+S[t][k]+'</td>').join('')+'</tr>').join('')+'<tr class="tot"><td>Tổng</td>'+ts.map(t=>'<td>'+S[t].total+'</td>').join('')+'</tr>'};
+  window.__showScore=showScore;
+  $('qScore').addEventListener('click',()=>{if(!G||G.over)return;showScore();$('ovScore').classList.remove('hid');paused=true;window.__scoreTimer=setInterval(showScore,1000)});
+  $('scoreClose').addEventListener('click',()=>{$('ovScore').classList.add('hid');clearInterval(window.__scoreTimer);paused=false});
   // chọn trang phục lính: xem trước bằng chính hàm vẽ trong game
   const renderSkins=()=>{const L=$('skinList');L.innerHTML='';for(const k in SKINS){const d=SKINS[k],b=document.createElement('button');b.className='skc leaf'+(k===curSkin?' on':'');b.dataset.k=k;
       const cv=document.createElement('canvas');cv.width=300;cv.height=190;const x=cv.getContext('2d');x.scale(2.3,2.3);const keep=window.CARTOON;window.CARTOON=false;
