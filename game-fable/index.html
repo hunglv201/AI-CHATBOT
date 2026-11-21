@@ -2212,8 +2212,8 @@ function newGame(diff){
   // phân bổ thú theo môi trường sống và kiểu bản đồ
   const am=N/40;
   const hab=(x,y)=>{let tr=0,wa=0,op=0;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const nx=x+dx,ny=y+dy;if(!inb(nx,ny))continue;const i=ny*N+nx;if(G.obj[i]===O_TREE)tr++;else if(G.terr[i]===T_WATER)wa++;else op++}return {tr,wa,op}};
-  const OK={forest:h=>h.tr>=6,edge:h=>h.tr>=2&&h.tr<=9,water:h=>h.wa>=2&&h.wa<=12,open:h=>h.tr<=1&&h.wa===0,grass:h=>h.tr<=3&&h.wa<=1,any:()=>true};
-  const spotIn=(where,minD,maxD)=>{for(let g=0;g<400;g++){const p=spot(minD,maxD);if(!p)return null;if(OK[where](hab(p[0],p[1])))return p}return where==='water'||where==='forest'?null:spot(minD,maxD)};
+  const OK={forest:h=>h.tr>=6,edge:h=>h.tr>=2&&h.tr<=9,water:h=>h.wa>=2&&h.wa<=12,open:h=>h.tr<=1&&h.wa===0,shore:h=>h.wa>=1,grass:h=>h.tr<=3&&h.wa<=1,any:()=>true};
+  const spotIn=(where,minD,maxD)=>{maxD=Math.max(maxD,N*.75);for(let g=0;g<400;g++){let p=spot(minD,maxD);if(!p)p=spot(Math.min(minD,N*.22),maxD);if(!p)p=spot(5,maxD);if(!p)return null;if(OK[where](hab(p[0],p[1])))return p}const nx={forest:'edge',edge:'grass',water:'shore',open:'grass',grass:'any',shore:'any'}[where];return nx?spotIn(nx,minD,maxD):(spot(minD,maxD)||spot(5,maxD))};
   // [loài, nơi ở, đàn, khoảng cách tối thiểu tới làng, số đàn theo kiểu bản đồ: Đồng bằng, Sông, Rừng, Hồ, Vịnh, Thảo nguyên]
   const FAUNA=[
     ['deer','grass',3,12,[3,2.5,2,2.5,2,5]],
@@ -2230,7 +2230,7 @@ function newGame(diff){
     ['turtle','water',1,8,[1,2,0,3,2.5,.5]],
     ['croc','water',1,14,[.5,2.5,.5,2.5,1,0]]];
   {const p=spotIn('grass',6,9);if(p)herd('deer',p[0],p[1],4)}
-  for(const [type,where,n,minD,per] of FAUNA){const k0=per[G.mapKind]||0,cnt=Math.round(k0*am);for(let k=0;k<cnt;k++){const p=spotIn(where,minD,26*am);if(p)herd(type,p[0],p[1],n)}}
+  for(const [type,where,n,minD,per] of FAUNA){const k0=per[G.mapKind]||0,cnt=Math.max(1,Math.round(k0*am));for(let k=0;k<cnt;k++){const p=spotIn(where,minD,26*am);if(p)herd(type,p[0],p[1],n)}}
   sel=[];placing=null;rallyMode=false;panelKey='#';paused=false;started=true;lastAlert=-99;
   for(const k in BD)ICON[k]=bldIcon(k);groups=[[],[],[]];renderGroups();$('autoChip').classList.add('hid');$('btnAuto').setAttribute('aria-pressed','false');
   cam.z=cw<500?1:cw<900?.9:1.1;centerOn(7.5,N-9.5);
