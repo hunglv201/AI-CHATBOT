@@ -251,6 +251,7 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
 .card::after{content:'';position:absolute;left:18px;right:18px;top:3px;height:6px;pointer-events:none;opacity:.55;background:repeating-linear-gradient(90deg,#8a6a44 0 2px,transparent 2px 7px,#8a6a44 7px 8px,transparent 8px 14px),linear-gradient(#8a6a44,#8a6a44) bottom/100% 1px no-repeat}
 #ovStart .smoke{position:fixed;pointer-events:none;width:120px;height:260px;bottom:20%;opacity:.35;background:radial-gradient(ellipse at 50% 100%,rgba(235,235,230,.7),transparent 60%);filter:blur(8px);animation:smk 9s ease-in-out infinite}
 @keyframes smk{0%{transform:translateY(40px) scaleX(.6);opacity:0}30%{opacity:.35}100%{transform:translateY(-160px) scaleX(1.4);opacity:0}}
+#autoChip{position:fixed;z-index:6;left:50%;transform:translateX(-50%);top:calc(52px + var(--sat));display:flex;align-items:center;gap:6px;padding:5px 12px;font-weight:800;font-size:13px;background:var(--jade);color:#fff}#autoChip small{font-weight:600;font-size:10.5px;opacity:.85}#autoChip .dot{width:8px;height:8px;border-radius:50%;background:#bff5c8;animation:blink 1.2s ease-in-out infinite}@keyframes blink{50%{opacity:.25}}body.menu #autoChip{display:none}
 </style>
 </head>
 <body>
@@ -270,6 +271,7 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
 <div id="groups"></div>
 <div id="goal" class="leaf hid"></div>
 <div id="sky" class="leaf"></div>
+<button id="autoChip" class="leaf hid" aria-label="Tắt tự động chơi"><span class="dot"></span>Tự động chơi<small>chạm để tắt</small></button>
 <div id="zoomBtns"><button class="leaf" id="zIn" aria-label="Phóng to">+</button><button class="leaf" id="zOut" aria-label="Thu nhỏ">−</button></div>
 
 <div id="quick">
@@ -391,6 +393,7 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
     <div class="toggles">
       <button class="tog leaf" id="btnSfx" aria-pressed="true"><span class="sw"></span>Hiệu ứng</button>
       <button class="tog leaf" id="btnMusic" aria-pressed="true"><span class="sw"></span>Nhạc nền</button>
+      <button class="tog leaf" id="btnAuto" aria-pressed="false" style="grid-column:1/-1"><span class="sw"></span>Tự động chơi (máy điều khiển làng bạn)</button>
       <button class="tog leaf" id="btnVoice" aria-pressed="true"><span class="sw"></span>Tiếng lính</button>
       <button class="tog leaf" id="btnStyle" aria-pressed="false"><span class="sw"></span>Kiểu hoạt hình</button>
     </div>
@@ -1640,9 +1643,9 @@ function queuedPop(team){let q=0;for(const b of G.blds)if(b.team===team)for(cons
 function canAfford(team,cost){const r=G.teams[team].res;for(const k in cost)if(r[k]<cost[k])return false;return true}
 function pay(team,cost){const r=G.teams[team].res;for(const k in cost)r[k]-=cost[k]}
 function canPlace(type,tx,ty,team){const s=BD[type].size;
-  if(BD[type].naval){let shore=false;for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!inb(x,y))return false;const i=y*N+x;if(G.terr[i]!==T_WATER||G.obj[i]||G.bld[i])return false;if(team===0&&!G.explored[i])return false}
+  if(BD[type].naval){let shore=false;for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!inb(x,y))return false;const i=y*N+x;if(G.terr[i]!==T_WATER||G.obj[i]||G.bld[i])return false;if(team===0&&!G.auto&&!G.explored[i])return false}
     for(let y=ty-1;y<=ty+s;y++)for(let x=tx-1;x<=tx+s;x++)if(pass(x,y))shore=true;return shore}
-  for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!pass(x,y))return false;if(G.hill&&G.hill[y*N+x])return false;if(team===0&&!G.explored[y*N+x])return false}return true}
+  for(let y=ty;y<ty+s;y++)for(let x=tx;x<tx+s;x++){if(!pass(x,y))return false;if(G.hill&&G.hill[y*N+x])return false;if(team===0&&!G.auto&&!G.explored[y*N+x])return false}return true}
 function kill(e,src){
   if(e.dead)return;e.dead=true;G.ents.delete(e.id);
   const ST=G.stats;
@@ -2024,6 +2027,7 @@ function step(dt){
       let nx=a.x-px,ny=a.y-py;if((nx|0)===(a.x|0)&&(ny|0)===(a.y|0)){a.x=nx;a.y=ny}nx=b.x+px;ny=b.y+py;if((nx|0)===(b.x|0)&&(ny|0)===(b.y|0)){b.x=nx;b.y=ny}}}}}
   if(G.tick%5===0)updFog();
   G.aiTeams.forEach((t,i)=>{if(G.tick%20===(7+i*5)%20)aiTick(t)});
+  if(G.auto&&!G.demo&&G.tick%20===2){if(!G.ais[0])G.ais[0]={cfg:Object.assign({},DIFF[2],{gm:1.01,interval:150,grow:3}),di:2,nextWave:G.time+420,waveSize:10,waves:0,needFarm:0,flip:0,lastWave:-1};aiTick(0)}
   if(G.fx.length>120)G.fx.splice(0,G.fx.length-120);
   if(G.dmgn&&G.dmgn.length&&G.time-G.dmgn[0].t>1)G.dmgn=G.dmgn.filter(d=>G.time-d.t<1);
   if(G.tick%100===0){const T0=G.teams[0];let a0=0,ae=0;for(const u of G.units){if(UD[u.type].mil||UD[u.type].hero){if(u.team===0)a0++;else if(foe(0,u.team))ae++}}const S=G.stats.gath;(G.hist||(G.hist=[])).push([Math.round(G.time),T0.pop,a0,ae,S.food+S.wood+S.gold])}
@@ -2069,7 +2073,7 @@ function newGame(diff){
   {const shore=[];for(let y=2;y<N-2;y++)for(let x=2;x<N-2;x++){if(!pass(x,y))continue;let w=0;for(let d=0;d<4;d++)if(G.terr[(y+DY[d])*N+x+DX[d]]===T_WATER)w++;const d0=Math.min(Math.hypot(x-6.5,y-(N-7.5)),Math.hypot(x-(N-6.5),y-7.5),Math.hypot(x-6.5,y-6.5),Math.hypot(x-(N-6.5),y-(N-6.5)));if(w&&d0>14)shore.push([x,y])}
    const nc=Math.min(Math.round(shore.length/60),Math.round((G.mapKind===1||G.mapKind===3?2.5:1.2)*am));for(let k=0;k<nc;k++){const q=shore[(G.rnd()*shore.length)|0];if(q)herd('croc',q[0],q[1],1)}}
   sel=[];placing=null;rallyMode=false;panelKey='#';paused=false;started=true;lastAlert=-99;
-  for(const k in BD)ICON[k]=bldIcon(k);groups=[[],[],[]];renderGroups();
+  for(const k in BD)ICON[k]=bldIcon(k);groups=[[],[],[]];renderGroups();$('autoChip').classList.add('hid');$('btnAuto').setAttribute('aria-pressed','false');
   cam.z=cw<500?1:cw<900?.9:1.1;centerOn(7.5,N-9.5);
   updFog();refreshPanel();updateTop();document.body.classList.remove('menu');
 }
@@ -2540,6 +2544,7 @@ window.addEventListener('keydown',e=>{
   if(!G||!started||(e.target&&e.target.tagName==='INPUT'))return;const k=e.key.toLowerCase();keys[k]=true;
   if(k==='escape'){if(placing||rallyMode)cancelModes();else if(paused)setPause(false);else if(sel.length)select([]);else setPause(true)}
   else if(k==='p')setPause(!paused);
+  else if(k==='t'&&window.__setAuto)window.__setAuto(!G.auto);
   else if(k==='+'||k==='='||k==='-'){const i=SPEEDS.indexOf(speed)+(k==='-'?-1:1);if(i>=0&&i<SPEEDS.length){setSpeed(SPEEDS[i]);toast('Tốc độ x'+SPEEDS[i])}}
   else if(paused||G.over)return;
   else if(k==='1'||k==='2'||k==='3'){const g=+k-1;if(e.ctrlKey||e.metaKey){e.preventDefault();assignGroup(g)}else selectGroup(g)}
@@ -2654,7 +2659,7 @@ function restartCurrent(){$('ovPause').classList.add('hid');$('ovEnd').classList
 function renderCamp(){const done=campDone();$('campList').innerHTML=CAMP.map((m,i)=>`<button class="big alt leaf" data-c="${i}">${i+1}. ${m.name}${done.includes(i)?' ✓':''}<small>${m.desc}</small></button>`).join('')}
 function saveGame(silent){
   if(!G||G.over||!started)return false;
-  try{const o={v:1,mapKind:G.mapKind,diff:G.diff,seed:G.seed,time:G.time,tick:G.tick,nid:G.nid,reveal:G.reveal,cheated:!!G.cheated,fastTrain:!!G.fastTrain,rain:G.rain,
+  try{const o={v:1,mapKind:G.mapKind,diff:G.diff,seed:G.seed,time:G.time,tick:G.tick,nid:G.nid,reveal:G.reveal,cheated:!!G.cheated,auto:!!G.auto,fastTrain:!!G.fastTrain,rain:G.rain,
       N,size:G.size,mode:G.mode,aiTeams:G.aiTeams,mission:G.mission,teams:G.teams,stats:G.stats,ais:Object.fromEntries(Object.entries(G.ais).map(([k,a])=>[k,Object.assign({},a,{cfg:null})])),terr:Array.from(G.terr),obj:Array.from(G.obj),amt:Array.from(G.amt),tvar:Array.from(G.tvar),road:G.road?Array.from(G.road):null,hill:G.hill?Array.from(G.hill):null,explored:Array.from(G.explored),
       units:G.units,blds:G.blds,cam:{x:cam.x,y:cam.y,z:cam.z},at:Date.now()};
     localStorage.setItem(SAVE_KEY,JSON.stringify(o));if(!silent)toast('Đã lưu ván chơi');syncContinue();return true}
@@ -2665,14 +2670,14 @@ function dropSave(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}syncContinue
 function loadGame(){
   const o=readSave();if(!o||o.v!==1||!o.ais){toast('Không có ván đã lưu',1);return false}
   curDiff=o.diff;curMap=o.mapKind||0;if(curMap>5)curMap=0;setN(o.N||40);curSize=o.size!=null?o.size:1;const cfg=DIFF[o.diff];
-  G={seed:o.seed,diff:o.diff,size:curSize,mapKind:curMap,rain:o.rain||0,time:o.time,tick:o.tick,nid:o.nid,units:[],blds:[],ents:new Map(),proj:[],fx:[],over:null,reveal:!!o.reveal,cheated:!!o.cheated,fastTrain:!!o.fastTrain,
+  G={seed:o.seed,diff:o.diff,size:curSize,mapKind:curMap,rain:o.rain||0,time:o.time,tick:o.tick,nid:o.nid,units:[],blds:[],ents:new Map(),proj:[],fx:[],over:null,reveal:!!o.reveal,cheated:!!o.cheated,auto:!!o.auto,fastTrain:!!o.fastTrain,
     rnd:mulberry32((o.seed^(o.tick*2654435761))>>>0),mode:o.mode||0,aiTeams:o.aiTeams||[1],mission:o.mission,teams:o.teams,stats:o.stats,ais:{}};
   if(o.ais)for(const k in o.ais)G.ais[k]=Object.assign(o.ais[k],{cfg:DIFF[o.ais[k].di!=null?o.ais[k].di:o.diff]});else if(o.ai)G.ais[1]=Object.assign(o.ai,{cfg});G.ai=G.ais[1];
   G.terr=Uint8Array.from(o.terr);G.obj=Uint8Array.from(o.obj);G.amt=Uint16Array.from(o.amt);G.tvar=Uint8Array.from(o.tvar);G.road=o.road?Uint8Array.from(o.road):new Uint8Array(N*N);G.hill=o.hill?Uint8Array.from(o.hill):new Uint8Array(N*N);G.explored=Uint8Array.from(o.explored);G.visible=new Uint8Array(N*N);G.bld=new Int32Array(N*N);
   for(const b of o.blds){G.blds.push(b);G.ents.set(b.id,b);for(let y=b.ty;y<b.ty+b.size;y++)for(let x=b.tx;x<b.tx+b.size;x++)G.bld[y*N+x]=b.id}
   for(const u of o.units){u.path=null;u.pi=0;if(u.order){u.order.p=0;u.order.arr=0}G.units.push(u);G.ents.set(u.id,u)}
   sel=[];placing=null;rallyMode=false;panelKey='#';paused=false;started=true;lastAlert=-99;G.phase=null;G.rainOn=G.rain>G.time;
-  curMission=o.mission!=null?o.mission:null;groups=[[],[],[]];renderGroups();
+  curMission=o.mission!=null?o.mission:null;groups=[[],[],[]];renderGroups();$('autoChip').classList.toggle('hid',!G.auto);$('btnAuto').setAttribute('aria-pressed',!!G.auto);
   if(o.cam){cam.x=o.cam.x;cam.y=o.cam.y;cam.z=o.cam.z;clampCam()}
   for(const k in BD)ICON[k]=bldIcon(k);
   $('ovStart').classList.add('hid');$('ovPause').classList.add('hid');$('ovEnd').classList.add('hid');
@@ -2745,6 +2750,8 @@ function boot(){
   $('btnSound').addEventListener('click',()=>{SND.init();const on=!(SND.sfxOn||SND.musicOn);SND.sfxOn=SND.musicOn=on;SND.save();syncSoundUI();toast(on?'Đã bật âm thanh':'Đã tắt âm thanh')});
   $('btnSfx').addEventListener('click',()=>{SND.sfxOn=!SND.sfxOn;SND.save();syncSoundUI()});
   $('btnMusic').addEventListener('click',()=>{SND.musicOn=!SND.musicOn;SND.save();syncSoundUI()});
+  const setAuto=v=>{if(!G)return;G.auto=!!v;$('btnAuto').setAttribute('aria-pressed',G.auto);$('autoChip').classList.toggle('hid',!G.auto);toast(G.auto?'Máy đang tự chơi cho bạn: dân tự thu hoạch, xây nhà, luyện quân, đánh địch':'Đã tắt tự động chơi, bạn điều khiển lại')};window.__setAuto=setAuto;
+  $('btnAuto').addEventListener('click',()=>setAuto(!G.auto));$('autoChip').addEventListener('click',()=>setAuto(false));
   $('btnVoice').setAttribute('aria-pressed',SND.voiceOn);$('btnVoice').addEventListener('click',()=>{SND.voiceOn=!SND.voiceOn;SND.save();$('btnVoice').setAttribute('aria-pressed',SND.voiceOn);if(SND.voiceOn)SND.voice('sel','spear')});
   try{if(window.speechSynthesis)speechSynthesis.getVoices()}catch(e){}
   $('zIn').addEventListener('click',()=>zoomSmooth(1.3));$('zOut').addEventListener('click',()=>zoomSmooth(1/1.3));
