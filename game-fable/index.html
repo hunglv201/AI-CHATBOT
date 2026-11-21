@@ -1550,7 +1550,7 @@ function kill(e,src){
 function distTo(u,t){if(t.k===0)return Math.hypot(t.x-u.x,t.y-u.y);const cx=clamp(u.x,t.tx,t.tx+t.size),cy=clamp(u.y,t.ty,t.ty+t.size);return Math.hypot(u.x-cx,u.y-cy)}
 function atkOf(u){const D=UD[u.type],tk=G.teams[u.team].tech;let a=D.atk;if(tk.blade&&(u.type==='spear'||u.type==='horse'||u.type==='ele'))a+=2;if(tk.arrow&&u.type==='archer')a+=2;return a}
 function damage(t,amt,src){
-  if(t.dead)return;if((src&&src.team===0||t.team===0)&&G.visible[((t.k?t.ty:t.y)|0)*N+((t.k?t.tx:t.x)|0)]){const D=G.dmgn||(G.dmgn=[]);if(D.length<40)D.push({x:t.k?t.tx+t.size/2:t.x,y:t.k?t.ty+t.size/2:t.y,n:Math.max(1,Math.round(amt)),t:G.time,h:t.k?BD[t.type].h*.5:(t.type==='ele'?60:t.type==='wele'?44:30),bad:t.team===0,dx:(Math.random()-.5)*10})}
+  if(t.dead)return;if((src&&src.team===0||t.team===0)&&G.visible[((t.k?t.ty:t.y)|0)*N+((t.k?t.tx:t.x)|0)]){const D=G.dmgn||(G.dmgn=[]);const old=D.find(d=>d.id===t.id&&G.time-d.t<.45);if(old){old.n+=Math.round(amt);old.t=G.time-.05;old.big=1}else{if(D.length>=12)D.shift();D.push({id:t.id,x:t.k?t.tx+t.size/2:t.x,y:t.k?t.ty+t.size/2:t.y,n:Math.max(1,Math.round(amt)),t:G.time,h:t.k?BD[t.type].h*.5:(t.type==='ele'?60:t.type==='wele'?44:30),bad:t.team===0,dx:(Math.random()-.5)*10})}}
   if(src&&src.k===0&&UD[src.type].range<=2&&G.fx.length<120)G.fx.push({t:G.time,x:t.k?t.tx+t.size/2:t.x,y:t.k?t.ty+t.size/2:t.y,type:t.k?'chip':'spark',h:t.k?BD[t.type].h*.4:14});if(t.k===0&&UD[t.type].mil&&G.teams[t.team].tech.armor)amt=Math.max(1,amt-2);t.hp-=amt;t.hitT=G.time;
   const px=t.k?t.tx+t.size/2:t.x,py=t.k?t.ty+t.size/2:t.y;
   G.teams[t.team].alarm={x:px,y:py,t:G.time};
@@ -2032,7 +2032,6 @@ function render(){
     else{diamond(ctx,e.tx,e.ty,e.size);ctx.stroke();
       if(e.rally){const wx=(e.rally.x-e.rally.y)*HW,wy=(e.rally.x+e.rally.y+1)*HH;ctx.beginPath();ctx.moveTo(wx,wy);ctx.lineTo(wx,wy-22);ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#d9a441';ctx.beginPath();ctx.moveTo(wx,wy-22);ctx.lineTo(wx+12,wy-18);ctx.lineTo(wx,wy-13);ctx.closePath();ctx.fill();ctx.stroke();ctx.lineWidth=2}}
   }
-  if(G.dmgn){ctx.font='800 10px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.lineJoin='round';for(const d of G.dmgn){const a=(G.time-d.t);if(a>1)continue;const wx=(d.x-d.y)*HW+d.dx*a,wy=(d.x+d.y)*HH-d.h-a*22;ctx.globalAlpha=a<.7?1:1-(a-.7)/.3;ctx.lineWidth=3;ctx.strokeStyle='rgba(30,16,8,.85)';ctx.strokeText('-'+d.n,wx,wy);ctx.fillStyle=d.bad?'#ff8a6a':'#ffe9a0';ctx.fillText('-'+d.n,wx,wy)}ctx.globalAlpha=1;ctx.textAlign='start'}
   for(const f of G.fx)if(f.type==='selpop'){const a=(now-f.rt)/320;if(a<1){const u=f.u;if(!u||u.dead)continue;const wx=(u.x-u.y)*HW,wy=(u.x+u.y)*HH,r=(u.type==='ele'||u.type==='wele'?24:11)*usc(u.type)*(1+a*.7);ctx.globalAlpha=1-a;ctx.strokeStyle='#fff6c8';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(wx,wy,r,r*.48,0,0,7);ctx.stroke();ctx.globalAlpha=1}}
   for(const f of G.fx)if(f.type==='ping'){const a=(now-f.rt)/500;if(a<1){const wx=(f.x-f.y)*HW,wy=(f.x+f.y)*HH;ctx.strokeStyle=f.col;ctx.globalAlpha=1-a;ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(wx,wy,22*(1-a)+5,11*(1-a)+2.5,0,0,7);ctx.stroke();ctx.globalAlpha=1}}
   if(placing)for(const [gx,gy] of ghostTiles()){const s=BD[placing.type].size;for(let y=0;y<s;y++)for(let x=0;x<s;x++){const tx=gx+x,ty=gy+y;diamond(ctx,tx,ty,1);ctx.fillStyle=(BD[placing.type].naval?canPlace(placing.type,gx,gy,0):pass(tx,ty))&&ex[ty*N+tx]?'rgba(90,200,120,.55)':'rgba(220,70,50,.6)';ctx.fill()}}
@@ -2089,14 +2088,17 @@ function render(){
   ctx.setTransform(dpr*z,0,0,dpr*z,dpr*ox,dpr*oy);
   // thanh máu
   const bar=(x,y,w,f,col)=>{ctx.fillStyle=INK;ctx.fillRect(x-w/2-1,y-1,w+2,6);ctx.fillStyle='#5b3a2a';ctx.fillRect(x-w/2,y,w,4);ctx.fillStyle=col;ctx.fillRect(x-w/2,y,w*clamp(f,0,1),4)};
+  let hurt=0;for(const it of list)if(it[1]===2&&it[2].hp<it[2].max)hurt++;const crowd=hurt>12;
   for(const it of list){
-    if(it[1]===2){const u=it[2];if(u.hp<u.max||sel.indexOf(u)>=0){const f=u.hp/u.max;bar(it[3],it[4]-(u.type==='ele'?72:u.type==='wele'?54:u.type==='duck'?18:u.type==='tiger'?28:u.type==='buff'?30:u.type==='boar'?22:u.type==='croc'?14:34)*usc(u.type)-4,u.type==='ele'||u.type==='wele'?30:20,f,foe(0,u.team)?'#e0563a':u.team!==0?'#e2b23a':f>.5?'#5fbf6a':f>.25?'#e2b23a':'#e0563a')}}
+    if(it[1]===2){const u=it[2];const isSel=sel.indexOf(u)>=0;if(crowd&&!isSel&&u.hp<u.max){const f=u.hp/u.max,w=12,y=it[4]-(u.type==='ele'?72:u.type==='wele'?54:34)*usc(u.type);ctx.globalAlpha=.85;ctx.fillStyle='rgba(30,16,8,.7)';ctx.fillRect(it[3]-w/2,y,w,2.2);ctx.fillStyle=foe(0,u.team)?'#e0563a':u.team!==0?'#e2b23a':'#5fbf6a';ctx.fillRect(it[3]-w/2,y,w*clamp(f,0,1),2.2);ctx.globalAlpha=1;continue}
+      if(u.hp<u.max||isSel){const f=u.hp/u.max;bar(it[3],it[4]-(u.type==='ele'?72:u.type==='wele'?54:u.type==='duck'?18:u.type==='tiger'?28:u.type==='buff'?30:u.type==='boar'?22:u.type==='croc'?14:34)*usc(u.type)-4,u.type==='ele'||u.type==='wele'?30:20,f,foe(0,u.team)?'#e0563a':u.team!==0?'#e2b23a':f>.5?'#5fbf6a':f>.25?'#e2b23a':'#e0563a')}}
     else if(it[1]===1){const b=it[2],d=BD[b.type];if(b.team!==0&&!vis[(b.ty+(b.size>>1))*N+b.tx+(b.size>>1)]&&!(sel[0]===b))continue;const y=it[4]+b.size*HH-d.h-12;
       if(d.gar&&b.team===0){const n=garCount(b);if(n){const gx=it[3]+b.size*12,gy=y-16;ctx.fillStyle='#2f66a0';ctx.strokeStyle=INK;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(gx,gy,9,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.font='800 11px "Be Vietnam Pro",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n,gx,gy+.5)}}
       if(!b.built)bar(it[3],y,b.size*20,b.prog,'#d9a441');
       else if(b.hp<b.max||sel[0]===b)bar(it[3],y,b.size*20,b.hp/b.max,foe(0,b.team)?'#e0563a':b.team?'#e2b23a':'#5fbf6a');
       if(b.built&&b.queue.length&&b.team===0){const q=b.queue[0];bar(it[3],y-8,b.size*20,q.t/UD[q.type].time,'#7fb0e0')}}
   }
+  if(G.dmgn){if(cam.z>=.7){ctx.textAlign='center';ctx.lineJoin='round';for(const d of G.dmgn){const a=(G.time-d.t);if(a>1)continue;const wx=(d.x-d.y)*HW+d.dx*a,wy=(d.x+d.y)*HH-d.h-a*22;ctx.globalAlpha=a<.7?1:1-(a-.7)/.3;ctx.font=(d.big?'800 11px':'800 9px')+' "Be Vietnam Pro",sans-serif';ctx.lineWidth=3;ctx.strokeStyle='rgba(30,16,8,.85)';ctx.strokeText('-'+d.n,wx,wy);ctx.fillStyle=d.bad?'#ff8a6a':'#ffe9a0';ctx.fillText('-'+d.n,wx,wy)}ctx.globalAlpha=1;ctx.textAlign='start'}}
   // khung chọn
   ctx.setTransform(dpr,0,0,dpr,0,0);
   if(gest&&gest.box&&gest.moved){ctx.strokeStyle='#ffe9a8';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.fillStyle='rgba(255,233,168,.14)';const x=Math.min(gest.sx,gest.x),y=Math.min(gest.sy,gest.y),w=Math.abs(gest.x-gest.sx),h=Math.abs(gest.y-gest.sy);ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);ctx.setLineDash([])}
