@@ -1401,7 +1401,7 @@ function initIcons(){for(const k of ['food','wood','gold','pop'])ICON[k]=resIcon
 /* ---------------- Bản đồ & tìm đường ---------------- */
 const inb=(x,y)=>x>=0&&y>=0&&x<N&&y<N;
 function setN(n){N=n;HALLS={0:[5,N-9],1:[N-8,6],3:[N-8,N-8],4:[5,5]};const M=N*N;PF.g=new Float32Array(M);PF.f=new Float32Array(M);PF.from=new Int32Array(M);PF.st=new Uint32Array(M);PF.cl=new Uint32Array(M);PF.gen=0;
-  hideT=new Uint8Array(M);if(typeof fogC!=='undefined'&&fogC){fogC.width=fogC.height=N+2;fogImg=fogX.createImageData(N+2,N+2);for(let i=0;i<fogImg.data.length;i+=4){fogImg.data[i]=14;fogImg.data[i+1]=21;fogImg.data[i+2]=25;fogImg.data[i+3]=255}}miniDirty=true}
+  hideT=new Uint8Array(M);if(typeof fogC!=='undefined'&&fogC){fogC.width=fogC.height=N+2;fogImg=fogX.createImageData(N+2,N+2);for(let i=0;i<fogImg.data.length;i+=4){fogImg.data[i]=14;fogImg.data[i+1]=21;fogImg.data[i+2]=25;fogImg.data[i+3]=255}fogEdge()}miniDirty=true}
 function pass(x,y){if(x<0||y<0||x>=N||y>=N)return false;const i=y*N+x;if(PNAV)return G.terr[i]===T_WATER&&G.obj[i]===0&&G.bld[i]===0;if(G.terr[i]===T_WATER||G.obj[i]!==0)return false;const id=G.bld[i];if(!id)return true;if(PT<0)return false;const b=G.ents.get(id);return !!b&&b.type==='gate'&&b.team===PT&&b.built}
 const PF={g:null,f:new Float32Array(N*N),from:new Int32Array(N*N),st:new Uint32Array(N*N),cl:new Uint32Array(N*N),gen:0,heap:[]};
 const DX=[1,-1,0,0,1,1,-1,-1],DY=[0,0,1,-1,1,-1,1,-1];
@@ -1767,6 +1767,7 @@ function enqueue(b,type){
 
 /* ---------------- Sương mù ---------------- */
 let fogC=null,fogX=null,fogImg=null;
+function fogEdge(){const W=N+2,d=fogImg.data;for(let y=0;y<W;y++)for(let x=0;x<W;x++)if(x===0||y===0||x===W-1||y===W-1)d[(y*W+x)*4+3]=0}
 function updFog(){
   const v=G.visible,ex=G.explored;v.fill(0);
   const mark=(cx,cy,r)=>{const x0=Math.max(0,Math.floor(cx-r)),x1=Math.min(N-1,Math.ceil(cx+r)),y0=Math.max(0,Math.floor(cy-r)),y1=Math.min(N-1,Math.ceil(cy+r)),r2=r*r;
@@ -1949,7 +1950,20 @@ let mw=156,mh=78,miniDirty=true;
 function s2t(sx,sy){const wx=(sx-cw/2)/cam.z+cam.x,wy=(sy-ch/2)/cam.z+cam.y;return {x:(wx/HW+wy/HH)/2,y:(wy/HH-wx/HW)/2}}
 function t2s(x,y){return [((x-y)*HW-cam.x)*cam.z+cw/2,((x+y)*HH-cam.y)*cam.z+ch/2]}
 function centerOn(x,y){cam.x=(x-y)*HW;cam.y=(x+y)*HH;clampCam()}
-function clampCam(){let x=(cam.x/HW+cam.y/HH)/2,y=(cam.y/HH-cam.x/HW)/2;x=clamp(x,0,N);y=clamp(y,0,N);cam.x=(x-y)*HW;cam.y=(x+y)*HH}
+// vách đất dưới mép trước của bản đồ: bản đồ như một hòn đảo, không bị cắt cụt
+function edgeSkirt(tx,ty,wx,wy,tr){const D=26,w=tr===T_WATER;
+  for(const side of [0,1]){if(side===0&&tx!==N-1||side===1&&ty!==N-1)continue;
+    const a=side===0?[wx+HW,wy+HH]:[wx-HW,wy+HH],b=[wx,wy+2*HH];
+    const g=ctx.createLinearGradient(0,b[1]-HH,0,b[1]+D);
+    if(w){g.addColorStop(0,side?'#3d8b96':'#2f6f78');g.addColorStop(.25,side?'#2c6670':'#225058');g.addColorStop(1,'rgba(20,40,46,0)')}
+    else{g.addColorStop(0,side?'#8a6a44':'#6e5234');g.addColorStop(.5,side?'#5e452a':'#4a361f');g.addColorStop(1,'rgba(30,22,14,0)')}
+    ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.lineTo(b[0],b[1]+D);ctx.lineTo(a[0],a[1]+D);ctx.closePath();ctx.fill();
+    if(!w){ctx.strokeStyle=tr===T_GRASS?'#6c8f45':'#b8975c';ctx.lineWidth=2.2;ctx.beginPath();ctx.moveTo(a[0],a[1]+1);ctx.lineTo(b[0],b[1]+1);ctx.stroke();
+      ctx.strokeStyle='rgba(30,20,10,.28)';ctx.lineWidth=.8;for(const k of [8,15]){ctx.beginPath();ctx.moveTo(a[0],a[1]+k);ctx.lineTo(b[0],b[1]+k-((tx*7+ty*3)%3));ctx.stroke()}
+      ctx.fillStyle='rgba(40,28,16,.35)';const m=((tx+ty)*13)%5;ctx.beginPath();ctx.arc((a[0]+b[0])/2+m-2,(a[1]+b[1])/2+11,1.6,0,7);ctx.fill()}
+    else{ctx.strokeStyle='rgba(235,250,245,.35)';ctx.lineWidth=1;const o=((performance.now()/60)+tx*5+ty*3)%D;ctx.beginPath();ctx.moveTo((a[0]+b[0])/2,(a[1]+b[1])/2+o*.6);ctx.lineTo((a[0]+b[0])/2,(a[1]+b[1])/2+o*.6+6);ctx.stroke()}
+    ctx.strokeStyle='rgba(20,12,6,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}}
+function clampCam(){let x=(cam.x/HW+cam.y/HH)/2,y=(cam.y/HH-cam.x/HW)/2;const m=Math.min(N/2-1,Math.min(cw/(2*cam.z)/HW,ch/(2*cam.z)/HH)*.75);x=clamp(x,m,N-m);y=clamp(y,m,N-m);cam.x=(x-y)*HW;cam.y=(x+y)*HH}
 function zoomAt(sx,sy,nz){nz=clamp(nz,.42,2);const wx=(sx-cw/2)/cam.z+cam.x,wy=(sy-ch/2)/cam.z+cam.y;cam.z=nz;cam.x=wx-(sx-cw/2)/nz;cam.y=wy-(sy-ch/2)/nz;clampCam()}
 
 /* ---------------- Vẽ khung hình ---------------- */
@@ -1957,7 +1971,7 @@ const drawList=[];let hideT=new Uint8Array(N*N);
 function diamond(c,tx,ty,s){const wx=(tx-ty)*HW,wy=(tx+ty)*HH;c.beginPath();c.moveTo(wx,wy);c.lineTo(wx+s*HW,wy+s*HH);c.lineTo(wx,wy+s*2*HH);c.lineTo(wx-s*HW,wy+s*HH);c.closePath()}
 function render(){
   const z=cam.z,t=G.time,now=performance.now();
-  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#0e1519';ctx.fillRect(0,0,cw,ch);
+  ctx.setTransform(dpr,0,0,dpr,0,0);{const bg=ctx.createLinearGradient(0,0,0,ch);bg.addColorStop(0,'#1d2a2e');bg.addColorStop(1,'#0c1316');ctx.fillStyle=bg;ctx.fillRect(0,0,cw,ch)}
   const ox=cw/2-cam.x*z,oy=ch/2-cam.y*z;
   ctx.setTransform(dpr*z,0,0,dpr*z,dpr*ox,dpr*oy);
   const vx0=cam.x-cw/2/z-40,vx1=cam.x+cw/2/z+40,vy0=cam.y-ch/2/z-40,vy1=cam.y+ch/2/z+100;
@@ -1969,6 +1983,7 @@ function render(){
     const tr=G.terr[i],v=G.tvar[i];
     const sp=tr===T_WATER?SPR.tiles.w[(v&1)+2*((wf+(v>>1))&1)]:tr===T_DIRT?SPR.tiles.d[v&1]:SPR.tiles.g[v];
     ctx.drawImage(sp.c,wx-33,wy-1,66,34);
+    if(tx===N-1||ty===N-1)edgeSkirt(tx,ty,wx,wy,tr);
     if(tr===T_WATER){if(((i*13+((now/420)|0))%31)===0){ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(wx-1+(i*7)%22-11,wy+HH-1+(i*3)%8-4,2.4,2.4)}
       if(!G.obj[i]&&!G.bld[i]&&v===3&&i%3===0)ctx.drawImage(SPR.lotus.c,wx-SPR.lotus.ax+(i%9)-4,wy+HH-SPR.lotus.ay,SPR.lotus.w,SPR.lotus.h)}
     else if(tr===T_GRASS&&!G.obj[i]&&!G.bld[i]&&i%29===0)ctx.drawImage(SPR.rock.c,wx-SPR.rock.ax+(i%7)-3,wy+HH-SPR.rock.ay,SPR.rock.w,SPR.rock.h);
@@ -2482,7 +2497,7 @@ function frame(ts){
 function boot(){
   initSprites();initIcons();
   fogC=document.createElement('canvas');fogC.width=fogC.height=N+2;fogX=fogC.getContext('2d');fogImg=fogX.createImageData(N+2,N+2);
-  for(let i=0;i<fogImg.data.length;i+=4){fogImg.data[i]=14;fogImg.data[i+1]=21;fogImg.data[i+2]=25;fogImg.data[i+3]=255}
+  for(let i=0;i<fogImg.data.length;i+=4){fogImg.data[i]=14;fogImg.data[i+1]=21;fogImg.data[i+2]=25;fogImg.data[i+3]=255}fogEdge()
   setN(40);resize();window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,200));
   SND.load();syncSoundUI();
   {let lp=null,fired=false;const gb=$('groups');
