@@ -2061,14 +2061,18 @@ function step(dt){
   if(G.tick%6===0)for(const u of G.units)if(u.moving&&!u.inB&&(u.type==='horse'||u.type==='scout'||u.type==='ele'||u.type==='wele'||u.type==='tiger'||u.type==='cata'))G.fx.push({t:G.time,x:u.x,y:u.y,type:'dust'});
   {const se=Math.floor(G.time/240)%4;if(G.season!=null&&se!==G.season)toast('Sang '+['xuân','hạ','thu','đông'][se]+(se===2?': cây lá chuyển vàng':se===3?': cây cối trơ trụi':''));G.season=se}
   // thuyền và vịt trang trí trên sông hồ
-  if(!G.decor){G.decor=[];const w=[];for(let i=0;i<N*N;i++)if(G.terr[i]===T_WATER&&!G.obj[i])w.push(i);for(let k=0;k<Math.min(5,w.length>>4);k++){const i=w[(k*97+G.seed)%w.length];G.decor.push({type:k%2?'duck':'fboat',x:i%N+.5,y:((i/N)|0)+.5,tx:0,ty:0,face:1,anim:k})}
+  if(!G.decor){G.decor=[];const w=[];for(let i=0;i<N*N;i++)if(G.terr[i]===T_WATER&&!G.obj[i])w.push(i);for(let k=0;k<Math.min(3,w.length>>5);k++){const i=w[(k*97+G.seed)%w.length];G.decor.push({type:'fboat',x:i%N+.5,y:((i/N)|0)+.5,tx:0,ty:0,face:1,anim:k})}
+    // đàn vịt trời: con đầu đàn bơi tự do, các con sau bơi theo thành hàng
+    for(let k=0;k<Math.min(Math.round(N/5),w.length>>4);k++){const i=w[(k*331+G.seed*13)%w.length],lead={type:'duck',x:i%N+.5,y:((i/N)|0)+.5,tx:0,ty:0,face:1,anim:k*.7};G.decor.push(lead);
+      const n=2+((k*7+G.seed)%4);let prev=lead;for(let j=0;j<n;j++){const d={type:'duck',x:lead.x-.3*(j+1),y:lead.y,tx:0,ty:0,face:1,anim:k+j*.4,follow:prev,gap:.42};G.decor.push(d);prev=d}}
     const sh=[];for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){const i=y*N+x;if(G.terr[i]===T_WATER||G.obj[i]||G.bld[i])continue;for(let d=0;d<4;d++)if(G.terr[(y+DY[d])*N+x+DX[d]]===T_WATER){sh.push(i);break}}
-    for(let k=0;k<Math.min(Math.round(N/7),sh.length>>3);k++){const i=sh[(k*131+G.seed*7)%sh.length];G.decor.push({type:'stork',x:i%N+.5,y:((i/N)|0)+.5,tx:0,ty:0,face:k%2?1:-1,anim:k*1.7,z:0,fly:0,sh:1})}}
+    for(let k=0;k<Math.min(Math.round(N/3),sh.length>>2);k++){const i=sh[(k*131+G.seed*7)%sh.length];const m=1+((k*5)%3);for(let j=0;j<m;j++)G.decor.push({type:'stork',x:i%N+.5+(j?(j-1.5)*.45:0),y:((i/N)|0)+.5+(j?.25*j:0),tx:0,ty:0,face:(k+j)%2?1:-1,anim:k*1.7+j*2.3,z:0,fly:0,sh:1})}}
   for(const d of G.decor){if(d.type==='stork'){d.anim+=dt;
       if(d.fly){d.ft+=dt;const dd=Math.hypot(d.tx-d.x,d.ty-d.y);if(dd>.05){const sp=2.6*dt;d.x+=(d.tx-d.x)/dd*Math.min(sp,dd);d.y+=(d.ty-d.y)/dd*Math.min(sp,dd)}d.z=Math.min(40,d.z+30*dt);if(dd<=.05){d.z=Math.max(0,d.z-60*dt);if(d.z<=0){d.fly=0;d.mv=false}}d.mv=true;continue}
       let near=false;for(const u of G.units)if(u.team!==2&&Math.abs(u.x-d.x)<2.2&&Math.abs(u.y-d.y)<2.2){near=true;break}
       if(near){const a=G.rnd()*6.3,r=6+G.rnd()*6;let nx=clamp(Math.round(d.x+Math.cos(a)*r),1,N-2),ny=clamp(Math.round(d.y+Math.sin(a)*r),1,N-2);for(let g=0;g<30;g++){const i=ny*N+nx;if(G.terr[i]!==T_WATER&&!G.obj[i]&&!G.bld[i])break;nx=clamp(nx+((G.rnd()*3)|0)-1,1,N-2);ny=clamp(ny+((G.rnd()*3)|0)-1,1,N-2)}d.tx=nx+.5;d.ty=ny+.5;d.fly=1;d.ft=0;const sd=(d.tx-d.x)-(d.ty-d.y);d.face=sd>0?1:-1;continue}
       d.mv=false;continue}
+    if(d.follow){d.anim+=dt;const f=d.follow,ex2=f.x-d.x,ey2=f.y-d.y,dd2=Math.hypot(ex2,ey2);if(dd2>d.gap){const st=Math.min(dd2-d.gap,.6*dt*(dd2>1.5?3:1));const nx=d.x+ex2/dd2*st,ny=d.y+ey2/dd2*st;d.x=nx;d.y=ny;const sd=ex2-ey2;if(Math.abs(sd)>.02)d.face=sd>0?1:-1;d.mv=true}else d.mv=false;continue}
     d.anim+=dt;const dd=Math.hypot(d.tx-d.x,d.ty-d.y);if(!d.tx||dd<.1){const nx=(d.x|0)+((G.rnd()*5)|0)-2,ny=(d.y|0)+((G.rnd()*5)|0)-2;if(inb(nx,ny)&&G.terr[ny*N+nx]===T_WATER&&!G.obj[ny*N+nx]&&!G.bld[ny*N+nx]){d.tx=nx+.5;d.ty=ny+.5}d.mv=false}else{const sp=.35*dt;d.x+=(d.tx-d.x)/dd*Math.min(sp,dd);d.y+=(d.ty-d.y)/dd*Math.min(sp,dd);const sd=(d.tx-d.x)-(d.ty-d.y);if(Math.abs(sd)>.02)d.face=sd>0?1:-1;d.mv=true}}
 }
 function newGame(diff){
