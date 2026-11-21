@@ -2349,7 +2349,7 @@ $('qArmy').addEventListener('click',()=>{if(!G||paused)return;const a=G.units.fi
 $('qBox').addEventListener('click',()=>{boxMode=!boxMode;$('qBox').classList.toggle('on',boxMode);toast(boxMode?'Khoanh vùng: kéo trên bản đồ để chọn nhiều đơn vị':'Đã tắt khoanh vùng')});
 $('qHome').addEventListener('click',()=>{if(!G||paused)return;const h=G.blds.find(b=>b.team===0&&b.type==='hall');if(h){cancelModes();centerOn(h.tx+1.5,h.ty+1.5);select([h])}});
 function fmtTime(s){s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-function setPause(v){if(!G||G.over||!started)return;paused=v;$('codeMsg').textContent='';$('ovPause').classList.toggle('hid',!v);if(v){$('pauseInfo').textContent=fmtTime(G.time)+' · '+DIFF[G.diff].name+' · '+MAPS[G.mapKind||0].name+' · '+SIZES[G.size!=null?G.size:1].name+' · '+MODES[G.mode||0].name;$('codeBox').open=false}}
+function setPause(v){if(!G||G.over||!started)return;paused=v;$('codeMsg').textContent='';if(v&&$('codeBox'))$('codeBox').open=false;$('ovPause').classList.toggle('hid',!v);if(v){$('pauseInfo').textContent=fmtTime(G.time)+' · '+DIFF[G.diff].name+' · '+MAPS[G.mapKind||0].name+' · '+SIZES[G.size!=null?G.size:1].name+' · '+MODES[G.mode||0].name;$('codeBox').open=false}}
 $('btnPause').addEventListener('click',()=>setPause(true));
 $('btnResume').addEventListener('click',()=>setPause(false));
 $('btnRestart').addEventListener('click',restartCurrent);
