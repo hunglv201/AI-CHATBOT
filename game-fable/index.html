@@ -193,6 +193,8 @@ details.codes{margin-top:10px;text-align:left;border:1.5px dashed #8a6a44;border
 details.codes summary{cursor:pointer;min-height:36px;display:flex;align-items:center;font-weight:800;color:var(--son);font-size:14px}
 details.codes summary::after{content:'▾';margin-left:auto}details.codes[open] summary::after{content:'▴'}details.codes summary::-webkit-details-marker{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pause:has(details.codes[open]) .spdrow,.pause:has(details.codes[open]) .toggles,.pause:has(details.codes[open]) #btnSkin2,.pause:has(details.codes[open]) .pinfo{display:none}
+#codeList{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:6px}#codeList button{padding:3px 5px;font-size:11px}#codeList button small{font-size:9.5px}
 .chips button{padding:5px 9px;font-size:12px;font-weight:800;background:#fffaf0;border:2px solid var(--ink);border-radius:8px 2px 8px 2px;text-align:left;line-height:1.2}
 .chips button small{display:block;font-weight:600;font-size:10.5px;color:#5a4028}
 .linkbtn{display:block;margin:12px auto 0;background:none;border:0;padding:8px 12px;font-weight:800;font-size:14px;color:var(--son);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
@@ -461,7 +463,7 @@ const TECH={
   arrow:{name:'Tên đầu đồng',desc:'+2 sát thương cho cung thủ và chòi canh',cost:{wood:100,gold:60},time:25,ic:'archer'},
   armor:{name:'Giáp mây',desc:'Quân lính bị trúng đòn mất ít hơn 2 máu',cost:{food:120,gold:80},time:30,ic:'horse',age:3}};
 const AGES=[null,{name:'Thời Khai hoang',n:'I'},{name:'Thời Phong kiến',n:'II',cost:{food:300,gold:100},time:35},{name:'Thời Thịnh trị',n:'III',cost:{food:600,gold:350},time:55}];
-const CODES={LUAGAO:'Nhận 1000 lương',GOLIM:'Nhận 1000 gỗ',VANGBAC:'Nhận 1000 vàng',PHATTAI:'Nhận 1000 mỗi loại tài nguyên',XAYNHANH:'Xây xong ngay mọi công trình và nghiên cứu đang làm',SUONGTAN:'Xoá sương mù, nhìn thấy cả bản đồ (nhập lần nữa để tắt)',DOIAO:'Lính khoác ngẫu nhiên một bộ trang phục (nhập lại để đổi bộ khác)'};
+const CODES={LUAGAO:'Nhận 1000 lương',GOLIM:'Nhận 1000 gỗ',VANGBAC:'Nhận 1000 vàng',PHATTAI:'Nhận 1000 mỗi loại tài nguyên',XAYNHANH:'Xây xong ngay mọi công trình và nghiên cứu đang làm',SUONGTAN:'Xoá sương mù, nhìn thấy cả bản đồ (nhập lần nữa để tắt)',XINLINH:'Nhận ngay 6 lính ngẫu nhiên đứng cạnh Đình làng',LUYENNHANH:'Luyện quân nhanh gấp 6 lần (nhập lần nữa để tắt)',DOIAO:'Lính khoác ngẫu nhiên một bộ trang phục (nhập lại để đổi bộ khác)'};
 const MAPS=[{name:'Đồng bằng',desc:'Đất rộng, vài hồ nhỏ, đi lại dễ.'},{name:'Sông lớn',desc:'Sông chia đôi hai bờ, nhiều chỗ cạn để lội qua.'},{name:'Rừng rậm',desc:'Rừng dày, gỗ nhiều, luôn có lối mòn xuyên rừng.'},{name:'Hồ lớn',desc:'Hồ rộng giữa bản đồ, đảo vàng có lối cạn. Hợp đánh cá, thuyền chiến.'},{name:'Vịnh biển',desc:'Hai vịnh biển ở hai mép, nhiều cá. Đường bộ vòng quanh vịnh.'},{name:'Thảo nguyên',desc:'Đồng cỏ thoáng, ít cây, nhiều hươu voi và mỏ vàng.'},{name:'Ngẫu nhiên',desc:'Bốc thăm một trong sáu kiểu bản đồ.'}];
 const SAVE_KEY='suong-giang-save-v1',DAY=300;
 let curMap=0,curMode=0,curSize=1,PT=-1,PNAV=false;
@@ -1721,7 +1723,7 @@ function updBld(b,dt){
   if(b.type==='pen'){b.pt=(b.pt||0)+dt;if(b.pt>=25){b.pt=0;if(G.units.filter(u=>u.type==='duck'&&u.home===b.id).length<4){const f=freeNear(b.tx+1,b.ty+b.size,3);if(f){const d=addUnit('duck',b.team,f[0]+.5,f[1]+.5);d.hx=b.tx+1;d.hy=b.ty+b.size+.5;d.home=b.id}}}}
   if(b.rs){const isAge=b.rs.k==='age',need=isAge?AGES[T.age+1].time:TECH[b.rs.k].time;b.rs.t+=dt*T.tm;
     if(b.rs.t>=need){if(isAge)ageUp(b.team);else{T.tech[b.rs.k]=1;if(b.team===0){toast('Lò rèn: đã xong '+TECH[b.rs.k].name);SND.play('built');panelKey=''}}b.rs=null}}
-  if(b.queue.length){const q=b.queue[0],ud=UD[q.type];if(q.t<ud.time)q.t+=dt*T.tm;
+  if(b.queue.length){const q=b.queue[0],ud=UD[q.type];if(q.t<ud.time)q.t+=dt*T.tm*(b.team===0&&G.fastTrain?6:1);
     if(q.t>=ud.time&&T.pop+ud.pop<=T.cap){if(spawnFrom(b,q.type)){b.queue.shift();T.pop+=ud.pop;if(b.team===0&&sel[0]===b)panelKey=''}}}
   if(d.atk){b.cd-=dt;if(b.cd<=0){const cx=b.tx+b.size/2,cy=b.ty+b.size/2;let best=null,bdist=d.range;
     for(const e of G.units){if(!foe(b.team,e.team)||e.inB)continue;const dd=Math.hypot(e.x-cx,e.y-cy);if(dd<bdist){bdist=dd;best=e}}
@@ -2381,6 +2383,11 @@ function useCode(raw){
   if(k==='LUAGAO')r.food+=1000;else if(k==='GOLIM')r.wood+=1000;else if(k==='VANGBAC')r.gold+=1000;else if(k==='PHATTAI'){r.food+=1000;r.wood+=1000;r.gold+=1000}
   else if(k==='XAYNHANH'){for(const b of G.blds)if(b.team===0){if(!b.built){b.built=true;b.prog=1;b.hp=b.max;G.stats.built++}if(b.rs)b.rs.t=1e4}recalcCap(0)}
   else if(k==='SUONGTAN'){G.reveal=!G.reveal;updFog();miniDirty=true}
+  else if(k==='XINLINH'){const A=ageOf(0),pool=['spear','spear','archer','scout'].concat(A>=2?['horse','xbow','xbow','horse']:[],A>=3?['ele','cata']:[]);const h=G.blds.find(b=>b.team===0&&b.type==='hall')||G.blds.find(b=>b.team===0);
+    const got={};if(h){for(let i=0;i<6;i++){const t=pool[(Math.random()*pool.length)|0],f=freeNear(h.tx+h.size+1,h.ty+h.size+1,8);if(!f)break;const u=addUnit(t,0,f[0]+.5,f[1]+.5);G.fx.push({t:G.time,x:u.x,y:u.y,type:'dust'});got[t]=(got[t]||0)+1}}
+    const txt=Object.keys(got).map(t=>got[t]+' '+UD[t].name.toLowerCase()).join(', ');
+    msg.style.color='#2f66a0';msg.textContent=txt?'Đã dùng mã XINLINH: nhận '+txt+' cạnh Đình làng.':'Không còn chỗ trống cạnh Đình làng.';SND.play('train');updateTop();panelKey='';$('codeIn').value='';return}
+  else if(k==='LUYENNHANH'){G.fastTrain=!G.fastTrain;msg.style.color='#2f66a0';msg.textContent=G.fastTrain?'Đã bật luyện quân nhanh gấp 6 lần.':'Đã tắt luyện quân nhanh.';SND.play('coin');$('codeIn').value='';return}
   msg.style.color='#2f66a0';msg.textContent='Đã dùng mã '+k+': '+CODES[k].toLowerCase()+'.';SND.play('coin');updateTop();panelKey='';$('codeIn').value='';
 }
 const CAMP=[
@@ -2413,7 +2420,7 @@ function restartCurrent(){$('ovPause').classList.add('hid');$('ovEnd').classList
 function renderCamp(){const done=campDone();$('campList').innerHTML=CAMP.map((m,i)=>`<button class="big alt leaf" data-c="${i}">${i+1}. ${m.name}${done.includes(i)?' ✓':''}<small>${m.desc}</small></button>`).join('')}
 function saveGame(silent){
   if(!G||G.over||!started)return false;
-  try{const o={v:1,mapKind:G.mapKind,diff:G.diff,seed:G.seed,time:G.time,tick:G.tick,nid:G.nid,reveal:G.reveal,cheated:!!G.cheated,rain:G.rain,
+  try{const o={v:1,mapKind:G.mapKind,diff:G.diff,seed:G.seed,time:G.time,tick:G.tick,nid:G.nid,reveal:G.reveal,cheated:!!G.cheated,fastTrain:!!G.fastTrain,rain:G.rain,
       N,size:G.size,mode:G.mode,aiTeams:G.aiTeams,mission:G.mission,teams:G.teams,stats:G.stats,ais:Object.fromEntries(Object.entries(G.ais).map(([k,a])=>[k,Object.assign({},a,{cfg:null})])),terr:Array.from(G.terr),obj:Array.from(G.obj),amt:Array.from(G.amt),tvar:Array.from(G.tvar),explored:Array.from(G.explored),
       units:G.units,blds:G.blds,cam:{x:cam.x,y:cam.y,z:cam.z},at:Date.now()};
     localStorage.setItem(SAVE_KEY,JSON.stringify(o));if(!silent)toast('Đã lưu ván chơi');syncContinue();return true}
@@ -2424,7 +2431,7 @@ function dropSave(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}syncContinue
 function loadGame(){
   const o=readSave();if(!o||o.v!==1||!o.ais){toast('Không có ván đã lưu',1);return false}
   curDiff=o.diff;curMap=o.mapKind||0;if(curMap>5)curMap=0;setN(o.N||40);curSize=o.size!=null?o.size:1;const cfg=DIFF[o.diff];
-  G={seed:o.seed,diff:o.diff,size:curSize,mapKind:curMap,rain:o.rain||0,time:o.time,tick:o.tick,nid:o.nid,units:[],blds:[],ents:new Map(),proj:[],fx:[],over:null,reveal:!!o.reveal,cheated:!!o.cheated,
+  G={seed:o.seed,diff:o.diff,size:curSize,mapKind:curMap,rain:o.rain||0,time:o.time,tick:o.tick,nid:o.nid,units:[],blds:[],ents:new Map(),proj:[],fx:[],over:null,reveal:!!o.reveal,cheated:!!o.cheated,fastTrain:!!o.fastTrain,
     rnd:mulberry32((o.seed^(o.tick*2654435761))>>>0),mode:o.mode||0,aiTeams:o.aiTeams||[1],mission:o.mission,teams:o.teams,stats:o.stats,ais:{}};
   if(o.ais)for(const k in o.ais)G.ais[k]=Object.assign(o.ais[k],{cfg:DIFF[o.ais[k].di!=null?o.ais[k].di:o.diff]});else if(o.ai)G.ais[1]=Object.assign(o.ai,{cfg});G.ai=G.ais[1];
   G.terr=Uint8Array.from(o.terr);G.obj=Uint8Array.from(o.obj);G.amt=Uint16Array.from(o.amt);G.tvar=Uint8Array.from(o.tvar);G.explored=Uint8Array.from(o.explored);G.visible=new Uint8Array(N*N);G.bld=new Int32Array(N*N);
@@ -2488,7 +2495,7 @@ function boot(){
   $('btnContinue').addEventListener('click',()=>loadGame());
   $('btnSave').addEventListener('click',()=>saveGame(false));
   syncContinue();
-  const CS={LUAGAO:'+1000 lương',GOLIM:'+1000 gỗ',VANGBAC:'+1000 vàng',PHATTAI:'+1000 mỗi loại',XAYNHANH:'Xây xong ngay',SUONGTAN:'Bật/tắt sương mù',DOIAO:'Trang phục ngẫu nhiên'};
+  const CS={LUAGAO:'+1000 lương',GOLIM:'+1000 gỗ',VANGBAC:'+1000 vàng',PHATTAI:'+1000 mỗi loại',XAYNHANH:'Xây xong ngay',SUONGTAN:'Bật/tắt sương mù',XINLINH:'+6 lính ngẫu nhiên',LUYENNHANH:'Luyện quân x6',DOIAO:'Trang phục ngẫu nhiên'};
   $('codeList').innerHTML=Object.keys(CODES).map(k=>`<button class="leaf" data-code="${k}" title="${CODES[k]}">${k}<small>${CS[k]}</small></button>`).join('');
   $('codeList').addEventListener('click',e=>{const b=e.target.closest('[data-code]');if(b)useCode(b.dataset.code)});
   $('codeGo').addEventListener('click',()=>useCode($('codeIn').value));
