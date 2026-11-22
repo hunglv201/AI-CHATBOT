@@ -369,6 +369,7 @@ button.leaf:active{transform:translateY(1px) scale(.97);box-shadow:0 1px 0 rgba(
   <div class="card howcard">
     <h2>Cách chơi</h2>
     <ul class="howlist">
+        <li><b>Thuần hóa:</b> chọn dân làng rồi chạm vào <b>ngựa hoang</b> (50 lương, 8 giây) thành kỵ binh, hoặc <b>voi rừng</b> (120 lương, 40 vàng, 14 giây, cần Chuồng voi ngựa) thành tượng binh. Đừng đánh con thú trong lúc dỗ. Trại chăn nuôi nghiên cứu được Ổ rơm ấm, Cám ngô, Chăn thả và <b>Chó săn</b> (chó tự đi săn tha thịt về).</li>
         <li><b>Thú:</b> khỉ trộm quả gần làng; rắn nấp cỏ, sói đi săn ban đêm; tê giác da dày (tên chỉ gây 30%); gấu và công cho thêm vàng. <b>Trại chăn nuôi</b> nuôi gà (đẻ trứng ra lương), lợn (lớn dần), trâu (ruộng ra lúa nhanh), chó (sủa báo động). Ở bản đồ Hồ lớn, dẫn quân tới gần <b>Rùa thần</b> để được phù hộ.</li>
         <li><b>Địa hình:</b> lính bắn xa đứng trên <b>đồi</b> bắn xa thêm 1 ô, ai đứng trên đồi cũng nhìn xa hơn; không xây nhà trên đồi. Đi trên <b>đường mòn</b> nhanh hơn 20%.</li>
         <li><b>Điện thoại:</b> chạm để chọn, chạm đất / cây / mỏ / địch để ra lệnh. Kéo để di chuyển màn hình, chụm hai ngón để thu phóng. Giữ rồi kéo (hoặc bật nút khoanh vùng) để chọn nhiều; chạm đúp một đơn vị để chọn cả loại.</li>
@@ -504,7 +505,8 @@ const UD={
   pig:{name:'Lợn',hp:40,atk:0,range:.9,cd:1,speed:1.2,sight:3,cost:{food:40},time:10,pop:0,bm:0,stock:1,meat:60,bh:16,desc:'Lớn dần: nuôi càng lâu càng nhiều thịt (tới 240)'},
   ox:{name:'Trâu nhà',hp:150,atk:0,range:.9,cd:1,speed:1.4,sight:4,cost:{food:80,wood:20},time:16,pop:0,bm:0,stock:1,meat:250,bh:30,desc:'Mỗi con giúp ruộng ra lúa nhanh thêm 10% (tối đa 30%)'},
   dog:{name:'Chó làng',hp:60,atk:5,range:.9,cd:1,speed:3.2,sight:9,cost:{food:40},time:8,pop:0,bm:.2,mil:1,bh:18,desc:'Sủa báo động khi địch tới gần, đuổi khỉ, cắn rắn sói'},
-  wele:{name:'Voi rừng',hp:240,atk:13,range:1.1,cd:2,speed:1.6,sight:5,cost:{},time:1,pop:0,bm:1,wild:1,meat:380,desc:'Nhiều thịt nhưng sẽ đánh trả'}
+  whorse:{name:'Ngựa hoang',hp:90,atk:0,range:.9,cd:1,speed:4,sight:6,cost:{},time:1,pop:0,bm:0,wild:1,meat:120,bh:34,desc:'Chạy rất nhanh. Dân làng bắt được thành kỵ binh'},
+  wele:{name:'Voi rừng',hp:240,atk:13,range:1.1,cd:2,speed:1.6,sight:5,cost:{},time:1,pop:0,bm:1,wild:1,meat:380,desc:'Nhiều thịt, đánh trả. Dân làng thuần hóa được thành tượng binh (cần Chuồng voi ngựa)'}
 };
 const BD={
   hall:{name:'Đình làng',size:3,hp:1800,cost:{},time:60,pop:5,drop:1,gar:10,train:['vil','hero','heroine','healer'],sight:8,atk:5,range:5.5,cd:1.6,h:86,desc:'Luyện dân làng, tướng, thầy lang; nơi nộp tài nguyên'},
@@ -527,6 +529,10 @@ const BD={
 const TECH={
   blade:{name:'Rèn giáo sắt',desc:'+2 sát thương cho lính giáo, kỵ binh, tượng binh',cost:{food:100,gold:60},time:25,ic:'spear'},
   arrow:{name:'Tên đầu đồng',desc:'+2 sát thương cho cung thủ và chòi canh',cost:{wood:100,gold:60},time:25,ic:'archer'},
+  egg:{name:'Ổ rơm ấm',desc:'Gà đẻ gấp đôi: +10 lương mỗi 15 giây mỗi con',cost:{food:80,wood:60},time:20,ic:'chick',at:'pen'},
+  feed:{name:'Cám ngô',desc:'Lợn lớn nhanh gấp đôi; trâu giúp ruộng thêm 15% mỗi con',cost:{food:120,wood:40},time:25,ic:'pig',at:'pen'},
+  hound:{name:'Chó săn',desc:'Chó làng tự đi săn hươu, công, lợn rừng gần làng, tha thịt về Đình',cost:{food:100,gold:30},time:25,ic:'dog',at:'pen'},
+  herd:{name:'Chăn thả',desc:'Vật nuôi máu gấp đôi; trại nở tối đa 7 vịt',cost:{food:60,wood:80},time:20,ic:'duck',at:'pen'},
   armor:{name:'Giáp mây',desc:'Quân lính bị trúng đòn mất ít hơn 2 máu',cost:{food:120,gold:80},time:30,ic:'horse',age:3}};
 const AGES=[null,{name:'Thời Khai hoang',n:'I'},{name:'Thời Phong kiến',n:'II',cost:{food:300,gold:100},time:35},{name:'Thời Thịnh trị',n:'III',cost:{food:600,gold:350},time:55}];
 const CODES={LUAGAO:'Nhận 1000 lương',GOLIM:'Nhận 1000 gỗ',VANGBAC:'Nhận 1000 vàng',PHATTAI:'Nhận 1000 mỗi loại tài nguyên',XAYNHANH:'Xây xong ngay mọi công trình và nghiên cứu đang làm',SUONGTAN:'Xoá sương mù, nhìn thấy cả bản đồ (nhập lần nữa để tắt)',XINLINH:'Nhận ngay 6 lính ngẫu nhiên đứng cạnh Đình làng',LUYENNHANH:'Luyện quân nhanh gấp 6 lần (nhập lần nữa để tắt)',DOIAO:'Lính khoác ngẫu nhiên một bộ trang phục (nhập lại để đổi bộ khác)'};
@@ -1267,7 +1273,7 @@ function cel(c,fn,base,shade,light,k){k=k||1;c.save();c.beginPath();fn();c.clip(
   c.save();c.translate(-1.5*k,-2*k);c.beginPath();fn();c.restore();c.clip();c.fillStyle=base;c.fillRect(-400,-400,800,800);c.restore();
   c.beginPath();fn();c.strokeStyle=INK;c.lineWidth=1.25;c.stroke()}
 function eye(c,x,y,r,col){c.fillStyle=col||INK;c.beginPath();c.ellipse(x,y,r,r*1.15,0,0,7);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(x+r*.35,y-r*.4,r*.38,0,7);c.fill()}
-function drawElephant(c,team,o,leg,atk,war,age){
+function drawElephant(c,team,o,leg,atk,war,age){if(o.tame){c.save();c.fillStyle='#f06a9a';for(let k=0;k<3;k++){const a=((o.anim||0)*1.2+k*.33)%1;c.globalAlpha=1-a;c.save();c.translate(20+k*5,-56-a*14);c.scale(1.4,1.4);c.beginPath();c.moveTo(0,1);c.bezierCurveTo(-3,-2,-1,-4,0,-2);c.bezierCurveTo(1,-4,3,-2,0,1);c.fill();c.restore()}c.restore()}
   const tc=TEAM[team],sw=Math.sin((o.anim||0)*1.6),B='#a59d92',S='#776f65',L='#cbc4b9';
   const LEG=(x,k,b,s)=>{cel(c,()=>{c.moveTo(x-4+k*.3,-21);c.lineTo(x-3.8+k,-2);c.quadraticCurveTo(x+k,.4,x+3.8+k,-2);c.lineTo(x+3.6+k*.3,-21);c.closePath()},b,s,L,1.2);
     c.fillStyle='#efe8da';c.strokeStyle='rgba(43,29,20,.5)';c.lineWidth=.6;for(const dx of [-2.2,0,2.2]){c.beginPath();c.arc(x+k+dx,-1.3,1,Math.PI,0);c.fill();c.stroke()}
@@ -1499,6 +1505,7 @@ function drawDog(c,o,leg,bob,atk,team){const B='#c89a5a',S='#8a6434',L='#e8c088'
   q4legs(c,[[-2,-1],[5,1]],leg,B,S,L,1.6,6);c.fillStyle=TEAM[team].col;c.fillRect(3.4,-11.6,2.4,1.2);
   const hy=-12.6+(atk>0?1:0);cel(c,()=>{c.ellipse(8,hy,3.2,2.8,0,0,7)},B,S,L,.3);cel(c,()=>{c.ellipse(10.6,hy+1,2,1.3,0,0,7)},'#e8d0a8','#b89a70','#f8e6c8',.2);
   c.fillStyle=INK;c.beginPath();c.arc(12.2,hy+.6,.6,0,7);c.fill();cel(c,()=>{c.moveTo(6,hy-2);c.lineTo(5.6,hy-5.4);c.lineTo(8.2,hy-2.6);c.closePath()},S,'#5e4020',B,.2);eye(c,8.6,hy-.6,.45);
+  if(o.carryMeat){c.fillStyle='#b04a34';c.strokeStyle=INK;c.lineWidth=.6;c.beginPath();c.ellipse(11.4,hy+2.4,2.2,1.4,0,0,7);c.fill();c.stroke()}
   if(o.bark){c.strokeStyle='rgba(255,250,230,.9)';c.lineWidth=.8;for(const r of [3,5.4]){c.beginPath();c.arc(12,hy,r,-.7,.7);c.stroke()}}}
 function drawTurtle(c,o,leg,bob,gold){const B=gold?'#e8b830':'#6a7a4a',S=gold?'#b88418':'#3e4a2a',L=gold?'#fff0a0':'#8a9a6a';const sw=gold?Math.sin((o.anim||0)*1.2)*.6:0;
   if(gold){c.strokeStyle='rgba(255,236,140,.6)';c.lineWidth=1;c.beginPath();c.ellipse(0,-1,14+Math.sin((o.anim||0)*2)*2,5,0,0,7);c.stroke()}
@@ -1515,14 +1522,24 @@ function drawDolphin(c,o){const T=(o.anim||0)%5;if(T>1.2){c.strokeStyle='rgba(23
 function drawEagle(c,o){const f=Math.sin((o.anim||0)*2.2),z=o.z||70;c.fillStyle='rgba(20,15,10,.15)';c.beginPath();c.ellipse(0,0,8,2.4,0,0,7);c.fill();c.translate(0,-z);
   for(const s of [-1,1]){cel(c,()=>{c.moveTo(0,0);c.quadraticCurveTo(s*7,-4-f*3,s*15,-1-f*5);c.lineTo(s*13,1-f*3);c.quadraticCurveTo(s*6,2,0,2);c.closePath()},'#5a4028','#3a2818','#8a6a48',.4)}
   cel(c,()=>{c.ellipse(0,1,2.6,4,0,0,7)},'#5a4028','#3a2818','#8a6a48',.3);cel(c,()=>{c.arc(0,-3.4,1.8,0,7)},'#f2ece0','#c8c0b0','#fff',.2);c.fillStyle='#e8b830';c.beginPath();c.moveTo(1,-3.6);c.lineTo(3,-3);c.lineTo(1,-2.4);c.closePath();c.fill()}
+function drawWildHorse(c,o,leg,bob){const B='#a8703a',S='#6e4420',L='#c89060',M='#3a2614',sw=Math.sin((o.anim||0)*2);
+  q4legs(c,[[-7,1,1],[6,-1,1]],leg,B,S,L,2.4,10);c.translate(0,-bob);
+  c.strokeStyle=INK;c.lineWidth=3.4;c.beginPath();c.moveTo(-11,-16);c.quadraticCurveTo(-16+sw,-12,-15+sw,-5);c.stroke();c.strokeStyle=M;c.lineWidth=2.2;c.stroke();
+  cel(c,()=>{c.moveTo(-11,-15);c.quadraticCurveTo(-12,-20,-6,-20);c.lineTo(6,-19.6);c.quadraticCurveTo(11,-19.6,12,-15);c.quadraticCurveTo(11,-10,6,-10);c.lineTo(-6,-10);c.quadraticCurveTo(-11.4,-10.4,-11,-15);c.closePath()},B,S,L,1.2);
+  c.fillStyle='#f2e6cc';c.beginPath();c.ellipse(-3,-12,3,1.6,0,0,7);c.fill();q4legs(c,[[-3.5,-1],[9.5,1]],leg,B,S,L,2.4,10);
+  cel(c,()=>{c.moveTo(7,-18.6);c.quadraticCurveTo(10,-25,13.5,-28.4);c.quadraticCurveTo(16,-30,18,-28);c.lineTo(21.4,-23);c.quadraticCurveTo(21.6,-21,19.6,-21);c.lineTo(16.2,-22.6);c.quadraticCurveTo(14,-19,12.6,-14);c.closePath()},B,S,L,.6);
+  c.fillStyle='#f2e6cc';c.beginPath();c.moveTo(17,-27.6);c.lineTo(20.6,-22.8);c.lineTo(19.4,-22.4);c.lineTo(16.4,-26.6);c.closePath();c.fill();
+  cel(c,()=>{c.moveTo(14.2,-29);c.lineTo(14.6,-32.4);c.lineTo(16.2,-29.4);c.closePath()},B,S,L,.2);eye(c,16.4,-26.2,.6);
+  c.strokeStyle=M;c.lineWidth=2.4;c.beginPath();c.moveTo(7.6,-19.6);c.quadraticCurveTo(10+sw*.5,-26,14,-29.6);c.stroke();
+  if(o.tame){c.fillStyle='#f06a9a';for(let k=0;k<2;k++){const a=((o.anim||0)*1.5+k*.5)%1;c.globalAlpha=1-a;c.save();c.translate(16+k*4,-34-a*10);c.beginPath();c.moveTo(0,1);c.bezierCurveTo(-3,-2,-1,-4,0,-2);c.bezierCurveTo(1,-4,3,-2,0,1);c.fill();c.restore()}c.globalAlpha=1}}
 // tỉ lệ vẽ trên bản đồ: người to hơn cho dễ nhìn, voi gấp rưỡi người cưỡi ngựa
-const USC={monkey:1.05,bear:1.2,snake:1,rhino:1.25,wolf:1.1,peacock:1.1,turtle:1,gturtle:1.2,chick:.85,pig:1,ox:1.1,dog:1,dolphin:1.2,eagle:1,vil:1.18,spear:1.18,archer:1.18,xbow:1.18,hero:1.18,heroine:1.18,healer:1.18,monk:1.18,horse:1.15,scout:1.15,ele:1.22,wele:1.22,cata:1.2,tiger:1.05,deer:1.08,duck:.78,fboat:1.12,wboat:1.18,buff:1.15,boar:1.05,croc:1.05,stork:1};
+const USC={whorse:1.15,monkey:1.05,bear:1.2,snake:1,rhino:1.25,wolf:1.1,peacock:1.1,turtle:1,gturtle:1.2,chick:.85,pig:1,ox:1.1,dog:1,dolphin:1.2,eagle:1,vil:1.18,spear:1.18,archer:1.18,xbow:1.18,hero:1.18,heroine:1.18,healer:1.18,monk:1.18,horse:1.15,scout:1.15,ele:1.22,wele:1.22,cata:1.2,tiger:1.05,deer:1.08,duck:.78,fboat:1.12,wboat:1.18,buff:1.15,boar:1.05,croc:1.05,stork:1};
 const usc=t=>USC[t]||1;
 function drawUnit(c,type,team,px,py,o){const prev=c.__thin;c.__thin=!window.CARTOON&&!PERSON.has(type);try{drawUnit0(c,type,team,px,py,o)}finally{c.__thin=prev}}
 function drawUnit0(c,type,team,px,py,o){
   const tc=TEAM[team],big=type==='ele'||type==='wele',hor=type==='horse'||type==='scout',wild=type==='wele';
   c.save();c.translate(px,py);if(o.sc)c.scale(o.sc,o.sc);
-  const SHD={buff:[15,5.5],boar:[10,3.8],croc:[22,3.6],stork:[4.5,1.6],monkey:[6,2.4],bear:[14,5],snake:[11,1.6],rhino:[16,5.5],wolf:[10,3.4],peacock:[6,2],turtle:[7,2.4],gturtle:[8,2.6],chick:[4.5,1.6],pig:[8,3],ox:[15,5.5],dog:[8,2.8],dolphin:[1,.1],eagle:[1,.1]}[type];
+  const SHD={whorse:[13,5],buff:[15,5.5],boar:[10,3.8],croc:[22,3.6],stork:[4.5,1.6],monkey:[6,2.4],bear:[14,5],snake:[11,1.6],rhino:[16,5.5],wolf:[10,3.4],peacock:[6,2],turtle:[7,2.4],gturtle:[8,2.6],chick:[4.5,1.6],pig:[8,3],ox:[15,5.5],dog:[8,2.8],dolphin:[1,.1],eagle:[1,.1]}[type];
   if(!o.noShadow){c.fillStyle='rgba(20,15,10,'+SUN.a+')';c.beginPath();const SK=SUN.k;if(SHD)c.ellipse(SUN.dx*.5,0,SHD[0]*SK,SHD[1],0,0,7);else c.ellipse(SUN.dx*.5,0,SK*(big?24:hor?13:type==='fboat'||type==='wboat'?17:type==='cata'?16:type==='tiger'?11:type==='duck'?5:8),big?8:hor?5:type==='cata'?6:type==='tiger'?4.5:type==='duck'?2.4:3.6,0,0,7);c.fill()}
   c.scale(o.face||1,1);c.lineJoin='round';c.lineCap='round';
   const mv=o.moving,ph=o.anim*(big?7:11),bob=mv?Math.abs(Math.sin(ph))*1.5:0,leg=mv?Math.sin(ph)*3:0,atk=o.atk||0;
@@ -1561,7 +1578,7 @@ function drawUnit0(c,type,team,px,py,o){
   if(type==='duck'){drawDuck(c,o,leg,bob,team);c.restore();return}
   if(type==='buff'){drawBuffalo(c,o,leg,bob,atk);c.restore();return}
   {const F={monkey:()=>drawMonkey(c,o,leg,bob),bear:()=>drawBear(c,o,leg,bob,atk),snake:()=>drawSnake(c,o,leg,bob,atk),rhino:()=>drawRhino(c,o,leg,bob,atk),wolf:()=>drawWolf(c,o,leg,bob,atk),peacock:()=>drawPeacock(c,o,leg,bob),
-    chick:()=>drawChicken(c,o,leg,bob,team),pig:()=>drawPig(c,o,leg,bob),ox:()=>drawOx(c,o,leg,bob,atk,team),dog:()=>drawDog(c,o,leg,bob,atk,team),turtle:()=>drawTurtle(c,o,leg,bob,false),gturtle:()=>drawTurtle(c,o,leg,bob,true),dolphin:()=>drawDolphin(c,o),eagle:()=>drawEagle(c,o)}[type];if(F){F();c.restore();return}}
+    whorse:()=>drawWildHorse(c,o,leg,bob),chick:()=>drawChicken(c,o,leg,bob,team),pig:()=>drawPig(c,o,leg,bob),ox:()=>drawOx(c,o,leg,bob,atk,team),dog:()=>drawDog(c,o,leg,bob,atk,team),turtle:()=>drawTurtle(c,o,leg,bob,false),gturtle:()=>drawTurtle(c,o,leg,bob,true),dolphin:()=>drawDolphin(c,o),eagle:()=>drawEagle(c,o)}[type];if(F){F();c.restore();return}}
   if(type==='boar'){drawBoar(c,o,leg,bob,atk);c.restore();return}
   if(type==='croc'){drawCroc(c,o,leg,bob,atk);c.restore();return}
   if(type==='stork'){drawStork(c,o,team);c.restore();return}
@@ -1769,7 +1786,8 @@ function kill(e,src){
   const ST=G.stats;
   if(e.k===0){SND.play('die',e.x,e.y);if(UD[e.type].hero)toast(e.team===0?UD[e.type].name+' đã tử trận! Có thể luyện lại ở Đình làng.':'Đã hạ '+UD[e.type].name+' của '+TEAM[e.team].name+'!',e.team===0);G.units.splice(G.units.indexOf(e),1);G.fx.push({t:G.time,x:e.x,y:e.y,type:'die',team:e.team});if(!UD[e.type].meat&&!UD[e.type].naval&&e.type!=='cata'){const C=G.corpses||(G.corpses=[]);if(C.length>=30)C.shift();C.push({type:e.type,team:e.team,x:e.x,y:e.y,face:e.face||1,t:G.time,age:G.teams[e.team]?G.teams[e.team].age:1})}if(e.team===0&&!UD[e.type].stock)ST.lost++;else if(foe(0,e.team)&&src&&src.team===0)ST.kills++;if(src&&G.teams[src.team]&&foe(src.team,e.team))G.teams[src.team].kills=(G.teams[src.team].kills||0)+1;
     if((e.type==='bear'||e.type==='peacock')&&src&&G.teams[src.team]&&src.team!==2){const g=e.type==='bear'?60:40;G.teams[src.team].res.gold+=g;if(src.team===0)toast((e.type==='bear'?'Được mật gấu':'Được lông công')+': +'+g+' vàng')}
-    if(UD[e.type].meat){const f=freeNear(e.x|0,e.y|0,4);if(f){const i=f[1]*N+f[0];G.obj[i]=O_MEAT;G.amt[i]=e.type==='pig'?Math.min(240,60+(((G.time-(e.born||G.time))*.5)|0)):UD[e.type].meat;miniDirty=true;
+    if(UD[e.type].meat&&src&&src.type==='dog'&&e.team===2&&!src.dead){src.cf=Math.round(UD[e.type].meat*.7);src.order=null}
+    else if(UD[e.type].meat){const f=freeNear(e.x|0,e.y|0,4);if(f){const i=f[1]*N+f[0];G.obj[i]=O_MEAT;G.amt[i]=e.type==='pig'?Math.min(240,60+(((G.time-(e.born||G.time))*(G.teams[e.team]&&G.teams[e.team].tech.feed?1:.5))|0)):UD[e.type].meat;miniDirty=true;
       for(const v of G.units)if(v.type==='vil'&&v.order&&v.order.type==='attack'&&v.order.id===e.id)setOrder(v,gatherOrder('meat',f[0],f[1]))}}}
   else{SND.play('thud',e.tx+e.size/2,e.ty+e.size/2);G.blds.splice(G.blds.indexOf(e),1);for(let y=e.ty;y<e.ty+e.size;y++)for(let x=e.tx;x<e.tx+e.size;x++)G.bld[y*N+x]=0;
     ejectAll(e);G.fx.push({t:G.time,x:e.tx+e.size/2,y:e.ty+e.size/2,type:'ruin',s:e.size});(G.ruins||(G.ruins=[])).push({x:e.tx,y:e.ty,s:e.size,t:G.time,v:e.id});recalcCap(e.team);
@@ -1781,13 +1799,13 @@ function distTo(u,t){if(t.k===0)return Math.hypot(t.x-u.x,t.y-u.y);const cx=clam
 function atkOf(u){const D=UD[u.type],tk=G.teams[u.team].tech;let a=D.atk;if(tk.blade&&(u.type==='spear'||u.type==='horse'||u.type==='ele'))a+=2;if(tk.arrow&&u.type==='archer')a+=2;return a}
 function damage(t,amt,src){
   if(t.dead)return;if((src&&src.team===0||t.team===0)&&G.visible[((t.k?t.ty:t.y)|0)*N+((t.k?t.tx:t.x)|0)]){const D=G.dmgn||(G.dmgn=[]);const old=D.find(d=>d.id===t.id&&G.time-d.t<.45);if(old){old.n+=Math.round(amt);old.t=G.time-.05;old.big=1}else{if(D.length>=12)D.shift();D.push({id:t.id,x:t.k?t.tx+t.size/2:t.x,y:t.k?t.ty+t.size/2:t.y,n:Math.max(1,Math.round(amt)),t:G.time,h:t.k?BD[t.type].h*.5:(t.type==='ele'?60:t.type==='wele'?44:30),bad:t.team===0,dx:(Math.random()-.5)*10})}}
-  if(src&&src.k===0&&UD[src.type].range<=2&&G.fx.length<120)G.fx.push({t:G.time,x:t.k?t.tx+t.size/2:t.x,y:t.k?t.ty+t.size/2:t.y,type:t.k?'chip':'spark',h:t.k?BD[t.type].h*.4:14});if(t.k===0&&UD[t.type].mil&&G.teams[t.team].tech.armor)amt=Math.max(1,amt-2);if(t.type==='rhino'&&src&&src.k===0&&UD[src.type].range>2)amt*=.3;t.hp-=amt;t.hitT=G.time;
+  if(src&&src.k===0&&UD[src.type].range<=2&&G.fx.length<120)G.fx.push({t:G.time,x:t.k?t.tx+t.size/2:t.x,y:t.k?t.ty+t.size/2:t.y,type:t.k?'chip':'spark',h:t.k?BD[t.type].h*.4:14});if(t.k===0&&UD[t.type].mil&&G.teams[t.team].tech.armor)amt=Math.max(1,amt-2);if(t.tameT)t.tameT=0;if(t.type==='rhino'&&src&&src.k===0&&UD[src.type].range>2)amt*=.3;t.hp-=amt;t.hitT=G.time;
   const px=t.k?t.tx+t.size/2:t.x,py=t.k?t.ty+t.size/2:t.y;
   G.teams[t.team].alarm={x:px,y:py,t:G.time};
   if(t.team===0&&(t.k===1||!UD[t.type].mil))alertAttack(px,py);
   if(t.k===0&&src&&!src.dead&&src.k===0&&t.hp>amt){
     if((t.type==='wele'||t.type==='tiger'||t.type==='buff'||t.type==='boar'||t.type==='croc'||t.type==='bear'||t.type==='rhino'||t.type==='wolf'||t.type==='snake')&&(!t.order||t.order.type!=='attack'))t.order={type:'attack',id:src.id};
-    else if((t.type==='deer'||t.type==='monkey'||t.type==='peacock'||t.type==='turtle')&&!t.fled){t.fled=1;const dx=t.x-src.x,dy=t.y-src.y,d=Math.hypot(dx,dy)||1,f=freeNear(clamp((t.x+dx/d*3)|0,0,N-1),clamp((t.y+dy/d*3)|0,0,N-1),3);if(f)setOrder(t,{type:'move',goal:{t:0,x:f[0],y:f[1]}})}}
+    else if((t.type==='deer'||t.type==='monkey'||t.type==='peacock'||t.type==='turtle'||t.type==='whorse')&&!t.fled){t.fled=1;const dx=t.x-src.x,dy=t.y-src.y,d=Math.hypot(dx,dy)||1,f=freeNear(clamp((t.x+dx/d*3)|0,0,N-1),clamp((t.y+dy/d*3)|0,0,N-1),3);if(f)setOrder(t,{type:'move',goal:{t:0,x:f[0],y:f[1]}})}}
   if(t.k===0&&UD[t.type].mil&&src&&!src.dead&&src.k===0){
     if(!t.order)t.order={type:'attack',id:src.id,auto:1};
     else if(t.order.type==='attack'&&!t.order.user){const cur=G.ents.get(t.order.id);if(cur&&cur.k===1&&distTo(t,src)<5){t.order={type:'attack',id:src.id,resume:t.order.resume||null};t.path=null}}
@@ -1866,7 +1884,7 @@ function updGather(u,o,dt){
     if(u.ck!==rk){u.ck=rk;u.carry=0}
     if(farm){const b=G.ents.get(o.bid);if(!b){o.p=0;o.ph=u.carry>0?2:0;if(o.ph===2)o.last=0;return}faceTo(u,b.tx+1,b.ty+1)}
     else{const i=o.ty*N+o.tx;if(G.obj[i]!==ok){o.tx=-1;o.p=0;o.ph=u.carry>=CAP?2:0;return}faceTo(u,o.tx+.5,o.ty+.5)}
-    u.work=true;o.t+=dt*RATE[o.res]*G.teams[u.team].gm*(o.res==='farm'&&G.oxN?1+Math.min(.3,.1*(G.oxN[u.team]||0)):1);
+    u.work=true;o.t+=dt*RATE[o.res]*G.teams[u.team].gm*(o.res==='farm'&&G.oxN?1+Math.min(G.teams[u.team].tech.feed?.45:.3,(G.teams[u.team].tech.feed?.15:.1)*(G.oxN[u.team]||0)):1);
     let got=0;
     while(o.t>=1&&u.carry<CAP){o.t-=1;u.carry++;got=1;if(!farm){const i=o.ty*N+o.tx;if(G.amt[i]>0)G.amt[i]--;if(G.amt[i]<=0){G.obj[i]=0;break}}}
     if(got&&G.fx.length<120&&G.tick%2===0){const fx=farm?u.x:o.tx+.5,fy=farm?u.y:o.ty+.5;G.fx.push({t:G.time,x:fx,y:fy,type:rk==='wood'?'chipw':rk==='gold'?'chipg':'grain',h:rk==='wood'?20:6});if(rk==='wood'){if(!G.shake)G.shake=new Float32Array(N*N);G.shake[o.ty*N+o.tx]=G.time}}
@@ -1942,6 +1960,7 @@ function updUnit(u,dt){
     if(o&&(o.type==='move'||o.type==='amove')){if(approach(u,o,dt)===1)u.order=null}
     return}
   if(D.wild||D.stock){
+    if(G.time-(u.tamed||-9)<.5)return;
     if(u.type==='monkey'&&u.steal==null&&(!o||o.type==='move')){u.scan2=(u.scan2||0)-dt;if(u.scan2<=0){u.scan2=4;let best=-1,bd=10;for(let y=Math.max(0,(u.hy|0)-10);y<Math.min(N,(u.hy|0)+10);y++)for(let x=Math.max(0,(u.hx|0)-10);x<Math.min(N,(u.hx|0)+10);x++){const i=y*N+x;if(G.obj[i]!==O_BERRY)continue;const d=Math.hypot(x-u.x,y-u.y);if(d<bd){bd=d;best=i}}if(best>=0){const f=freeNear(best%N,(best/N)|0,2);if(f){setOrder(u,{type:'move',goal:{t:0,x:f[0],y:f[1]}});u.steal=best}}}}
     if(u.type==='monkey'&&u.steal!=null&&(!o||o.type!=='move')){const i=u.steal,bx=i%N,by=(i/N)|0;if(G.obj[i]===O_BERRY&&Math.hypot(bx+.5-u.x,by+.5-u.y)<1.8){u.work=true;u.carry=1;faceTo(u,bx+.5,by+.5);if(G.tick%20===0){G.amt[i]=Math.max(0,G.amt[i]-6);if(!G.amt[i]){G.obj[i]=0;miniDirty=true;u.steal=null}}return}else if(!o)u.steal=null}
     if(u.type==='monkey'&&u.steal!=null&&o&&o.type==='move'){if(approach(u,o,dt)===1)u.order=null;return}
@@ -1950,6 +1969,10 @@ function updUnit(u,dt){
     if(o&&o.type==='move'){if(approach(u,o,dt)===1)u.order=null;return}
     u.scan-=dt;if(u.scan<=0){u.scan=3+G.rnd()*6;const f=freeNear(clamp((u.hx+(G.rnd()-.5)*5)|0,0,N-1),clamp((u.hy+(G.rnd()-.5)*5)|0,0,N-1),2);if(f)setOrder(u,{type:'move',goal:{t:0,x:f[0],y:f[1]}})}
     return}
+  if(u.type==='dog'&&(!o||o.dogHunt)){const T=G.teams[u.team],h=G.blds.find(b=>b.team===u.team&&b.type==='hall');
+    if(u.cf&&h){const hx=h.tx+1.5,hy=h.ty+1.5;if(Math.hypot(hx-u.x,hy-u.y)<2.6){T.res.food+=u.cf;T.gath=(T.gath||0)+u.cf;if(u.team===0){G.stats.gath.food+=u.cf;G.dmgn&&0}u.cf=0;u.order=null}else if(!o){const f=freeNear(h.tx+1,h.ty+h.size,4);if(f)u.order={type:'move',goal:{t:0,x:f[0],y:f[1]},dogHunt:1}}}
+    else if(!o&&T.tech.hound&&h){u.scan3=(u.scan3||0)-dt;if(u.scan3<=0){u.scan3=3;if(!nearEnemy(u,7,true)){let best=null,bd=14;for(const a of G.units){if(a.team!==2||!(a.type==='deer'||a.type==='peacock'||a.type==='boar'||a.type==='monkey'))continue;const d=Math.hypot(a.x-h.tx,a.y-h.ty);if(d<bd){bd=d;best=a}}if(best){u.order={type:'attack',id:best.id,dogHunt:1};return}}}}}
+  if(o&&o.dogHunt&&o.type==='move'){if(approach(u,o,dt)===1)u.order=null;return}
   if(!o){if(D.mil){u.scan-=dt;if(u.scan<=0){u.scan=.5;const t=nearEnemy(u,5.5,true);if(t)u.order={type:'attack',id:t.id,auto:1}}}return}
   switch(o.type){
     case 'move':if(approach(u,o,dt)===1)u.order=null;break;
@@ -1957,6 +1980,15 @@ function updUnit(u,dt){
       if(approach(u,o,dt)===1)u.order=null;break;
     case 'attack':updAttack(u,o,dt);break;
     case 'gather':updGather(u,o,dt);break;
+    case 'tame':{const t=G.ents.get(o.id);if(!t||t.dead||t.team!==2){u.order=null;break}const d=Math.hypot(t.x-u.x,t.y-u.y);
+      if(d>1.6){o.goal={t:0,x:t.x|0,y:t.y|0};if(G.tick%10===0)u.path=null;approach(u,o,dt);break}
+      u.path=null;faceTo(u,t.x,t.y);u.work=true;t.order=null;t.path=null;t.tamed=G.time;const dur=t.type==='wele'?14:8;t.tameT=(t.tameT||0)+dt/Math.max(1,sel.length&&0||1);
+      if(G.tick%8===0)G.fx.push({t:G.time,x:t.x,y:t.y,fx:u.x,fy:u.y,type:'conv'});
+      if(t.tameT>=dur){const nt=t.type==='wele'?'ele':'horse',T=G.teams[u.team];if(T.pop+UD[nt].pop>T.cap){if(u.team===0&&G.time-(G.tameWarn||-9)>4){G.tameWarn=G.time;toast('Cần thêm chỗ ở để nhận '+UD[nt].name,1)}break}
+        const x=t.x,y=t.y,f=t.face;t.dead=true;G.ents.delete(t.id);G.units.splice(G.units.indexOf(t),1);const nu=addUnit(nt,u.team,x,y);nu.face=f;T.pop+=UD[nt].pop;
+        for(const v of G.units)if(v.order&&v.order.type==='tame'&&v.order.id===t.id)v.order=null;
+        if(u.team===0){toast('Đã thuần hóa: có thêm '+UD[nt].name+'!');SND.play('built');G.stats.trained++}G.fx.push({t:G.time,x,y,type:'ageup'})}
+      break}
     case 'build':updBuild(u,o,dt);break;
     case 'enter':{const b=G.ents.get(o.bid);if(!b||!b.built){u.order=null;break}if(!o.goal)o.goal=rectOf(b);const r=approach(u,o,dt);
       if(r===1){if(adjRect(u,o.goal)){if(garCount(b)<BD[b.type].gar){u.inB=b.id;u.order=null;u.path=null;const si=sel.indexOf(u);if(si>=0){sel.splice(si,1);panelKey=''}}else{if(u.team===0)toast(BD[b.type].name+' đã đầy',1);u.order=null}}else{o.p=0;o.f=(o.f||0)+1;if(o.f>5)u.order=null}}break}
@@ -1967,16 +1999,16 @@ function spawnFrom(b,type){
   PNAV=!!UD[type].naval;for(let r=1;r<=4&&!best;r++)for(let y=b.ty-r;y<b.ty+s+r;y++)for(let x=b.tx-r;x<b.tx+s+r;x++){if(!pass(x,y))continue;const d=Math.hypot(x+.5-rx,y+.5-ry);if(d<bd){bd=d;best=[x,y]}}PNAV=false;
   if(!best)return null;
   const u=addUnit(type,b.team,best[0]+.5,best[1]+.5);
-  if(UD[type].stock){u.hx=u.x;u.hy=u.y;u.home=b.id}
+  if(UD[type].stock){u.hx=u.x;u.hy=u.y;u.home=b.id;if(G.teams[b.team].tech.herd){u.max*=2;u.hp=u.max}}
   if(b.rally){const r=b.rally,i=r.y*N+r.x;if(type==='vil'&&G.obj[i])u.order=gatherOrder(RES_OF[G.obj[i]],r.x,r.y);else{const f=freeNear(r.x,r.y,6);if(f)u.order={type:'move',goal:{t:0,x:f[0],y:f[1]}}}}
   if(b.team===0){G.stats.trained++;SND.play('train')}
   return u;
 }
 function updBld(b,dt){
   if(!b.built)return;const d=BD[b.type],T=G.teams[b.team];
-  if(b.type==='pen'){b.pt=(b.pt||0)+dt;if(b.pt>=25){b.pt=0;if(G.units.filter(u=>u.type==='duck'&&u.home===b.id).length<4){const f=freeNear(b.tx+1,b.ty+b.size,3);if(f){const d=addUnit('duck',b.team,f[0]+.5,f[1]+.5);d.hx=b.tx+1;d.hy=b.ty+b.size+.5;d.home=b.id}}}}
+  if(b.type==='pen'){b.pt=(b.pt||0)+dt;if(b.pt>=25){b.pt=0;if(G.units.filter(u=>u.type==='duck'&&u.home===b.id).length<(G.teams[b.team].tech.herd?7:4)){const f=freeNear(b.tx+1,b.ty+b.size,3);if(f){const d=addUnit('duck',b.team,f[0]+.5,f[1]+.5);d.hx=b.tx+1;d.hy=b.ty+b.size+.5;d.home=b.id}}}}
   if(b.rs){const isAge=b.rs.k==='age',need=isAge?AGES[T.age+1].time:TECH[b.rs.k].time;b.rs.t+=dt*T.tm;
-    if(b.rs.t>=need){if(isAge)ageUp(b.team);else{T.tech[b.rs.k]=1;if(b.team===0){toast('Lò rèn: đã xong '+TECH[b.rs.k].name);SND.play('built');panelKey=''}}b.rs=null}}
+    if(b.rs.t>=need){if(isAge)ageUp(b.team);else{T.tech[b.rs.k]=1;if(b.team===0){toast(BD[b.type].name+': đã xong '+TECH[b.rs.k].name);SND.play('built');panelKey=''}}b.rs=null}}
   if(b.queue.length){const q=b.queue[0],ud=UD[q.type];if(q.t<ud.time)q.t+=dt*T.tm*(b.team===0&&G.fastTrain?6:1);
     if(q.t>=ud.time&&T.pop+ud.pop<=T.cap){if(spawnFrom(b,q.type)){b.queue.shift();T.pop+=ud.pop;if(b.team===0&&sel[0]===b)panelKey=''}}}
   if(d.atk){b.cd-=dt;if(b.cd<=0){const cx=b.tx+b.size/2,cy=b.ty+b.size/2;let best=null,bdist=d.range;
@@ -2163,7 +2195,7 @@ function step(dt){
   if(G.auto&&!G.demo&&G.tick%20===2){if(!G.ais[0])autoInit();aiTick(0)}
   if(G.fx.length>120)G.fx.splice(0,G.fx.length-120);
   if(G.tick%20===0){const ox={};for(const u of G.units)if(u.type==='ox')ox[u.team]=(ox[u.team]||0)+1;G.oxN=ox}
-  if(G.tick%300===0)for(const u of G.units)if(u.type==='chick'&&G.teams[u.team]&&u.team!==2){G.teams[u.team].res.food+=5;if(u.team===0)G.stats.gath.food+=5}
+  if(G.tick%300===0)for(const u of G.units)if(u.type==='chick'&&G.teams[u.team]&&u.team!==2){const e2=G.teams[u.team].tech.egg?10:5;G.teams[u.team].res.food+=e2;G.teams[u.team].gath=(G.teams[u.team].gath||0)+e2;if(u.team===0)G.stats.gath.food+=e2}
   if(G.tick%10===0)for(const d of G.units)if(d.type==='dog'){d.bark=false;for(const e of G.units)if(foe(d.team,e.team)&&!UD[e.type].wild&&Math.abs(e.x-d.x)<7&&Math.abs(e.y-d.y)<7){d.bark=true;if(d.team===0&&G.time-(G.barkT||-99)>20){G.barkT=G.time;toast('Chó sủa: có địch tới gần làng!',1);alertAttack(e.x,e.y);SND.play('bark',d.x,d.y)}break}}
   if(G.dmgn&&G.dmgn.length&&G.time-G.dmgn[0].t>1)G.dmgn=G.dmgn.filter(d=>G.time-d.t<1);
   if(G.tick%100===0){const T0=G.teams[0];let a0=0,ae=0;for(const u of G.units){if(UD[u.type].mil||UD[u.type].hero){if(u.team===0)a0++;else if(foe(0,u.team))ae++}}const S=G.stats.gath;(G.hist||(G.hist=[])).push([Math.round(G.time),T0.pop,a0,ae,S.food+S.wood+S.gold])}
@@ -2218,6 +2250,7 @@ function newGame(diff){
   const FAUNA=[
     ['deer','grass',3,12,[3,2.5,2,2.5,2,5]],
     ['buff','open',3,12,[1,1.5,0,1,.5,5]],
+    ['whorse','open',3,13,[1.5,1,.5,1,1,3]],
     ['wele','edge',1,11,[2,2,2.5,2,1.5,3]],
     ['rhino','open',1,15,[.5,.5,0,.5,0,2]],
     ['tiger','forest',1,14,[1,1,2,1,1,.5]],
@@ -2365,7 +2398,7 @@ function render(){
       if(b.built&&b.type==='house'){const cx=it[3]+8,cy=it[4]+b.size*HH-BD.house.h-6;ctx.fillStyle='rgba(225,225,220,.55)';for(let k=0;k<3;k++){const a=(now/1600+k/3+b.id*.13)%1;ctx.globalAlpha=.55*(1-a);ctx.beginPath();ctx.arc(cx+Math.sin(a*5+k)*4+a*8,cy-a*30,3+a*6,0,7);ctx.fill()}ctx.globalAlpha=1}
       if(b.built&&b.hp<b.max*.4){{const cx=it[3],cy=it[4]+b.size*HH-BD[b.type].h;for(let k=0;k<6;k++){const a=(now/1400+k/6+b.id*.17)%1;ctx.globalAlpha=.5*(1-a);ctx.fillStyle=k%2?'#2e2a28':'#4a4440';ctx.beginPath();ctx.arc(cx+Math.sin(a*4+k)*6+a*14,cy-a*70,5+a*14,0,7);ctx.fill()}ctx.globalAlpha=1}const cx=it[3],cy=it[4]+b.size*HH-BD[b.type].h*.55;for(let k=0;k<b.size*2+1;k++){const fx=cx+(k-b.size)*10,fl=Math.sin(now/90+k*1.7)*3,hh=12+((k*7)%5)+fl;ctx.fillStyle='rgba(240,120,30,.85)';ctx.beginPath();ctx.moveTo(fx-5,cy);ctx.quadraticCurveTo(fx-4,cy-hh*.6,fx,cy-hh);ctx.quadraticCurveTo(fx+4,cy-hh*.6,fx+5,cy);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,215,90,.9)';ctx.beginPath();ctx.moveTo(fx-2.5,cy);ctx.quadraticCurveTo(fx-2,cy-hh*.35,fx,cy-hh*.6);ctx.quadraticCurveTo(fx+2,cy-hh*.35,fx+2.5,cy);ctx.closePath();ctx.fill()}}
       if(b.built&&b.hp<b.max*.5){const cx=it[3],cy=it[4]+b.size*HH-BD[b.type].h*.5;ctx.fillStyle='rgba(60,50,45,.5)';for(let k=0;k<3;k++){const a=(now/900+k/3)%1;ctx.globalAlpha=.5*(1-a);ctx.beginPath();ctx.arc(cx+Math.sin(k*2+a*3)*6,cy-a*26,4+a*7,0,7);ctx.fill()}ctx.globalAlpha=1}}
-    else{const u=it[2];drawUnit(ctx,u.type,u.team,it[3]-(t-u.hitT<.15?(u.face||1)*2.2*(1-(t-u.hitT)/.15):0),it[4],{bark:u.bark,born:u.born,hidden:u.type==='snake'&&!u.moving&&!u.order,wk:u.order&&(u.order.type==='build'?'build':u.order.res),hit:t-u.hitT<.15,up:u.moving&&u.up,age:G.teams[u.team]?G.teams[u.team].age:1,sc:usc(u.type),face:u.face,anim:u.anim+RA*.05,moving:u.moving,work:u.work,carry:u.carry,ck:u.ck,atk:Math.max(0,1-(t-u.atkT)/.25)})}
+    else{const u=it[2];drawUnit(ctx,u.type,u.team,it[3]-(t-u.hitT<.15?(u.face||1)*2.2*(1-(t-u.hitT)/.15):0),it[4],{carryMeat:u.cf>0,tame:u.tameT>0&&G.time-(u.tamed||-9)<.3,bark:u.bark,born:u.born,hidden:u.type==='snake'&&!u.moving&&!u.order,wk:u.order&&(u.order.type==='build'?'build':u.order.res),hit:t-u.hitT<.15,up:u.moving&&u.up,age:G.teams[u.team]?G.teams[u.team].age:1,sc:usc(u.type),face:u.face,anim:u.anim+RA*.05,moving:u.moving,work:u.work,carry:u.carry,ck:u.ck,atk:Math.max(0,1-(t-u.atkT)/.25)})}
   }
   if(placing){const sp=sprB(0,ageOf(0),placing.type);ctx.globalAlpha=.65;for(const [gx,gy] of ghostTiles().sort((a,b)=>a[0]+a[1]-b[0]-b[1])){const wx=(gx-gy)*HW,wy=(gx+gy)*HH;ctx.drawImage(sp.c,wx-sp.ax,wy-sp.ay,sp.w,sp.h)}ctx.globalAlpha=1}
   // tên bay
@@ -2429,6 +2462,7 @@ function render(){
   const bar=(x,y,w,f,col)=>{ctx.fillStyle=INK;ctx.fillRect(x-w/2-1,y-1,w+2,6);ctx.fillStyle='#5b3a2a';ctx.fillRect(x-w/2,y,w,4);ctx.fillStyle=col;ctx.fillRect(x-w/2,y,w*clamp(f,0,1),4)};
   let hurt=0;for(const it of list)if(it[1]===2&&it[2].hp<it[2].max)hurt++;const crowd=hurt>12;
   for(const it of list){
+    if(it[1]===2&&it[2].tameT>0&&G.time-(it[2].tamed||-9)<.3){const u=it[2];bar(it[3],it[4]-(u.type==='wele'?60:44)*usc(u.type),26,u.tameT/(u.type==='wele'?14:8),'#f08ac0')}
     if(it[1]===2){const u=it[2];const isSel=sel.indexOf(u)>=0;if(crowd&&!isSel&&u.hp<u.max){const f=u.hp/u.max,w=12,y=it[4]-(u.type==='ele'?72:u.type==='wele'?54:34)*usc(u.type);ctx.globalAlpha=.85;ctx.fillStyle='rgba(30,16,8,.7)';ctx.fillRect(it[3]-w/2,y,w,2.2);ctx.fillStyle=foe(0,u.team)?'#e0563a':u.team!==0?'#e2b23a':'#5fbf6a';ctx.fillRect(it[3]-w/2,y,w*clamp(f,0,1),2.2);ctx.globalAlpha=1;continue}
       if(u.hp<u.max||isSel){const f=u.hp/u.max;bar(it[3],it[4]-(u.type==='ele'?72:u.type==='wele'?54:u.type==='duck'?18:u.type==='tiger'?28:u.type==='buff'?30:u.type==='boar'?22:u.type==='croc'?14:(UD[u.type].bh||34))*usc(u.type)-4,u.type==='ele'||u.type==='wele'?30:20,f,foe(0,u.team)?'#e0563a':u.team!==0?'#e2b23a':f>.5?'#5fbf6a':f>.25?'#e2b23a':'#e0563a')}}
     else if(it[1]===1){const b=it[2],d=BD[b.type];if(b.team!==0&&!vis[(b.ty+(b.size>>1))*N+b.tx+(b.size>>1)]&&!(sel[0]===b))continue;const y=it[4]+b.size*HH-d.h-12;
@@ -2499,7 +2533,7 @@ function refreshPanel(){
         if(e.team===0&&e.built&&e.type==='hall'&&ageOf(0)<3){const nx=AGES[ageOf(0)+1];h+=`<button class="act leaf" data-a="age" data-acost="1"><img class="ic" src="${ICON.hall}" alt=""><b>Lên ${nx.name}</b>${costHtml(nx.cost)}</button>`}
         if(e.team===0&&e.built&&d.train){for(const t of d.train){const u=UD[t],lk=(u.age||1)>ageOf(0);h+=`<button class="act leaf" data-a="train:${t}" data-cost="${t}"><img class="ic" src="${ICON[t]}" alt=""><b>${u.name}</b>${lk?'<span class="cost">Cần thời '+AGES[u.age].n+'</span>':costHtml(u.cost)}</button>`}
           h+=`<button class="act leaf" data-a="rally">${ACT_FLAG}<b>Tập kết</b></button>`}
-        if(e.team===0&&e.built&&e.type==='smithy')for(const k in TECH){const tk=TECH[k],dn=G.teams[0].tech[k];h+=`<button class="act leaf" data-a="tech:${k}" data-tcost="${k}"><img class="ic" src="${ICON[tk.ic]}" alt=""><b>${tk.name}</b>${dn?'<span class="cost">Đã xong</span>':(tk.age||1)>ageOf(0)?'<span class="cost">Cần thời '+AGES[tk.age].n+'</span>':costHtml(tk.cost)}</button>`}
+        if(e.team===0&&e.built&&(e.type==='smithy'||e.type==='pen'))for(const k in TECH){if((TECH[k].at||'smithy')!==e.type)continue;const tk=TECH[k],dn=G.teams[0].tech[k];h+=`<button class="act leaf" data-a="tech:${k}" data-tcost="${k}"><img class="ic" src="${ICON[tk.ic]}" alt=""><b>${tk.name}</b>${dn?'<span class="cost">Đã xong</span>':(tk.age||1)>ageOf(0)?'<span class="cost">Cần thời '+AGES[tk.age].n+'</span>':costHtml(tk.cost)}</button>`}
         if(e.team===0&&e.built&&d.gar)h+=`<button class="act leaf" data-a="bell">${ACT_BELL}<b>${e.type==='hall'?'Rung chuông':'Gọi vào trú'}</b><span class="cost">Dân gần vào trú</span></button><button class="act leaf" data-a="eject">${ACT_OUT}<b>Cho ra hết</b></button>`;
         if(e.team===0&&e.built&&e.type==='market')TRADE.forEach(([a,b,x,y],i)=>{h+=`<button class="act leaf" data-a="trade:${i}" data-rcost="${i}"><img class="ic" src="${ICON[b]}" alt=""><b>Đổi lấy ${y} ${RNAME[b].toLowerCase()}</b>${costHtml({[a]:x})}</button>`});
       }else if(e.team===0){
@@ -2598,6 +2632,10 @@ function command0(pick){
   if(pick.ent){const e=pick.ent;
     if(e.team===0&&e.k===0&&UD[e.type].stock){const vs=us.filter(u=>u.type==='vil');if(vs.length){for(const v of vs)setOrder(v,{type:'attack',id:e.id,user:1});ping(e.x,e.y,'#ffe08a');return true}return false}
     if(e.team===0&&e.k===0){const hs=us.filter(u=>u.type==='healer');if(hs.length&&e.hp<e.max){for(const h of hs)setOrder(h,{type:'heal',id:e.id});ping(e.x,e.y,'#8ef08a');return true}return false}
+    if(e.team===2&&(e.type==='wele'||e.type==='whorse')&&us.some(u=>u.type==='vil')){const vs=us.filter(u=>u.type==='vil'),T=G.teams[0],ele=e.type==='wele',cost=ele?{food:120,gold:40}:{food:50};
+      if(ele&&!G.blds.some(b=>b.team===0&&b.type==='stable'&&b.built)){toast('Cần xây Chuồng voi ngựa trước mới thuần hóa được voi',1);return true}
+      if(!e.tamePaid){if(!canAfford(0,cost)){toast('Thuần hóa cần '+missing(cost),1);return true}pay(0,cost);e.tamePaid=1}
+      for(const v of vs)setOrder(v,{type:'tame',id:e.id,user:1});for(const u of us)if(u.type!=='vil'&&u.type!=='healer'&&u.type!=='monk')setOrder(u,{type:'move',goal:{t:0,x:u.x|0,y:u.y|0}});ping(e.x,e.y,'#f08ac0');toast(ele?'Dân làng đang dỗ voi rừng (giữ yên 14 giây, đừng đánh nó)':'Dân làng đang bắt ngựa hoang (8 giây)');return true}
     if(foe(0,e.team)||e.team===2){for(const u of us){if(u.type==='monk'){if(e.k===0&&foe(0,e.team))setOrder(u,{type:'convert',id:e.id})}else if(u.type!=='healer')setOrder(u,{type:'attack',id:e.id,user:1})}const c=e.k?centerOf(e):[e.x,e.y];ping(c[0],c[1],'#ff7a5a');return true}
     if(e.k===1){const vs=us.filter(u=>u.type==='vil');const [cx,cy]=centerOf(e);
       if(!e.built&&vs.length){for(const u of vs)setOrder(u,{type:'build',bid:e.id});ping(cx,cy,'#ffe08a');return true}
@@ -2721,7 +2759,7 @@ $('pacts').addEventListener('click',e=>{
   else if(a==='cancel')cancelModes();
   else if(a==='stop'){for(const u of sel)if(u.k===0&&u.team===0)setOrder(u,null)}
   else if(a==='rally'){rallyMode=true;refreshPanel()}
-  else if(a==='tech'){const bl=sel[0];if(bl&&bl.k===1&&bl.team===0&&bl.built&&bl.type==='smithy')research(bl,arg);refreshPanel()}
+  else if(a==='tech'){const bl=sel[0];if(bl&&bl.k===1&&bl.team===0&&bl.built&&(bl.type==='smithy'||bl.type==='pen'))research(bl,arg);refreshPanel()}
   else if(a==='trade')trade(+arg);
   else if(a==='enter'){let n=0;for(const u of sel.slice())if(canShelter(u)){const b=bestShelter(u);if(b){setOrder(u,{type:'enter',bid:b.id});n++}}toast(n?'Đang vào trú':'Không còn chỗ trú',!n)}
   else if(a==='bell'){const bl=sel[0];if(bl&&bl.k===1){let n=0,room=BD[bl.type].gar-garCount(bl);for(const u of G.units)if(u.team===0&&u.type==='vil'&&!u.inB&&room>0&&distTo(u,bl)<12){setOrder(u,{type:'enter',bid:bl.id});room--;n++}toast(n?n+' dân làng đang vào trú':'Không có dân ở gần')}}
@@ -2944,7 +2982,7 @@ function boot(){
   setDiff(1);startDemo();requestAnimationFrame(frame);
 }
 /* Móc gỡ lỗi / kiểm thử */
-window.SG={get G(){return G},cam,t2s,s2t,BD,SPR,sprB,drawUnit,USC,ICON,portrait,
+window.SG={get G(){return G},cam,t2s,s2t,BD,SPR,sprB,drawUnit,USC,ICON,portrait,command,select,
   start(d,map,mode,size){if(size!=null)curSize=size;$('ovStart').classList.add('hid');$('ovEnd').classList.add('hid');$('ovPause').classList.add('hid');if(map!=null)curMap=map;if(mode!=null)curMode=mode;newGame(d==null?1:d)},
   ff(sec){const n=Math.round(sec*20);for(let i=0;i<n&&!G.over;i++)step(.05);updateTop();refreshPanel();return this.info()},
   reveal(v){G.reveal=v!==false;updFog()},
