@@ -1981,7 +1981,7 @@ function updUnit(u,dt){
     case 'attack':updAttack(u,o,dt);break;
     case 'gather':updGather(u,o,dt);break;
     case 'tame':{const t=G.ents.get(o.id);if(!t||t.dead||t.team!==2){u.order=null;break}const d=Math.hypot(t.x-u.x,t.y-u.y);
-      if(d>1.6){o.goal={t:0,x:t.x|0,y:t.y|0};if(G.tick%10===0)u.path=null;approach(u,o,dt);break}
+      if(d>(t.type==='wele'?2.7:1.7)&&!(o.p&&!u.path&&d<3.2)){if(!o.goal||Math.hypot(o.goal.x-t.x,o.goal.y-t.y)>1.8){o.goal={t:0,x:t.x|0,y:t.y|0};o.p=0}if(approach(u,o,dt)===1)o.p=0;break}
       u.path=null;faceTo(u,t.x,t.y);u.work=true;t.order=null;t.path=null;t.tamed=G.time;const dur=t.type==='wele'?14:8;t.tameT=(t.tameT||0)+dt/Math.max(1,sel.length&&0||1);
       if(G.tick%8===0)G.fx.push({t:G.time,x:t.x,y:t.y,fx:u.x,fy:u.y,type:'conv'});
       if(t.tameT>=dur){const nt=t.type==='wele'?'ele':'horse',T=G.teams[u.team];if(T.pop+UD[nt].pop>T.cap){if(u.team===0&&G.time-(G.tameWarn||-9)>4){G.tameWarn=G.time;toast('Cần thêm chỗ ở để nhận '+UD[nt].name,1)}break}
