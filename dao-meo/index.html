@@ -101,6 +101,9 @@
     </div>
     <h3>Điều khiển</h3>
     <label><input type="checkbox" id="auto" checked> Tự động giả lập người xem</label>
+    <label><input type="checkbox" id="vo" checked> 🔊 Giọng đọc câu hỏi và đáp án</label>
+    <label><input type="checkbox" id="so" checked> 🎵 Hiệu ứng âm thanh</label>
+    <div class="g"><button data-a="voicetest">🔊 Thử giọng đọc</button></div>
     <label>Tốc độ <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select></label>
     <p class="note">Câu hỏi hiện 25 giây. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý tự mở dần ở giây 8 và 16. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
   </aside>
@@ -213,6 +216,7 @@ function nextQ(){
   $('tag').textContent=cur.cat||'ĐỐ MẸO';$('q').textContent=cur.q;$('why').textContent='';
   $('qn').textContent='Câu '+round;$('win').innerHTML='';
   renderHint();
+  lastTick=-1;speak('Câu số '+round+'. '+cur.q);
 }
 function hintText(){
   const words=cur.show.split(' ');
@@ -228,8 +232,36 @@ function reveal(){
   $('hint').innerHTML=cur.show.toUpperCase();
   $('why').textContent=cur.why;
   $('tf').style.width='0%';
+  if(winners.length)sfx.ta();else sfx.buzz();
+  speak('Đáp án là '+cur.show+'. '+cur.why);
 }
 function toast(txt){const e=$('toast');e.textContent=txt;e.classList.remove('show');void e.offsetWidth;e.classList.add('show');}
+
+/* ---------- âm thanh & giọng đọc ---------- */
+if(params.get('voice')==='0')$('vo').checked=false;
+if(params.get('sound')==='0')$('so').checked=false;
+let actx=null,viVoice=null,lastTick=-1;
+const unlock=()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();}catch(e){}};
+addEventListener('pointerdown',unlock);addEventListener('keydown',unlock);
+try{unlock();}catch(e){}
+function beep(f,d,type,vol,delay){
+  if(!$('so').checked||!actx)return;
+  try{const o=actx.createOscillator(),g=actx.createGain(),t0=actx.currentTime+(delay||0);
+    o.type=type||'sine';o.frequency.value=f;g.gain.setValueAtTime(vol||.08,t0);g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+    o.connect(g);g.connect(actx.destination);o.start(t0);o.stop(t0+d);}catch(e){}
+}
+const sfx={
+  ding(){beep(880,.18,'triangle',.1);beep(1320,.25,'triangle',.1,.12);},
+  tick(){beep(620,.05,'square',.035);},
+  ta(){[523,659,784,1047].forEach((f,i)=>beep(f,.22,'triangle',.1,i*.09));},
+  buzz(){beep(180,.35,'sawtooth',.06);}
+};
+function loadVoice(){try{viVoice=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang))||null;}catch(e){}}
+try{speechSynthesis.onvoiceschanged=loadVoice;loadVoice();}catch(e){}
+function speak(text){
+  if(!$('vo').checked||!('speechSynthesis' in window))return;
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=.95;speechSynthesis.speak(u);}catch(e){}
+}
 
 /* ---------- sự kiện ---------- */
 function player(u){let p=players.get(u);if(!p){p={user:u,score:0,correct:0};players.set(u,p);}return p;}
@@ -249,7 +281,7 @@ function handle(ev){
       done.add(u);const rank=winners.length,pts=Math.round((POINTS[rank]??1)*mult);
       const p=player(u);p.score+=pts;p.correct++;
       winners.push({u,pts});
-      chat(u,'✅ đúng rồi!',true);
+      chat(u,'✅ đúng rồi!',true);sfx.ding();
       const d=document.createElement('div');d.className='line ok';d.textContent='#'+winners.length+' '+u+' +'+pts;$('win').appendChild(d);
       if(winners.length===1)toast('🎉 '+u+' nhanh nhất!');
       if(winners.length>=8)reveal();
@@ -281,6 +313,7 @@ function tick(dt){
     if(hintStage<1&&el>=8){hintStage=1;renderHint();}
     if(hintStage<2&&el>=16){hintStage=2;renderHint();}
     $('tf').style.width=Math.max(0,t/ASK*100)+'%';
+    if(t<=5&&t>0&&Math.ceil(t)!==lastTick){lastTick=Math.ceil(t);sfx.tick();}
     if(t<=0)reveal();
   }else if(ph==='reveal'&&t<=0)nextQ();
   autoSim(dt);
@@ -318,6 +351,7 @@ document.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{
   else if(a==='join')handle({type:'join',user:fake()});
   else if(a==='like')handle({type:'like',user:u,count:20});
   else if(a==='skip'&&ph==='ask')reveal();
+  else if(a==='voicetest'){unlock();speak(cur?cur.q:'Xin chào các bạn, chào mừng đến với Đố Mẹo Live');}
   else if(a==='rose'||a==='turret'||a==='lion')handle({type:'gift',user:u,gift:a,count:1});
 });
 $('tog').onclick=()=>$('panel').classList.toggle('open');
