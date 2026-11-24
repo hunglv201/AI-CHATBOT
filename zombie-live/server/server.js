@@ -15,7 +15,8 @@ if (!mock && !username) {
 }
 
 /* ---- web server: phục vụ game + WebSocket cùng một cổng ---- */
-const GAME = path.join(__dirname, '..', 'index.html');
+const gameName = (args.find(a => a.startsWith('--game=')) || '--game=zombie-live').split('=')[1];
+const GAME = path.join(__dirname, '..', '..', gameName, 'index.html');
 const server = http.createServer((req, res) => {
   if (req.url.split('?')[0] === '/' ) {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

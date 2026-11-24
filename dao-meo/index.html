@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Đố Mẹo Live</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#120a24;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  #wrap{display:flex;height:100%;align-items:center;justify-content:center;gap:12px;padding:8px}
+  #stage{container-type:size;position:relative;overflow:hidden;aspect-ratio:9/16;width:min(calc(100vw - 310px),calc((100vh - 16px)*9/16));
+    background:radial-gradient(120% 80% at 50% 0%,#5b2bd6 0%,#2a1170 45%,#150a38 100%);border:2px solid #2a1a55;border-radius:10px}
+  body.land #stage{aspect-ratio:16/9;width:min(calc(100vw - 310px),calc((100vh - 16px)*16/9))}
+  body.obs #wrap{padding:0}
+  body.obs #stage{border:0;border-radius:0;width:min(100vw,calc(100vh*9/16))}
+  body.obs.land #stage{width:min(100vw,calc(100vh*16/9))}
+  body.obs #panel,body.obs #tog{display:none}
+  .col{position:absolute;inset:0;display:flex;flex-direction:column;padding:3.5cqmin;gap:2.4cqmin}
+  .top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:4cqmin}
+  .logo{font-size:5.4cqmin;letter-spacing:.3cqmin;background:linear-gradient(90deg,#ffd54a,#ff7ab8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pill{background:rgba(255,255,255,.14);border-radius:99px;padding:.8cqmin 2.6cqmin}
+  .card{background:#fff;color:#1c1038;border-radius:4cqmin;padding:4cqmin 3.6cqmin;text-align:center;box-shadow:0 1.2cqmin 0 #b9a2ff, 0 3cqmin 5cqmin rgba(0,0,0,.35);position:relative;transition:background .25s}
+  .tag{display:inline-block;background:#ff4f8b;color:#fff;font-weight:800;font-size:3.2cqmin;border-radius:99px;padding:.6cqmin 2.6cqmin;margin-bottom:2cqmin}
+  #q{font-weight:900;font-size:6.2cqmin;line-height:1.25;min-height:19cqmin;display:flex;align-items:center;justify-content:center}
+  body.land #q{font-size:4.4cqmin;min-height:0}
+  .timer{height:2.2cqmin;border-radius:9px;background:#e6defa;margin-top:3cqmin;overflow:hidden}
+  #tf{height:100%;width:100%;background:linear-gradient(90deg,#2ecc71,#f1c40f,#e74c3c);background-size:300% 100%;transition:width .1s linear}
+  #hint{margin-top:2.6cqmin;font-weight:800;font-size:5cqmin;letter-spacing:.8cqmin;color:#6a3bd8;min-height:6.5cqmin;word-break:break-word}
+  #hint small{display:block;letter-spacing:0;font-size:3cqmin;color:#8b7ab5;font-weight:700}
+  .card.reveal{background:#eafff0}
+  .card.reveal #hint{color:#17a34a;letter-spacing:0;font-size:7cqmin}
+  #why{font-size:3.4cqmin;font-weight:600;color:#4a3a78;margin-top:1cqmin}
+  .row{display:flex;gap:2.4cqmin;flex:1;min-height:0}
+  .box{background:rgba(0,0,0,.28);border-radius:3cqmin;padding:2.4cqmin;flex:1;min-width:0;overflow:hidden}
+  .box h4{margin:0 0 1.2cqmin;font-size:3.2cqmin;color:#ffd54a;letter-spacing:.2cqmin}
+  .line{font-size:3.3cqmin;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .line.ok{color:#7dffa6;font-weight:800;animation:pop .35s}
+  .line.bad{opacity:.75}
+  @keyframes pop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+  .bars{display:flex;flex-direction:column;gap:1.4cqmin}
+  .bar{position:relative;height:5cqmin;background:rgba(0,0,0,.4);border-radius:99px;overflow:hidden}
+  .bar i{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#ffb300,#ffe14d);transition:width .2s}
+  .bar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:3cqmin;text-shadow:0 1px 2px #000}
+  .how{text-align:center;font-weight:800;font-size:3.3cqmin;opacity:.9}
+  #toast{position:absolute;left:0;right:0;top:36%;text-align:center;font-weight:900;font-size:8cqmin;color:#ffe14d;text-shadow:0 .6cqmin 0 #8a2be2,0 1cqmin 3cqmin #000;opacity:0;pointer-events:none}
+  #toast.show{animation:ban 1.8s forwards}
+  @keyframes ban{0%{opacity:0;transform:scale(.5)}15%{opacity:1;transform:scale(1.05)}80%{opacity:1}100%{opacity:0}}
+  #panel{width:290px;flex:none;background:#1a1236;border:1px solid #3a2a70;border-radius:8px;padding:12px;font-size:13px;max-height:calc(100vh - 16px);overflow:auto}
+  #panel h3{margin:0 0 4px;font-size:14px;color:#ffd54a}
+  #panel .g{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 12px}
+  button,select{background:#35248a;color:#fff;border:1px solid #5a43c8;padding:7px 6px;font:inherit;cursor:pointer;border-radius:6px}
+  button:hover{background:#4733b3}
+  label{display:block;margin:6px 0}
+  .note{opacity:.65;font-size:11px;line-height:1.4}
+  #tog{display:none}
+  @media(max-width:760px){
+    #wrap{display:block;padding:0}
+    #stage{width:100vw;height:100dvh;aspect-ratio:auto;margin:0 auto;border:0;border-radius:0}
+    body.land #stage{width:min(100vw,calc(100dvh*16/9));height:auto;aspect-ratio:16/9}
+    #panel{position:fixed;left:0;right:0;bottom:0;width:100%;max-height:60vh;z-index:5;transform:translateY(100%);transition:transform .2s}
+    #panel.open{transform:none}
+    #tog{display:block;position:fixed;left:min(172px,45vw);top:10px;z-index:6;font-size:11px;padding:5px 7px;opacity:.85}
+    body.obs #tog{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <div class="col">
+      <div class="top"><span class="logo">ĐỐ MẸO LIVE</span><span class="pill" id="qn">Câu 1</span></div>
+      <div class="card" id="card">
+        <span class="tag" id="tag">ĐỐ MẸO</span>
+        <div id="q">…</div>
+        <div class="timer"><div id="tf"></div></div>
+        <div id="hint"></div>
+        <div id="why"></div>
+      </div>
+      <div class="row">
+        <div class="box"><h4>✅ TRẢ LỜI ĐÚNG</h4><div id="win"></div></div>
+        <div class="box"><h4>🏆 TOP ĐIỂM</h4><div id="lb"></div></div>
+      </div>
+      <div class="box" style="flex:none;height:25cqmin"><h4>💬 CHAT</h4><div id="chat"></div></div>
+      <div class="bars"><div class="bar" id="en"><i></i><span></span></div></div>
+      <div class="how">Gõ đáp án vào comment · Thả tim để x2 điểm</div>
+    </div>
+    <div id="toast"></div>
+  </div>
+  <button id="tog">⚙ Điều khiển</button>
+  <aside id="panel">
+    <h3>Giả lập sự kiện TikTok LIVE</h3>
+    <div class="g">
+      <button data-a="good">✅ Trả lời đúng</button>
+      <button data-a="bad">❌ Trả lời sai</button>
+      <button data-a="join">+ Vào phòng</button>
+      <button data-a="like">❤️ Like x20</button>
+      <button data-a="rose">🌹 Quà: gợi ý</button>
+      <button data-a="turret">⏱ Quà: +5 giây</button>
+      <button data-a="lion">🦁 Quà: x2 điểm</button>
+      <button data-a="skip">⏭ Qua câu</button>
+    </div>
+    <h3>Điều khiển</h3>
+    <label><input type="checkbox" id="auto" checked> Tự động giả lập người xem</label>
+    <label>Tốc độ <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select></label>
+    <p class="note">Câu hỏi hiện 25 giây. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý tự mở dần ở giây 8 và 16. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
+  </aside>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+if(params.get('obs'))document.body.classList.add('obs');
+const land=params.get('mode')==='land'||(params.get('mode')!=='portrait'&&innerWidth>innerHeight&&innerWidth>900);
+if(land)document.body.classList.add('land');
+const rnd=(a,b)=>a+Math.random()*(b-a),pick=a=>a[Math.floor(Math.random()*a.length)];
+const norm=s=>' '+String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/[^a-z0-9]+/g,' ').trim()+' ';
+
+/* ---------- ngân hàng câu hỏi ---------- */
+const BANK=[
+ {q:'Cái gì càng lau càng ướt?',a:['khăn','cái khăn','khăn lau'],show:'cái khăn',why:'Lau bàn thì khăn ướt dần!'},
+ {q:'Con gì đập thì sống, không đập thì chết?',a:['tim','con tim','trái tim'],show:'con tim',why:'Tim ngừng đập là toang!'},
+ {q:'Cái gì của bạn nhưng người khác dùng nhiều hơn bạn?',a:['tên','cái tên','tên của bạn'],show:'cái tên',why:'Ai cũng gọi tên bạn, bạn có tự gọi đâu.'},
+ {q:'Từ nào ai cũng đọc sai?',a:['sai','từ sai','chữ sai'],show:'từ sai',why:'Đọc "sai" là đúng rồi còn gì!'},
+ {q:'Cái gì có tay mà không có chân?',a:['áo','cái áo'],show:'cái áo',why:'Áo có tay áo, có cổ áo nhưng không đi được.'},
+ {q:'Cái gì đi lên mà không bao giờ đi xuống?',a:['tuổi','tuổi tác','tuổi của bạn'],show:'tuổi',why:'Sinh nhật nào cũng +1, không có -1!'},
+ {q:'Con gì mang cả nhà đi khắp nơi?',a:['ốc','ốc sên','con ốc','con ốc sên'],show:'ốc sên',why:'Vác nhà trên lưng luôn!'},
+ {q:'Quả gì không ai ăn được?',a:['quả đất','trái đất','địa cầu'],show:'quả đất',why:'Quả này to quá nuốt không nổi.'},
+ {q:'Cái gì luôn ở phía trước bạn nhưng bạn không thể nhìn thấy?',a:['tương lai','tương lai của bạn'],show:'tương lai',why:'Chưa tới mà, sao thấy được!'},
+ {q:'Cái gì làm bạn khóc mà không ai đánh bạn?',a:['hành','củ hành','hành tây','hành lá'],show:'củ hành',why:'Thái hành là nước mắt tuôn rơi.'},
+ {q:'Cái gì có nhiều răng nhưng không bao giờ cắn?',a:['lược','cái lược','cưa','cái cưa','bánh răng'],show:'cái lược',why:'Chải đầu thôi, đâu có cắn!'},
+ {q:'Tháng nào có 28 ngày?',a:['tất cả','tháng nào cũng có','tháng nào cũng vậy','cả 12 tháng','12 tháng','mọi tháng','tháng nào cũng'],show:'tháng nào cũng có',why:'Tháng nào cũng có ít nhất 28 ngày, không riêng tháng 2.'},
+ {q:'Con gì sáng đi 4 chân, trưa 2 chân, tối 3 chân?',a:['người','con người'],show:'con người',why:'Bé bò, lớn đi, già chống gậy.'},
+ {q:'Cái gì bạn có mà chia sẻ cho người khác thì sẽ mất?',a:['bí mật','điều bí mật','một bí mật'],show:'bí mật',why:'Nói ra là hết bí mật!'},
+ {q:'Cái gì đen khi mua, đỏ khi dùng, xám khi vứt?',a:['than','than củi','cục than','than đá'],show:'than củi',why:'Đen rồi đỏ rực, cháy xong thành tro xám.'},
+ {q:'Mặt trời mọc ở hướng nào?',a:['đông','phía đông','hướng đông','đằng đông'],show:'hướng đông',why:'Câu dễ mà, đừng nghĩ nhiều!'},
+ {q:'Cái gì có mặt mà không có mũi, có kim mà không có chỉ?',a:['đồng hồ','cái đồng hồ'],show:'đồng hồ',why:'Kim giờ, kim phút, mặt đồng hồ.'},
+ {q:'Cái gì có mắt mà không nhìn thấy?',a:['kim','cái kim','cây kim','mắt kim'],show:'cái kim',why:'Xỏ chỉ qua mắt kim.'},
+ {q:'Chữ nào nằm giữa Paris?',a:['r','chữ r'],show:'chữ R',why:'P-a-R-i-s, ở giữa là R đó.'},
+ {q:'Có 5 quả táo, bạn lấy đi 3 quả. Bạn có mấy quả?',a:['3','ba','3 quả','ba quả'],show:'3 quả',why:'Bạn lấy 3 thì bạn có 3!'},
+ {q:'Bạn đang chạy thi và vượt người thứ 2. Bạn đứng thứ mấy?',a:['2','hai','thứ 2','thứ hai','nhì','hạng nhì'],show:'thứ hai',why:'Vượt người thứ 2 thì vào chỗ của họ, chưa phải nhất.'},
+ {q:'Cái gì dễ vỡ nhất mà chỉ cần nhắc tên là vỡ?',a:['im lặng','sự im lặng','yên lặng','sự yên lặng'],show:'sự im lặng',why:'Vừa nói ra là hết im lặng.'},
+ {q:'Bác sĩ cho 3 viên thuốc, uống mỗi nửa tiếng một viên. Bao lâu thì hết?',a:['1 tiếng','một tiếng','1 giờ','một giờ','60 phút','1h','1 tiếng đồng hồ'],show:'1 tiếng',why:'Uống viên 1 ngay, viên 2 sau 30p, viên 3 sau 1 tiếng.'},
+ {q:'Cái gì chỉ đi một chiều và không bao giờ quay lại?',a:['thời gian','time','thời gian trôi'],show:'thời gian',why:'Tiền mất còn kiếm lại, thời gian mất là mất luôn.'},
+];
+
+/* ---------- trạng thái ---------- */
+const ASK=25,REVEAL=6;
+let order=[],qi=-1,cur=null;
+let ph='idle',t=0,hintStage=0,mult=1,energy=0,extra=0,round=0;
+let winners=[],done=new Set();
+const players=new Map();
+const POINTS=[10,7,5,3,2];
+let speed=1,uidCounter=0;
+const NAMES=['Minh','Lan Anh','Hùng','Thảo','Nam','Hà My','Quốc Bảo','Ngọc','Tuấn','Linh','Phúc','Trang','Đạt','Mai','Khôi','Vy','Sơn','Yến','Kiên','Hải','Thu','Long','Bé Na','Cún'];
+const fake=()=>pick(NAMES)+' '+(10+Math.floor(Math.random()*90));
+
+function shuffle(){order=BANK.map((_,i)=>i).sort(()=>Math.random()-.5);}
+function nextQ(){
+  if(!order.length||qi>=order.length-1){shuffle();qi=-1;}
+  qi++;cur=BANK[order[qi]];round++;
+  ph='ask';t=ASK;hintStage=0;mult=1;extra=0;winners=[];done=new Set();
+  $('card').classList.remove('reveal');
+  $('tag').textContent='ĐỐ MẸO';$('q').textContent=cur.q;$('why').textContent='';
+  $('qn').textContent='Câu '+round;$('win').innerHTML='';
+  renderHint();
+}
+function hintText(){
+  const words=cur.show.split(' ');
+  if(hintStage===0)return '<small>Đáp án có '+words.length+' từ</small>';
+  const s=words.map(w=>hintStage>=2?[[...w][0].toUpperCase(),...Array([...w].length-1).fill('_')].join(' '):[...w].map(()=>'_').join(' ')).join('   ');
+  return s.replace(/(.)/g,'$1').trim()+'<small>'+(hintStage>=2?'Gợi ý chữ cái đầu':'Số chữ cái mỗi từ')+'</small>';
+}
+function renderHint(){$('hint').innerHTML=hintText();}
+function reveal(){
+  ph='reveal';t=REVEAL;
+  $('card').classList.add('reveal');
+  $('tag').textContent=winners.length?'ĐÚNG RỒI!':'HẾT GIỜ!';
+  $('hint').innerHTML=cur.show.toUpperCase();
+  $('why').textContent=cur.why;
+  $('tf').style.width='0%';
+}
+function toast(txt){const e=$('toast');e.textContent=txt;e.classList.remove('show');void e.offsetWidth;e.classList.add('show');}
+
+/* ---------- sự kiện ---------- */
+function player(u){let p=players.get(u);if(!p){p={user:u,score:0,correct:0};players.set(u,p);}return p;}
+function chat(u,text,ok){
+  const d=document.createElement('div');d.className='line '+(ok?'ok':'bad');d.textContent=u+': '+text;
+  const c=$('chat');c.appendChild(d);while(c.children.length>3)c.firstChild.remove();
+}
+function handle(ev){
+  const u=ev.user||'Ẩn danh',T=ev.type;
+  if(T==='join'){player(u);return;}
+  if(T==='comment'){
+    const text=String(ev.text||'').slice(0,40);
+    if(ph!=='ask'){chat(u,text,false);return;}
+    const c=norm(text);
+    const ok=!done.has(u)&&cur.a.some(a=>c.includes(norm(a)));
+    if(ok){
+      done.add(u);const rank=winners.length,pts=Math.round((POINTS[rank]??1)*mult);
+      const p=player(u);p.score+=pts;p.correct++;
+      winners.push({u,pts});
+      chat(u,'✅ đúng rồi!',true);
+      const d=document.createElement('div');d.className='line ok';d.textContent='#'+winners.length+' '+u+' +'+pts;$('win').appendChild(d);
+      if(winners.length===1)toast('🎉 '+u+' nhanh nhất!');
+      if(winners.length>=8)reveal();
+    }else if(!done.has(u))chat(u,text,false);
+    return;
+  }
+  if(T==='like'){
+    energy=Math.min(100,energy+(ev.count||1)*0.5);
+    if(energy>=100&&ph==='ask'){energy=0;mult=2;toast('❤️ x2 ĐIỂM!');}
+    return;
+  }
+  if(T==='gift'&&ph==='ask'){
+    const g=ev.gift,p=player(u);
+    if(g==='rose'||g==='rocket'){hintStage=Math.min(2,hintStage+1);renderHint();p.score+=5;toast('🎁 '+u+' mở gợi ý');}
+    else if(g==='turret'){t+=5;p.score+=5;toast('⏱ '+u+' +5 giây');}
+    else if(g==='lion'){mult=2;p.score+=20;toast('🦁 '+u+' x2 ĐIỂM!');}
+    return;
+  }
+}
+window.GameAPI={handle};
+
+/* ---------- vòng lặp ---------- */
+let lbT=0;
+function tick(dt){
+  if(ph==='idle'){nextQ();return;}
+  t-=dt;
+  if(ph==='ask'){
+    const el=ASK-t;
+    if(hintStage<1&&el>=8){hintStage=1;renderHint();}
+    if(hintStage<2&&el>=16){hintStage=2;renderHint();}
+    $('tf').style.width=Math.max(0,t/ASK*100)+'%';
+    if(t<=0)reveal();
+  }else if(ph==='reveal'&&t<=0)nextQ();
+  autoSim(dt);
+}
+function render(now){
+  $('en').querySelector('i').style.width=energy+'%';
+  $('en').querySelector('span').textContent=mult>1?'⚡ ĐANG x2 ĐIỂM':'❤️ Thả tim nạp x2 điểm '+Math.floor(energy)+'%';
+  if(now-lbT>400){
+    lbT=now;
+    const top=[...players.values()].sort((a,b)=>b.score-a.score).slice(0,5);
+    $('lb').innerHTML=top.length?'':'<div class="line">Chưa có ai</div>';
+    top.forEach((p,i)=>{const d=document.createElement('div');d.className='line';d.textContent=(i+1)+'. '+p.user+' · '+p.score;$('lb').appendChild(d);});
+  }
+}
+
+/* ---------- giả lập ---------- */
+let autoT=0;
+const anyUser=()=>{const a=[...players.keys()];return a.length&&Math.random()<.8?pick(a):fake();};
+const WRONG=['con mèo','cái bàn','tôi không biết','hihi','là gì vậy','con chó','cái nón','khó quá','nước','mặt trời'];
+function autoSim(dt){
+  if(!$('auto').checked)return;
+  autoT-=dt;if(autoT>0)return;autoT=rnd(.25,.7);
+  const r=Math.random(),el=ph==='ask'?ASK-t:0;
+  if(r<.12)handle({type:'join',user:fake()});
+  else if(r<.62){
+    if(ph==='ask'&&Math.random()<.1+el/ASK*.3)handle({type:'comment',user:anyUser(),text:pick(cur.a)});
+    else handle({type:'comment',user:anyUser(),text:pick(WRONG)});
+  }else if(r<.9)handle({type:'like',user:anyUser(),count:10});
+  else handle({type:'gift',user:anyUser(),gift:pick(['rose','rose','turret','lion']),count:1});
+}
+document.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{
+  const a=b.dataset.a,u=anyUser();
+  if(a==='good'&&cur)handle({type:'comment',user:fake(),text:pick(cur.a)});
+  else if(a==='bad')handle({type:'comment',user:u,text:pick(WRONG)});
+  else if(a==='join')handle({type:'join',user:fake()});
+  else if(a==='like')handle({type:'like',user:u,count:20});
+  else if(a==='skip'&&ph==='ask')reveal();
+  else if(a==='rose'||a==='turret'||a==='lion')handle({type:'gift',user:u,gift:a,count:1});
+});
+$('tog').onclick=()=>$('panel').classList.toggle('open');
+$('speed').onchange=e=>speed=+e.target.value;
+
+const wsUrl=params.get('ws');
+if(wsUrl){
+  const connect=()=>{
+    const ws=new WebSocket(wsUrl);
+    ws.onopen=()=>{$('auto').checked=false;};
+    ws.onmessage=m=>{try{const d=JSON.parse(m.data);(Array.isArray(d)?d:[d]).forEach(handle);}catch(e){}};
+    ws.onclose=()=>setTimeout(connect,2000);
+  };
+  connect();
+}
+
+let last=performance.now(),acc=0;
+function frame(now){
+  acc+=Math.min(.1,(now-last)/1000)*speed;last=now;
+  while(acc>0){const d=Math.min(acc,1/20);tick(d);acc-=d;}
+  render(now);requestAnimationFrame(frame);
+}
+window.__game={handle,get ph(){return ph},get cur(){return cur},players};
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
