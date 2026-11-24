@@ -133,7 +133,7 @@
     <p class="note" id="vstat"></p>
     <div class="g"><button data-a="voicetest">🔊 Thử giọng đọc</button></div>
     <label>Tốc độ <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select></label>
-    <p class="note">Nhịp câu: 3 dễ ⭐ (20 giây), 1 vừa ⭐⭐ (25 giây, điểm x1.2), 1 mẹo ⭐⭐⭐ (35 giây, điểm x1.5), rồi lặp lại. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý mở dần: đầu tiên hiện số chữ cái, sau đó mở từng chữ cái. Dễ thì gợi ý đến muộn và ít, mẹo thì gợi ý đến sớm và nhiều hơn, tùy độ dài đáp án. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
+    <p class="note">Nhịp câu: 3 dễ ⭐ (25 giây), 1 vừa ⭐⭐ (30 giây, điểm x1.2), 1 mẹo ⭐⭐⭐ (40 giây, điểm x1.5), rồi lặp lại. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý mở dần: đầu tiên hiện số chữ cái, sau đó mở từng chữ cái. Dễ thì gợi ý đến muộn và ít, mẹo thì gợi ý đến sớm và nhiều hơn, tùy độ dài đáp án. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
   </aside>
 </div>
 <script>
@@ -263,7 +263,7 @@ const BANK=[
 
 /* ---------- trạng thái ---------- */
 const REVEAL=6;
-const ASK_BY={1:20,2:25,3:35},PM={1:1,2:1.2,3:1.5};
+const ASK_BY={1:25,2:30,3:40},PM={1:1,2:1.2,3:1.5};
 const PATTERN=[1,1,1,2,3];
 let askT=25,cur=null;
 let ph='idle',t=0,blanksOn=false,rc=0,hintOrder=[],hintTimes=[],hintPlan=null,mult=1,energy=0,extra=0,round=0;
