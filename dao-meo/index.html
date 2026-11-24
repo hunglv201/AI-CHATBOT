@@ -105,7 +105,7 @@
     <label><input type="checkbox" id="so" checked> 🎵 Hiệu ứng âm thanh</label>
     <div class="g"><button data-a="voicetest">🔊 Thử giọng đọc</button></div>
     <label>Tốc độ <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select></label>
-    <p class="note">Câu hỏi hiện 25 giây. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý tự mở dần ở giây 8 và 16. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
+    <p class="note">Nhịp câu: 3 dễ ⭐ (20 giây), 1 vừa ⭐⭐ (25 giây, điểm x1.2), 1 mẹo ⭐⭐⭐ (35 giây, điểm x1.5), rồi lặp lại. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý tự mở ở 1/3 và 2/3 thời gian. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
   </aside>
 </div>
 <script>
@@ -197,8 +197,10 @@ const BANK=[
 ];
 
 /* ---------- trạng thái ---------- */
-const ASK=25,REVEAL=6;
-let order=[],qi=-1,cur=null;
+const REVEAL=6;
+const ASK_BY={1:20,2:25,3:35},PM={1:1,2:1.2,3:1.5};
+const PATTERN=[1,1,1,2,3];
+let askT=25,cur=null;
 let ph='idle',t=0,hintStage=0,mult=1,energy=0,extra=0,round=0;
 let winners=[],done=new Set();
 const players=new Map();
@@ -207,16 +209,24 @@ let speed=1,uidCounter=0;
 const NAMES=['Minh','Lan Anh','Hùng','Thảo','Nam','Hà My','Quốc Bảo','Ngọc','Tuấn','Linh','Phúc','Trang','Đạt','Mai','Khôi','Vy','Sơn','Yến','Kiên','Hải','Thu','Long','Bé Na','Cún'];
 const fake=()=>pick(NAMES)+' '+(10+Math.floor(Math.random()*90));
 
-function shuffle(){order=BANK.map((_,i)=>i).sort(()=>Math.random()-.5);}
+/* mức độ: 1 dễ, 2 vừa, 3 mẹo */
+const LV3=['Tháng nào','5 quả táo','người thứ 2','giữa Paris','ai cũng đọc sai','3 viên thuốc','không ai ăn được','chia sẻ cho người khác','nhắc tên là vỡ','sáng đi 4 chân'];
+const LV1CAT=['ĐỐ CON VẬT','CÂY - QUẢ','ĐỐ TẾT','VIỆT NAM'];
+const LV1Q=['Mặt trời mọc','Nhỏ như hạt gạo','Đêm sáng thì tròn'];
+BANK.forEach(c=>{c.lv=LV3.some(k=>c.q.includes(k))?3:(LV1CAT.includes(c.cat)||LV1Q.some(k=>c.q.includes(k)))?1:2;});
+const buckets={1:[],2:[],3:[]};
+function drawQ(lv){
+  if(!buckets[lv].length)buckets[lv]=BANK.filter(c=>c.lv===lv).sort(()=>Math.random()-.5);
+  return buckets[lv].pop();
+}
 function nextQ(){
-  if(!order.length||qi>=order.length-1){shuffle();qi=-1;}
-  qi++;cur=BANK[order[qi]];round++;
-  ph='ask';t=ASK;hintStage=0;mult=1;extra=0;winners=[];done=new Set();
+  round++;cur=drawQ(PATTERN[(round-1)%PATTERN.length]);askT=ASK_BY[cur.lv];
+  ph='ask';t=askT;hintStage=0;mult=1;extra=0;winners=[];done=new Set();
   $('card').classList.remove('reveal');
-  $('tag').textContent=cur.cat||'ĐỐ MẸO';$('q').textContent=cur.q;$('why').textContent='';
+  $('tag').textContent=(cur.cat||'ĐỐ MẸO')+'  '+'⭐'.repeat(cur.lv);$('q').textContent=cur.q;$('why').textContent='';
   $('qn').textContent='Câu '+round;$('win').innerHTML='';
   renderHint();
-  lastTick=-1;speak('Câu số '+round+'. '+cur.q);
+  lastTick=-1;if(cur.lv===3)toast('⚡ CÂU MẸO · ĐIỂM x1.5');speak('Câu số '+round+'. '+cur.q);
 }
 function hintText(){
   const words=cur.show.split(' ');
@@ -278,7 +288,7 @@ function handle(ev){
     const c=norm(text);
     const ok=!done.has(u)&&cur.a.some(a=>c.includes(norm(a)));
     if(ok){
-      done.add(u);const rank=winners.length,pts=Math.round((POINTS[rank]??1)*mult);
+      done.add(u);const rank=winners.length,pts=Math.round((POINTS[rank]??1)*mult*PM[cur.lv]);
       const p=player(u);p.score+=pts;p.correct++;
       winners.push({u,pts});
       chat(u,'✅ đúng rồi!',true);sfx.ding();
@@ -309,10 +319,10 @@ function tick(dt){
   if(ph==='idle'){nextQ();return;}
   t-=dt;
   if(ph==='ask'){
-    const el=ASK-t;
-    if(hintStage<1&&el>=8){hintStage=1;renderHint();}
-    if(hintStage<2&&el>=16){hintStage=2;renderHint();}
-    $('tf').style.width=Math.max(0,t/ASK*100)+'%';
+    const el=askT-t;
+    if(hintStage<1&&el>=askT*.32){hintStage=1;renderHint();}
+    if(hintStage<2&&el>=askT*.64){hintStage=2;renderHint();}
+    $('tf').style.width=Math.min(100,Math.max(0,t/askT*100))+'%';
     if(t<=5&&t>0&&Math.ceil(t)!==lastTick){lastTick=Math.ceil(t);sfx.tick();}
     if(t<=0)reveal();
   }else if(ph==='reveal'&&t<=0)nextQ();
@@ -336,10 +346,10 @@ const WRONG=['con mèo','cái bàn','tôi không biết','hihi','là gì vậy',
 function autoSim(dt){
   if(!$('auto').checked)return;
   autoT-=dt;if(autoT>0)return;autoT=rnd(.25,.7);
-  const r=Math.random(),el=ph==='ask'?ASK-t:0;
+  const r=Math.random(),el=ph==='ask'?askT-t:0;
   if(r<.12)handle({type:'join',user:fake()});
   else if(r<.62){
-    if(ph==='ask'&&Math.random()<.1+el/ASK*.3)handle({type:'comment',user:anyUser(),text:pick(cur.a)});
+    if(ph==='ask'&&Math.random()<.1+el/askT*.3)handle({type:'comment',user:anyUser(),text:pick(cur.a)});
     else handle({type:'comment',user:anyUser(),text:pick(WRONG)});
   }else if(r<.9)handle({type:'like',user:anyUser(),count:10});
   else handle({type:'gift',user:anyUser(),gift:pick(['rose','rose','turret','lion']),count:1});
