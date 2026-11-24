@@ -37,7 +37,21 @@
   button:hover{background:#34483a}
   label{display:block;margin:6px 0}
   .note{opacity:.65;font-size:11px;line-height:1.4}
-  @media(max-width:760px){#wrap{flex-direction:column}#stage{width:100%}#panel{width:100%}}
+  body.portrait #stage{aspect-ratio:9/16;width:min(calc(100vw - 310px),calc((100vh - 16px)*9/16))}
+  body.portrait.obs #stage{width:min(100vw,calc(100vh*9/16))}
+  body.portrait #feed{top:auto;bottom:calc(var(--u)*34px);width:62%}
+  body.portrait #lb{top:calc(var(--u)*26px);min-width:40%}
+  body.portrait #bars{width:84%}
+  #tog{display:none}
+  @media(max-width:760px){
+    #wrap{display:block;padding:0}
+    #stage{width:min(100vw,calc(100dvh*16/9));margin:0 auto;border:0}
+    body.portrait #stage{width:min(100vw,calc(100dvh*9/16))}
+    #panel{position:fixed;left:0;right:0;bottom:0;width:100%;max-height:60vh;z-index:5;transform:translateY(100%);transition:transform .2s}
+    #panel.open{transform:none}
+    #tog{display:block;position:fixed;left:8px;top:8px;font-size:11px;padding:5px 7px;z-index:6;opacity:.85}
+    body.obs #tog{display:none}
+  }
 </style>
 </head>
 <body>
@@ -54,6 +68,7 @@
     </div>
     <div id="banner" class="ov"></div>
   </div>
+  <button id="tog">⚙ Điều khiển</button>
   <aside id="panel">
     <h3>Giả lập sự kiện TikTok LIVE</h3>
     <div class="g">
@@ -83,11 +98,13 @@
 <script>
 (()=>{
 'use strict';
-const W=480,H=270,CX=240,CY=135;
+const params=new URLSearchParams(location.search);
+const portrait=params.get('mode')==='portrait'||(params.get('mode')!=='land'&&innerHeight>innerWidth);
+const W=portrait?270:480,H=portrait?480:270,CX=W/2,CY=H/2;
+if(portrait)document.body.classList.add('portrait');
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 cv.width=W;cv.height=H;ctx.imageSmoothingEnabled=false;
 const $=id=>document.getElementById(id);
-const params=new URLSearchParams(location.search);
 if(params.get('obs'))document.body.classList.add('obs');
 const stageEl=$('stage');
 function fit(){stageEl.style.setProperty('--u',(stageEl.clientWidth/W).toFixed(3));}
@@ -500,6 +517,7 @@ document.querySelectorAll('button[data-a]').forEach(b=>b.onclick=()=>{
   else if(a==='clear'){heroes.clear();}
   else sim(a);
 });
+$('tog').onclick=()=>$('panel').classList.toggle('open');
 $('speed').onchange=e=>speed=+e.target.value;
 let autoT=0;
 function autoSim(dt){
