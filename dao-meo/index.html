@@ -25,7 +25,7 @@
   body.land #q{font-size:4.4cqmin;min-height:0}
   .timer{height:2.2cqmin;border-radius:9px;background:#e6defa;margin-top:3cqmin;overflow:hidden}
   #tf{height:100%;width:100%;background:linear-gradient(90deg,#2ecc71,#f1c40f,#e74c3c);background-size:300% 100%;transition:width .1s linear}
-  #hint{margin-top:2.6cqmin;font-weight:800;font-size:5cqmin;letter-spacing:.8cqmin;color:#6a3bd8;min-height:6.5cqmin;word-break:break-word}
+  #hint{white-space:pre-wrap;margin-top:2.6cqmin;font-weight:800;font-size:5cqmin;letter-spacing:.8cqmin;color:#6a3bd8;min-height:6.5cqmin;word-break:break-word}
   #hint small{display:block;letter-spacing:0;font-size:3cqmin;color:#8b7ab5;font-weight:700}
   .card.reveal{background:#eafff0}
   .card.reveal #hint{color:#17a34a;letter-spacing:0;font-size:7cqmin}
@@ -105,7 +105,7 @@
     <label><input type="checkbox" id="so" checked> 🎵 Hiệu ứng âm thanh</label>
     <div class="g"><button data-a="voicetest">🔊 Thử giọng đọc</button></div>
     <label>Tốc độ <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select></label>
-    <p class="note">Nhịp câu: 3 dễ ⭐ (20 giây), 1 vừa ⭐⭐ (25 giây, điểm x1.2), 1 mẹo ⭐⭐⭐ (35 giây, điểm x1.5), rồi lặp lại. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý tự mở ở 1/3 và 2/3 thời gian. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
+    <p class="note">Nhịp câu: 3 dễ ⭐ (20 giây), 1 vừa ⭐⭐ (25 giây, điểm x1.2), 1 mẹo ⭐⭐⭐ (35 giây, điểm x1.5), rồi lặp lại. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý mở dần: đầu tiên hiện số chữ cái, sau đó mở từng chữ cái. Dễ thì gợi ý đến muộn và ít, mẹo thì gợi ý đến sớm và nhiều hơn, tùy độ dài đáp án. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
   </aside>
 </div>
 <script>
@@ -201,7 +201,7 @@ const REVEAL=6;
 const ASK_BY={1:20,2:25,3:35},PM={1:1,2:1.2,3:1.5};
 const PATTERN=[1,1,1,2,3];
 let askT=25,cur=null;
-let ph='idle',t=0,hintStage=0,mult=1,energy=0,extra=0,round=0;
+let ph='idle',t=0,blanksOn=false,rc=0,hintOrder=[],hintTimes=[],hintPlan=null,mult=1,energy=0,extra=0,round=0;
 let winners=[],done=new Set();
 const players=new Map();
 const POINTS=[10,7,5,3,2];
@@ -221,18 +221,41 @@ function drawQ(lv){
 }
 function nextQ(){
   round++;cur=drawQ(PATTERN[(round-1)%PATTERN.length]);askT=ASK_BY[cur.lv];
-  ph='ask';t=askT;hintStage=0;mult=1;extra=0;winners=[];done=new Set();
+  ph='ask';t=askT;planHints();mult=1;extra=0;winners=[];done=new Set();
   $('card').classList.remove('reveal');
   $('tag').textContent=(cur.cat||'ĐỐ MẸO')+'  '+'⭐'.repeat(cur.lv);$('q').textContent=cur.q;$('why').textContent='';
   $('qn').textContent='Câu '+round;$('win').innerHTML='';
   renderHint();
   lastTick=-1;if(cur.lv===3)toast('⚡ CÂU MẸO · ĐIỂM x1.5');speak('Câu số '+round+'. '+cur.q);
 }
+/* Gợi ý mở dần: số chữ cái mở và thời điểm mở phụ thuộc độ dài đáp án và mức độ khó.
+   Dễ: gợi ý đến muộn và ít. Mẹo: gợi ý đến sớm và nhiều hơn. */
+const HINT_CFG={1:{b:.30,l:.45,f:.35},2:{b:.25,l:.40,f:.45},3:{b:.20,l:.35,f:.55}};
+function planHints(){
+  const words=cur.show.split(' ').map(w=>[...w]);
+  const L=words.reduce((n,w)=>n+w.length,0),cfg=HINT_CFG[cur.lv];
+  let k=Math.min(L-1,Math.max(1,Math.round(L*cfg.f)));
+  if(L<=2)k=0;
+  const firsts=[],rest=[];let pos=0;
+  words.forEach(w=>w.forEach((_,i)=>{(i===0?firsts:rest).push(pos++);}));
+  rest.sort(()=>Math.random()-.5);
+  hintOrder=firsts.concat(rest);
+  hintTimes=[];
+  for(let i=0;i<k;i++)hintTimes.push(askT*(cfg.l+(.9-cfg.l)*(k===1?0:i/(k-1))));
+  hintPlan={words,L,k,tb:askT*cfg.b};
+  blanksOn=false;rc=0;
+}
 function hintText(){
-  const words=cur.show.split(' ');
-  if(hintStage===0)return '<small>Đáp án có '+words.length+' từ</small>';
-  const s=words.map(w=>hintStage>=2?[[...w][0].toUpperCase(),...Array([...w].length-1).fill('_')].join(' '):[...w].map(()=>'_').join(' ')).join('   ');
-  return s.replace(/(.)/g,'$1').trim()+'<small>'+(hintStage>=2?'Gợi ý chữ cái đầu':'Số chữ cái mỗi từ')+'</small>';
+  const {words,L}=hintPlan;
+  if(!blanksOn)return '<small>Đáp án có '+words.length+' từ</small>';
+  const shown=new Set(hintOrder.slice(0,rc));let pos=0;
+  const h=words.map(w=>w.map(ch=>{const on=shown.has(pos);pos++;return on?ch.toUpperCase():'_';}).join(' ')).join('   ');
+  return h+'<small>'+(rc?'Đã mở '+rc+'/'+L+' chữ cái':'Số chữ cái mỗi từ')+'</small>';
+}
+function bonusHint(){
+  if(!blanksOn){blanksOn=true;}
+  else if(rc<hintPlan.L-1){rc++;}
+  renderHint();
 }
 function renderHint(){$('hint').innerHTML=hintText();}
 function reveal(){
@@ -263,6 +286,7 @@ function beep(f,d,type,vol,delay){
 const sfx={
   ding(){beep(880,.18,'triangle',.1);beep(1320,.25,'triangle',.1,.12);},
   tick(){beep(620,.05,'square',.035);},
+  ping(){beep(1050,.08,'sine',.05);},
   ta(){[523,659,784,1047].forEach((f,i)=>beep(f,.22,'triangle',.1,i*.09));},
   buzz(){beep(180,.35,'sawtooth',.06);}
 };
@@ -305,7 +329,7 @@ function handle(ev){
   }
   if(T==='gift'&&ph==='ask'){
     const g=ev.gift,p=player(u);
-    if(g==='rose'||g==='rocket'){hintStage=Math.min(2,hintStage+1);renderHint();p.score+=5;toast('🎁 '+u+' mở gợi ý');}
+    if(g==='rose'||g==='rocket'){bonusHint();p.score+=5;toast('🎁 '+u+' mở gợi ý');}
     else if(g==='turret'){t+=5;p.score+=5;toast('⏱ '+u+' +5 giây');}
     else if(g==='lion'){mult=2;p.score+=20;toast('🦁 '+u+' x2 ĐIỂM!');}
     return;
@@ -320,8 +344,8 @@ function tick(dt){
   t-=dt;
   if(ph==='ask'){
     const el=askT-t;
-    if(hintStage<1&&el>=askT*.32){hintStage=1;renderHint();}
-    if(hintStage<2&&el>=askT*.64){hintStage=2;renderHint();}
+    if(!blanksOn&&el>=hintPlan.tb){blanksOn=true;renderHint();}
+    while(rc<hintPlan.k&&el>=hintTimes[rc]){blanksOn=true;rc++;renderHint();sfx.ping();}
     $('tf').style.width=Math.min(100,Math.max(0,t/askT*100))+'%';
     if(t<=5&&t>0&&Math.ceil(t)!==lastTick){lastTick=Math.ceil(t);sfx.tick();}
     if(t<=0)reveal();
