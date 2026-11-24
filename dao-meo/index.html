@@ -142,6 +142,55 @@ const BANK=[
  {q:'Cái gì dễ vỡ nhất mà chỉ cần nhắc tên là vỡ?',a:['im lặng','sự im lặng','yên lặng','sự yên lặng'],show:'sự im lặng',why:'Vừa nói ra là hết im lặng.'},
  {q:'Bác sĩ cho 3 viên thuốc, uống mỗi nửa tiếng một viên. Bao lâu thì hết?',a:['1 tiếng','một tiếng','1 giờ','một giờ','60 phút','1h','1 tiếng đồng hồ'],show:'1 tiếng',why:'Uống viên 1 ngay, viên 2 sau 30p, viên 3 sau 1 tiếng.'},
  {q:'Cái gì chỉ đi một chiều và không bao giờ quay lại?',a:['thời gian','time','thời gian trôi'],show:'thời gian',why:'Tiền mất còn kiếm lại, thời gian mất là mất luôn.'},
+ {cat:"ĐỐ VẬT",q:"Không biết nói mà dạy được người, giữ cả trời kiến thức trong mấy trang giấy. Là cái gì?",a:["sách", "quyển sách", "cuốn sách", "cái sách"],show:"quyển sách",why:"Sách là người thầy thầm lặng."},
+ {cat:"ĐỐ VẬT",q:"Bốn chân đứng đó cả ngày, ai ngồi lên cũng chẳng kêu ca. Là cái gì?",a:["ghế", "cái ghế"],show:"cái ghế",why:"Ghế có chân mà chẳng bao giờ đi!"},
+ {cat:"ĐỐ VẬT",q:"Không có miệng mà trả lời đúng ý, ai soi vào cũng thấy mặt mình. Là cái gì?",a:["gương", "cái gương"],show:"cái gương",why:"Soi vào là thấy chính mình."},
+ {cat:"ĐỐ VẬT",q:"Có cổ mà chẳng có đầu, có miệng mà chẳng biết nói, chuyên đựng nước đựng dầu. Là cái gì?",a:["chai", "cái chai", "lọ", "cái lọ"],show:"cái chai",why:"Cổ chai, miệng chai!"},
+ {cat:"ĐỐ VẬT",q:"Có cánh mà chẳng biết bay, đóng mở hằng ngày giữ nhà. Là cái gì?",a:["cửa", "cánh cửa", "cái cửa"],show:"cánh cửa",why:"Cánh cửa chứ không phải cánh chim."},
+ {cat:"ĐỐ VẬT",q:"Đầu nhọn thân tròn, viết ra chữ nghĩa mà càng viết càng ngắn. Là cái gì?",a:["bút chì", "cây bút chì", "cái bút chì", "chì"],show:"bút chì",why:"Viết mãi thì chì mòn dần."},
+ {cat:"ĐỐ VẬT",q:"Mở ra như hoa, xếp lại như tre, mưa nắng đều che. Là cái gì?",a:["ô", "cái ô", "dù", "cái dù", "cây dù", "cây ô"],show:"cái ô",why:"Che mưa che nắng đều được."},
+ {cat:"ĐỐ VẬT",q:"Hai bánh lăn tròn, chẳng ăn cơm, chỉ cần chân đạp là chạy. Là cái gì?",a:["xe đạp", "cái xe đạp", "chiếc xe đạp"],show:"xe đạp",why:"Không đạp thì xe đứng im."},
+ {cat:"ĐỐ VẬT",q:"Cánh quay tít thò lò, mùa hè gió mát cả nhà. Là cái gì?",a:["quạt", "cái quạt", "quạt máy", "quạt điện", "quạt trần"],show:"cái quạt",why:"Mùa hè không thể thiếu."},
+ {cat:"ĐỐ VẬT",q:"Mình trắng đầu đỏ, quẹt vào hộp thì ra lửa, cháy rồi là hết. Là cái gì?",a:["diêm", "que diêm", "bao diêm", "que quẹt"],show:"que diêm",why:"Quẹt một cái là bùng lửa."},
+ {cat:"ĐỐ VẬT",q:"Bay trên trời xanh, đuôi dài thướt tha, trẻ con cầm dây chạy theo. Là cái gì?",a:["diều", "cái diều", "con diều", "cánh diều"],show:"cánh diều",why:"Tuổi thơ gắn với cánh diều."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì ngồi đáy giếng, kêu ộp oạp mỗi khi trời mưa?",a:["ếch", "con ếch"],show:"con ếch",why:"Ếch ngồi đáy giếng coi trời bằng vung."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì tám chân giăng tơ, chờ mồi mắc lưới khắp nhà?",a:["nhện", "con nhện"],show:"con nhện",why:"Nhện giăng tơ bắt côn trùng."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì chăm chỉ bay hoa, làm mật ngọt cho đời, đốt đau vô cùng?",a:["ong", "con ong", "ong mật"],show:"con ong",why:"Chăm chỉ nhưng đừng chọc giận!"},
+ {cat:"ĐỐ CON VẬT",q:"Con gì tai dài mắt đỏ, chân sau dài hơn chân trước, nhảy tung tăng ăn cà rốt?",a:["thỏ", "con thỏ"],show:"con thỏ",why:"Nhảy nhanh nhờ chân sau khỏe."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì cổ dài chân dài, ăn lá trên ngọn cây cao?",a:["hươu cao cổ", "con hươu cao cổ", "hươu"],show:"hươu cao cổ",why:"Cao nhất trong các loài thú."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì mũi dài như vòi, tai to như quạt, ngà trắng?",a:["voi", "con voi"],show:"con voi",why:"Vòi vừa là mũi vừa là tay."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì lưng đầy gai nhọn, gặp nguy cuộn tròn?",a:["nhím", "con nhím"],show:"con nhím",why:"Gai là áo giáp của nó."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì mang mai trên lưng, đi chậm ì ạch nhưng sống rất thọ?",a:["rùa", "con rùa"],show:"con rùa",why:"Chậm mà chắc, sống cả trăm năm."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì ngày ngủ đêm bay, treo ngược mình trên mái hang?",a:["dơi", "con dơi"],show:"con dơi",why:"Ngủ ngược đầu cho tiện."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì vằn vện rình trong rừng, tiếng gầm rúng động núi non?",a:["hổ", "cọp", "con hổ", "con cọp", "hùm", "con hùm"],show:"con hổ",why:"Chúa sơn lâm đó!"},
+ {cat:"ĐỐ CON VẬT",q:"Con gì không chân mà bò, mình dài uốn lượn, lưỡi chẻ đôi?",a:["rắn", "con rắn"],show:"con rắn",why:"Không chân mà trườn rất nhanh."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì đêm xuống thắp đèn bay khắp bờ ao?",a:["đom đóm", "con đom đóm"],show:"đom đóm",why:"Đèn nhỏ của đêm hè."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì ăn lá dâu, nhả tơ làm kén vàng?",a:["tằm", "con tằm", "tằm tơ"],show:"con tằm",why:"Tằm nhả tơ dệt nên lụa."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì kêu be be, ăn cỏ, dưới cằm có chòm râu?",a:["dê", "con dê"],show:"con dê",why:"Râu dê nổi tiếng."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì kêu ụt ịt, thích lăn bùn, ăn no ngủ kỹ?",a:["lợn", "heo", "con lợn", "con heo"],show:"con lợn",why:"Ăn no ngủ kỹ chính hiệu."},
+ {cat:"ĐỐ CON VẬT",q:"Con gì lưng có bướu, đi qua sa mạc mà không cần uống nước?",a:["lạc đà", "con lạc đà"],show:"con lạc đà",why:"Bướu là kho dự trữ."},
+ {cat:"CÂY - QUẢ",q:"Quả gì vỏ xanh ruột đỏ, hạt đen, mùa hè ăn mát cả người?",a:["dưa hấu", "quả dưa hấu", "trái dưa hấu", "dưa"],show:"dưa hấu",why:"Ăn dưa hấu giải nhiệt ngày hè."},
+ {cat:"CÂY - QUẢ",q:"Quả gì nhỏ xíu vỏ xanh, vắt vào nước ngọt thành món giải khát?",a:["chanh", "quả chanh", "trái chanh"],show:"quả chanh",why:"Chua chua mát mát."},
+ {cat:"CÂY - QUẢ",q:"Quả gì cong cong vỏ vàng, nhiều quả chung một buồng, khỉ rất thích?",a:["chuối", "quả chuối", "trái chuối", "cây chuối"],show:"quả chuối",why:"Khỉ mê chuối."},
+ {cat:"CÂY - QUẢ",q:"Quả gì vỏ gai nhọn, mùi nồng nặc, ai thích thì mê, ai ghét thì chạy?",a:["sầu riêng", "quả sầu riêng", "trái sầu riêng"],show:"sầu riêng",why:"Vua của các loại trái cây."},
+ {cat:"CÂY - QUẢ",q:"Gần bùn mà chẳng hôi tanh mùi bùn. Là hoa gì?",a:["sen", "hoa sen", "cây sen"],show:"hoa sen",why:"Quốc hoa của Việt Nam."},
+ {cat:"CÂY - QUẢ",q:"Hạt gì bé nhỏ, nấu thành cơm, nuôi sống người Việt?",a:["gạo", "lúa", "hạt gạo", "hạt lúa", "thóc"],show:"hạt gạo",why:"Hạt gạo làng ta."},
+ {cat:"ĐỐ TẾT",q:"Hoa gì sắc vàng rực rỡ, nở rộ dịp Tết ở miền Nam?",a:["mai", "hoa mai", "cây mai"],show:"hoa mai",why:"Mai vàng đón xuân."},
+ {cat:"ĐỐ TẾT",q:"Hoa gì sắc hồng thắm, nở rộ dịp Tết ở miền Bắc?",a:["đào", "hoa đào", "cây đào"],show:"hoa đào",why:"Đào hồng báo xuân về."},
+ {cat:"ĐỐ TẾT",q:"Bánh gì vuông vức, gói lá xanh, nhân đậu thịt, Tết không thể thiếu?",a:["bánh chưng", "chưng"],show:"bánh chưng",why:"Bánh chưng xanh ngày Tết."},
+ {cat:"ĐỐ TẾT",q:"Mùa nào hoa nở khắp nơi, chim hót líu lo, Tết đến là mùa đó?",a:["xuân", "mùa xuân"],show:"mùa xuân",why:"Tết rơi vào mùa xuân."},
+ {cat:"VIỆT NAM",q:"Sông nào chảy qua Hà Nội, nước đỏ phù sa?",a:["sông hồng", "hồng"],show:"sông Hồng",why:"Sông Mẹ của đồng bằng Bắc Bộ."},
+ {cat:"VIỆT NAM",q:"Đỉnh núi nào cao nhất Việt Nam, được gọi là nóc nhà Đông Dương?",a:["fansipan", "phan xi păng", "phanxipang", "phan-xi-păng", "phan si pang"],show:"Fansipan",why:"Cao 3.143 mét."},
+ {cat:"VIỆT NAM",q:"Thủ đô nghìn năm văn hiến của Việt Nam là gì?",a:["hà nội"],show:"Hà Nội",why:"Thủ đô nghìn năm tuổi."},
+ {cat:"VIỆT NAM",q:"Vịnh nào ở Quảng Ninh được UNESCO công nhận, có hàng nghìn đảo đá vôi?",a:["hạ long", "vịnh hạ long"],show:"Hạ Long",why:"Kỳ quan thiên nhiên thế giới."},
+ {cat:"VIỆT NAM",q:"Thành phố nào mang tên Bác, đông dân nhất cả nước?",a:["hồ chí minh", "sài gòn", "tphcm", "tp hcm", "hcm", "thành phố hồ chí minh"],show:"TP Hồ Chí Minh",why:"Còn gọi là Sài Gòn."},
+ {cat:"VIỆT NAM",q:"Món gì nước dùng thơm ngát, sợi bánh trắng, thịt bò hành lá, nổi tiếng thế giới?",a:["phở", "phở bò", "phở gà"],show:"phở",why:"Quốc hồn quốc túy."},
+ {cat:"ĐỐ MẸO",q:"Không có thật mà đêm nào cũng gặp, sáng ra là quên. Là gì?",a:["giấc mơ", "giấc mộng", "mơ", "mộng", "cơn mơ"],show:"giấc mơ",why:"Tỉnh dậy là tan biến."},
+ {cat:"ĐỐ MẸO",q:"Cái gì luôn đến gần nhưng chẳng bao giờ tới?",a:["ngày mai", "mai"],show:"ngày mai",why:"Hôm nay rồi mà ngày mai vẫn ở phía trước."},
+ {cat:"ĐỐ MẸO",q:"Nhỏ như hạt gạo treo giữa trời, tối đến lấp lánh khắp nơi. Là gì?",a:["ngôi sao", "sao", "vì sao", "những ngôi sao"],show:"ngôi sao",why:"Đếm mãi không hết."},
+ {cat:"ĐỐ MẸO",q:"Đêm sáng thì tròn, đêm không sáng thì khuyết, treo trên cao. Là gì?",a:["mặt trăng", "trăng", "vầng trăng"],show:"mặt trăng",why:"Rằm thì tròn, mồng một thì khuyết."},
+ {cat:"ĐỐ MẸO",q:"Ai cũng có, bạn đi nó đi, bạn dừng nó dừng, trời tối thì mất. Là gì?",a:["bóng", "cái bóng", "bóng của bạn"],show:"cái bóng",why:"Đi theo bạn suốt ngày nhưng tối là mất."},
+ {cat:"ĐỐ MẸO",q:"Nhẹ hơn bông mà người khỏe cũng không giữ được lâu. Là gì?",a:["hơi thở", "thở", "hơi"],show:"hơi thở",why:"Nín thở được bao lâu?"}
 ];
 
 /* ---------- trạng thái ---------- */
@@ -161,7 +210,7 @@ function nextQ(){
   qi++;cur=BANK[order[qi]];round++;
   ph='ask';t=ASK;hintStage=0;mult=1;extra=0;winners=[];done=new Set();
   $('card').classList.remove('reveal');
-  $('tag').textContent='ĐỐ MẸO';$('q').textContent=cur.q;$('why').textContent='';
+  $('tag').textContent=cur.cat||'ĐỐ MẸO';$('q').textContent=cur.q;$('why').textContent='';
   $('qn').textContent='Câu '+round;$('win').innerHTML='';
   renderHint();
 }
