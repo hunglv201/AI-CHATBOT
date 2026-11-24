@@ -103,6 +103,7 @@
     <label><input type="checkbox" id="auto" checked> Tự động giả lập người xem</label>
     <label><input type="checkbox" id="vo" checked> 🔊 Giọng đọc câu hỏi và đáp án</label>
     <label><input type="checkbox" id="so" checked> 🎵 Hiệu ứng âm thanh</label>
+    <p class="note" id="vstat"></p>
     <div class="g"><button data-a="voicetest">🔊 Thử giọng đọc</button></div>
     <label>Tốc độ <select id="speed"><option value="1">1x</option><option value="2">2x</option><option value="4">4x</option></select></label>
     <p class="note">Nhịp câu: 3 dễ ⭐ (20 giây), 1 vừa ⭐⭐ (25 giây, điểm x1.2), 1 mẹo ⭐⭐⭐ (35 giây, điểm x1.5), rồi lặp lại. Đúng nhanh nhất: +10, +7, +5, +3, +2 điểm. Gợi ý mở dần: đầu tiên hiện số chữ cái, sau đó mở từng chữ cái. Dễ thì gợi ý đến muộn và ít, mẹo thì gợi ý đến sớm và nhiều hơn, tùy độ dài đáp án. Quà tặng mở gợi ý, thêm giờ hoặc nhân đôi điểm. Thêm <code>?obs=1</code> để ẩn panel trong OBS, <code>?ws=ws://localhost:8080</code> để nhận sự kiện thật, <code>?mode=land</code> cho khung ngang.</p>
@@ -290,10 +291,12 @@ const sfx={
   ta(){[523,659,784,1047].forEach((f,i)=>beep(f,.22,'triangle',.1,i*.09));},
   buzz(){beep(180,.35,'sawtooth',.06);}
 };
-function loadVoice(){try{viVoice=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang))||null;}catch(e){}}
-try{speechSynthesis.onvoiceschanged=loadVoice;loadVoice();}catch(e){}
+function loadVoice(){try{viVoice=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang))||null;}catch(e){}
+  const st=$('vstat');if(st)st.textContent=viVoice?'✔ Máy có giọng tiếng Việt: '+viVoice.name:'⚠ Máy này CHƯA có giọng tiếng Việt, game sẽ im lặng thay vì đọc sai.';}
+try{speechSynthesis.onvoiceschanged=loadVoice;}catch(e){}
+loadVoice();
 function speak(text){
-  if(!$('vo').checked||!('speechSynthesis' in window))return;
+  if(!$('vo').checked||!('speechSynthesis' in window)||!viVoice)return;
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='vi-VN';if(viVoice)u.voice=viVoice;u.rate=.95;speechSynthesis.speak(u);}catch(e){}
 }
 
