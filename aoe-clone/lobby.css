@@ -1,0 +1,192 @@
+/* The room lobby (index.html). Sandstone and limestone from the game's own dialogs, iron-gall ink, laurel
+   for actions and open rooms, bronze for locks and focus. The player's name is carved on a tabula ansata. */
+@font-face { font-family: Cinzel; font-weight: 500; font-display: swap; src: url(vendor/fonts/cinzel/cinzel-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: Cinzel; font-weight: 700; font-display: swap; src: url(vendor/fonts/cinzel/cinzel-latin-700-normal.woff2) format('woff2'); }
+/* EB Garamond in two subsets, Latin and Vietnamese (the Vietnamese lobby, lobby-i18n.mjs); unicode-range picks the file. */
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-display: swap; src: url(vendor/fonts/eb-garamond/eb-garamond-latin-400-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: italic; font-display: swap; src: url(vendor/fonts/eb-garamond/eb-garamond-latin-400-italic.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'EB Garamond'; font-weight: 600; font-display: swap; src: url(vendor/fonts/eb-garamond/eb-garamond-latin-600-normal.woff2) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-display: swap; src: url(vendor/fonts/eb-garamond/eb-garamond-vietnamese-400-normal.woff2) format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'EB Garamond'; font-weight: 400; font-style: italic; font-display: swap; src: url(vendor/fonts/eb-garamond/eb-garamond-vietnamese-400-italic.woff2) format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+@font-face { font-family: 'EB Garamond'; font-weight: 600; font-display: swap; src: url(vendor/fonts/eb-garamond/eb-garamond-vietnamese-600-normal.woff2) format('woff2'); unicode-range: U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB; }
+
+:root {
+  --sandstone: #cbb287;   /* page */
+  --limestone: #e4d6b8;   /* raised: plaque, rows, fields */
+  --ink: #2b2118;
+  --faded: #4f3f2e;       /* secondary text (4.8:1 on sandstone) */
+  --laurel: #4c6a3b;
+  --on-laurel: #f6eedc;
+  --bronze: #7a4a16;      /* locks and the focus ring */
+  --error: #8a1f12;
+  --rule: rgb(43 33 24 / .22);
+  --carve-light: rgb(255 255 255 / .45);
+  --carve-dark: rgb(43 33 24 / .35);
+  --display: Cinzel, 'Trajan Pro', Georgia, serif;
+  --text: 'EB Garamond', Garamond, Georgia, serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --sandstone: #2c251e; --limestone: #3a3128; --ink: #eee2c8; --faded: #c9b797; --laurel: #9dbe86; --on-laurel: #1c1912;
+    --bronze: #d9a15e; --error: #f0a08f; --rule: rgb(238 226 200 / .18); --carve-light: rgb(0 0 0 / .5); --carve-dark: rgb(255 255 255 / .12);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --sandstone: #2c251e; --limestone: #3a3128; --ink: #eee2c8; --faded: #c9b797; --laurel: #9dbe86; --on-laurel: #1c1912;
+  --bronze: #d9a15e; --error: #f0a08f; --rule: rgb(238 226 200 / .18); --carve-light: rgb(0 0 0 / .5); --carve-dark: rgb(255 255 255 / .12);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--sandstone); }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink); background: var(--sandstone);
+  font: 1.125rem/1.55 var(--text); font-variant-numeric: oldstyle-nums proportional-nums;
+  /* Grain of the stone, faint. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .17 0 0 0 0 .13 0 0 0 0 .09 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--bronze); outline-offset: 2px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+
+/* ---- lobby column */
+#lobby { max-width: 760px; margin: 0 auto; padding: 20px 16px 64px; }
+.top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+.top h1 { margin: 0; font-size: 1rem; font-weight: 600; letter-spacing: .01em; }
+.languages { display: flex; gap: 14px; font-size: 1rem; }
+.languages .link { color: var(--faded); text-decoration-color: transparent; }
+.languages .link:hover { text-decoration-color: currentColor; }
+.languages .link[aria-pressed=true] { color: var(--ink); font-weight: 600; text-decoration-color: var(--laurel); text-decoration-thickness: 2px; }
+
+/* ---- the name, carved on a tabula ansata */
+.name { margin: 44px 0 36px; }
+.plaque {
+  position: relative; margin: 0 34px; padding: 26px 22px 22px; background: var(--limestone); text-align: center;
+  box-shadow: inset 0 0 0 7px var(--limestone), inset 0 0 0 8px var(--carve-dark), inset 0 0 0 9px var(--carve-light), 0 1px 0 var(--carve-light), 0 -1px 0 var(--carve-dark);
+}
+/* The ansae: dovetail handles on either side. */
+.plaque::before, .plaque::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 34px; background: var(--limestone);
+}
+.plaque::before { right: 100%; clip-path: polygon(100% 22%, 0 0, 0 100%, 100% 78%); }
+.plaque::after { left: 100%; clip-path: polygon(0 22%, 100% 0, 100% 100%, 0 78%); }
+.inscription {
+  margin: 0; font: 700 clamp(1.6rem, 7vw, 3.6rem)/1.15 var(--display); letter-spacing: .07em; color: var(--ink);
+  overflow-wrap: anywhere; text-shadow: 0 1px 0 var(--carve-light), 0 -1px 0 var(--carve-dark);
+}
+input.inscription {
+  width: 100%; text-align: center; background: transparent; border: 0; border-bottom: 2px solid var(--rule); padding: 0 0 2px; border-radius: 0;
+}
+input.inscription:focus-visible { outline: none; border-bottom-color: var(--bronze); }
+.caption { margin: 14px 0 0; text-align: center; color: var(--faded); }
+.caption .link { margin-left: 6px; }
+
+/* ---- controls */
+.link { background: none; border: 0; padding: 0; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.link:hover { text-decoration-thickness: 2px; }
+.primary {
+  background: var(--laurel); color: var(--on-laurel); border: 0; border-radius: 3px; padding: 6px 18px; font-weight: 600; cursor: pointer;
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / .18);
+}
+.primary:hover { filter: brightness(1.08); }
+.primary:active { box-shadow: inset 0 2px 0 rgb(0 0 0 / .2); }
+.primary:disabled { opacity: .55; cursor: progress; }
+input[type=search], input[type=password], input[type=text], .create input {
+  width: 100%; background: var(--limestone); border: 1px solid var(--rule); border-radius: 3px; padding: 8px 12px;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / .08);
+}
+.error { margin: 6px 0 0; color: var(--error); min-height: 0; }
+.error:empty { display: none; }
+
+/* ---- views */
+.views { display: flex; gap: 28px; border-bottom: 1px solid var(--rule); margin-bottom: 20px; }
+.views button {
+  background: none; border: 0; padding: 0 0 8px; margin-bottom: -1px; cursor: pointer; font-size: 1.2rem; color: var(--faded);
+  border-bottom: 3px solid transparent;
+}
+.views button[aria-selected=true] { color: var(--ink); border-bottom-color: var(--laurel); font-weight: 600; }
+.notice { margin: 0 0 20px; padding: 10px 14px; background: var(--limestone); border-left: 4px solid var(--bronze); }
+
+/* ---- rooms */
+.rooms { list-style: none; margin: 16px 0 0; padding: 0; }
+.room {
+  display: grid; grid-template-columns: 1fr auto 7.5rem; align-items: center; gap: 4px 20px; padding: 14px 4px;
+  border-bottom: 1px solid var(--rule);
+}
+.room-name { margin: 0; font: 500 1.2rem/1.3 var(--display); letter-spacing: .03em; display: flex; align-items: center; gap: 8px; overflow-wrap: anywhere; }
+.lock { width: .8em; height: .95em; flex: none; fill: none; stroke: var(--bronze); stroke-width: 1.6; display: none; }
+.room.locked .lock { display: block; }
+.room-host { margin: 0; font-style: italic; color: var(--faded); }
+.room-players { margin: 0; color: var(--faded); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.room-action { justify-self: end; }
+.room-state { color: var(--faded); font-style: italic; }
+.room.selected { background: var(--limestone); }
+.room-password {
+  grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: end; gap: 10px 14px; padding-top: 10px;
+}
+.room-password label { flex: 1 1 260px; color: var(--faded); }
+.room-password input { margin-top: 4px; }
+.room-password .error { flex-basis: 100%; }
+.room.opening .room-password { animation: open 160ms ease-out; }
+@keyframes open { from { opacity: 0; transform: translateY(-4px); } }
+.empty { color: var(--faded); padding: 18px 4px; }
+
+/* ---- create */
+.create { display: grid; gap: 6px; max-width: 30rem; }
+.create label { margin-top: 10px; font-weight: 600; }
+.optional { font-weight: 400; color: var(--faded); }
+/* Show/Hide sits inside the field, so both fields line up. */
+.password { position: relative; }
+.password input { padding-right: 4.5rem; }
+.password .link { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); }
+.help { margin: 2px 0 0; color: var(--faded); }
+.create .primary { justify-self: start; margin-top: 16px; padding: 8px 22px; }
+
+/* ---- the game */
+#game { position: fixed; inset: 0; display: flex; flex-direction: column; background: #000; color: #e8dcc0; }
+.game-bar {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 44px; padding: 6px 16px;
+  background: #1b1612; border-bottom: 1px solid #3b3127; font-size: 1rem;
+}
+.game-room { margin: 0; font: 500 1.05rem var(--display); letter-spacing: .03em; }
+.lock-note { font: italic .95rem var(--text); color: #c9b797; }
+.game-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.game-actions button { background: #2c251e; color: #eee2c8; border: 1px solid #54473a; border-radius: 3px; padding: 3px 12px; cursor: pointer; }
+.game-actions button:hover { background: #3a3128; }
+#leave-yes { background: #6e2a1c; border-color: #8a3a28; }
+.stage-space { flex: 1; display: grid; place-items: center; min-height: 0; padding: 8px 16px 16px; }
+#stage { --aspect: 4/3; position: relative; width: min(100%, calc((100vh - 76px) * (var(--aspect)))); aspect-ratio: var(--aspect); }
+#screen { width: 100%; height: 100%; background: #000; image-rendering: pixelated; cursor: none; outline: none; display: block; }
+.game-video { position: absolute; pointer-events: none; object-fit: fill; background: #000; }
+#cursor { position: absolute; z-index: 1; pointer-events: none; width: 1.6%; aspect-ratio: 12/19; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 19'%3E%3Cpath d='M.5.5v15.3l3.7-3.6 2.4 5.9 2.4-1-2.4-5.8h5.2z' fill='%23fff' stroke='%23000' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat; background-size: 100% 100%; }
+/* Covers the game until it is in the room (the main menu passes underneath). */
+#cover { position: absolute; inset: 0; z-index: 2; display: grid; place-content: center; gap: 6px; text-align: center; background: #000; }
+#cover-title { margin: 0; font: 700 clamp(1.4rem, 4vw, 2.4rem) var(--display); letter-spacing: .06em; }
+/* Cinzel has no Vietnamese letters: the Vietnamese cover title ("Đang tạo …") is set in EB Garamond. */
+:lang(vi) #cover-title { font-family: var(--text); font-weight: 600; letter-spacing: .02em; }
+#cover-status { margin: 0; color: #c9b797; font-style: italic; }
+:root:fullscreen .game-bar { display: none; }
+:root:fullscreen .stage-space { padding: 0; }
+:root:fullscreen #stage { width: min(100vw, calc(100vh * (var(--aspect)))); }
+dialog { background: #393126; color: #fff; border: 2px solid #b7a47c; max-width: min(480px, 90vw); }
+dialog h2 { font-size: 1rem; margin: 0 0 8px; }
+#help { width: min(900px, calc(100vw - 32px)); max-width: none; height: min(80vh, 800px); padding: 0; display: none; flex-direction: column; }
+#help[open] { display: flex; }
+.help-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; gap: 8px; }
+#help-frame { flex: 1; border: 0; background: #fffef8; width: 100%; }
+
+@media (max-width: 560px) {
+  .name { margin: 32px 0 28px; }
+  .plaque { margin: 0 22px; padding: 20px 10px 16px; }
+  .plaque::before, .plaque::after { width: 22px; }
+  .room { grid-template-columns: 1fr auto; }
+  .room-main { grid-column: 1 / -1; }
+  .room-action { justify-self: end; }
+  .views { gap: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .room.opening .room-password { animation: none; }
+}

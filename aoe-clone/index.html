@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title data-i18n="title">Rise of Rome rooms</title>
+<link rel="stylesheet" href="lobby.css">
+</head>
+<body>
+<main id="lobby">
+  <header class="top">
+    <h1>Age of Empires: The Rise of Rome</h1>
+    <div class="languages" role="group" aria-label="Language" data-i18n-aria-label="language">
+      <button type="button" class="link" lang="en" data-language="en" aria-pressed="true">English</button>
+      <button type="button" class="link" lang="vi" data-language="vi" aria-pressed="false">Tiếng Việt</button>
+    </div>
+  </header>
+
+  <section class="name" aria-labelledby="name-caption">
+    <div class="plaque">
+      <p id="name-text" class="inscription" aria-describedby="name-caption"></p>
+      <form id="name-form" class="name-form" hidden novalidate>
+        <label class="visually-hidden" for="name-input" data-i18n="yourName">Your name</label>
+        <input id="name-input" class="inscription" name="name" maxlength="15" autocomplete="nickname" spellcheck="false" required>
+      </form>
+    </div>
+    <p class="caption"><span id="name-caption" data-i18n="nameCaption">Other players see you by this name.</span>
+      <button id="name-edit" class="link" type="button" data-i18n="changeName">Change name</button>
+      <span id="name-actions" hidden><button id="name-save" class="link" type="submit" form="name-form" data-i18n="saveName">Save name</button>
+        <button id="name-cancel" class="link" type="button" data-i18n="cancel">Cancel</button></span></p>
+    <p id="name-error" class="error" role="alert"></p>
+  </section>
+
+  <nav class="views" role="tablist" aria-label="Rooms" data-i18n-aria-label="rooms">
+    <button id="tab-join" role="tab" aria-selected="true" aria-controls="join" data-i18n="tabJoin">Join a room</button>
+    <button id="tab-create" role="tab" aria-selected="false" aria-controls="create" tabindex="-1" data-i18n="tabCreate">Create a room</button>
+  </nav>
+
+  <p id="notice" class="notice" role="status" hidden></p>
+
+  <section id="join" role="tabpanel" aria-labelledby="tab-join">
+    <label class="visually-hidden" for="search" data-i18n="searchRooms">Search rooms</label>
+    <input id="search" type="search" placeholder="Search rooms or hosts" data-i18n-placeholder="searchPlaceholder" autocomplete="off" spellcheck="false">
+    <ul id="rooms" class="rooms" aria-live="polite" aria-busy="true"></ul>
+    <p id="rooms-empty" class="empty" hidden></p>
+  </section>
+
+  <section id="create" role="tabpanel" aria-labelledby="tab-create" hidden>
+    <form id="create-form" class="create" novalidate>
+      <label for="room-name" data-i18n="roomName">Room name</label>
+      <input id="room-name" name="room" maxlength="40" autocomplete="off" spellcheck="false" required>
+      <label for="room-password"><span data-i18n="password">Password</span> <span class="optional" data-i18n="optional">(optional)</span></label>
+      <div class="password">
+        <input id="room-password" name="password" type="password" maxlength="32" autocomplete="new-password" aria-describedby="password-help">
+        <button id="password-show" class="link" type="button" aria-controls="room-password" aria-pressed="false" data-i18n="show">Show</button>
+      </div>
+      <p id="password-help" class="help" data-i18n="passwordHelp">Leave it empty and anyone can join. With a password, only players who know it can.</p>
+      <p id="create-error" class="error" role="alert"></p>
+      <button class="primary" type="submit" data-i18n="createRoom">Create room</button>
+    </form>
+  </section>
+</main>
+
+<section id="game" hidden aria-label="Game" data-i18n-aria-label="game">
+  <header class="game-bar">
+    <p class="game-room"><span id="game-room"></span> <span id="game-lock" class="lock-note" hidden data-i18n="locked">locked</span></p>
+    <div class="game-actions">
+      <button id="invite" type="button" hidden data-i18n="copyInvite">Copy invite link</button>
+      <button id="fullscreen" type="button" title="Alt+Enter. The game keeps the mouse; hold Esc to leave." data-i18n-title="fullScreenTip" data-i18n="fullScreen">Full screen</button>
+      <button id="leave" type="button" data-i18n="leaveRoom">Leave room</button>
+      <span id="leave-confirm" hidden><span data-i18n="leaveMatch">Leave the match?</span> <button id="leave-yes" type="button" data-i18n="leave">Leave</button> <button id="leave-no" type="button" data-i18n="stay">Stay</button></span>
+    </div>
+  </header>
+  <div class="stage-space">
+    <div id="stage"><div id="cover"><p id="cover-title"></p><p id="cover-status" role="status"></p></div></div>
+  </div>
+</section>
+
+<dialog id="help" aria-label="Help" data-i18n-aria-label="help"><div class="help-bar"><strong id="help-title">Help</strong><button id="help-close" type="button" data-i18n="close">Close</button></div><iframe id="help-frame" title="Help" data-i18n-title="help"></iframe></dialog>
+<dialog id="box"><h2 id="box-title"></h2><p id="box-text"></p><form method="dialog"><button data-i18n="ok">OK</button></form></dialog>
+
+<template id="room-row">
+  <li class="room">
+    <div class="room-main">
+      <h2 class="room-name"><svg class="lock" viewBox="0 0 12 14" aria-hidden="true"><path d="M3 6V4a3 3 0 0 1 6 0v2"/><rect x="1" y="6" width="10" height="7.5" rx="1"/></svg><span></span></h2>
+      <p class="room-host"></p>
+    </div>
+    <p class="room-players"></p>
+    <div class="room-action"><button class="primary join" type="button" data-i18n="join">Join</button><span class="room-state"></span></div>
+    <form class="room-password" hidden novalidate>
+      <label><span data-i18n="roomPassword">Password for this room</span> <input type="password" maxlength="32" autocomplete="off" required></label>
+      <button class="primary" type="submit" data-i18n="join">Join</button>
+      <button class="link cancel" type="button" data-i18n="cancel">Cancel</button>
+      <p class="error" role="alert"></p>
+    </form>
+  </li>
+</template>
+
+<!-- spessasynth_core's own imports; the stand-ins in shims/ cover the formats this build doesn't use. -->
+<script type="importmap">{"imports": {"spessasynth_core": "./vendor/spessasynth_core/index.js", "fflate": "./shims/fflate.mjs", "stb-vorbis": "./shims/stb-vorbis.mjs"}}</script>
+<script type="module" src="lobby.mjs"></script>
+</body>
+</html>
