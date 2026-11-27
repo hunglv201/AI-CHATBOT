@@ -40,9 +40,9 @@ const only=process.argv[2];
    for(let y=hy-9;y<=hy+9;y++)for(let x=hx-4;x<=hx+12;x++){if(x<0||y<0||x>=N||y>=N)continue;const i=y*N+x;if(G.bld[i])continue;G.obj[i]=0;G.hill[i]=0;G.road[i]=0;if(G.terr[i]===1)G.terr[i]=0}
    for(const u of G.units)if(u.team===2&&Math.hypot(u.x-hx,u.y-hy)<14){u.x=1.5;u.y=1.5;u.hx=1.5;u.hy=1.5}
    window.__hx=hx;window.__hy=hy;const Z=innerWidth/360;SG.cam.z=1.5*Z;SG.cam.x=((hx+3)-(hy-1))*32;SG.cam.y=((hx+3)+(hy-1))*16;
-   setTimeout(()=>SG.build('house',0,hx+4,hy-3),1500);setTimeout(()=>SG.build('farm',0,hx+4,hy+2),5500);setTimeout(()=>SG.build('barracks',0,hx+8,hy-3),9500);
-   setTimeout(()=>{for(let y=hy+4;y<=hy+6;y++)for(let x=hx+8;x<=hx+10;x++)G.hill[y*N+x]=1;for(let k=0;k<4;k++)SG.spawn('archer',0,hx+8.6+(k%2)*.8,hy+4.8+((k/2)|0)*.9)},13000);`),
-   async p=>{const t0=Date.now();while((Date.now()-t0)<21500){const t=(Date.now()-t0)/1000;await p.evaluate(t=>{const Z=innerWidth/360;const hx=__hx,hy=__hy;const k=t<12?[hx+4,hy-.5,1.5]:t<19?[hx+9,hy+2.5,1.7]:[hx+4,hy,1.0];SG.cam.z+=(k[2]*Z-SG.cam.z)*.06;SG.cam.x+=(((k[0]-k[1])*32)-SG.cam.x)*.06;SG.cam.y+=(((k[0]+k[1])*16)-SG.cam.y)*.06},t);await p.waitForTimeout(80)}});
+   setTimeout(()=>SG.build('house',0,hx+4,hy-3),2500);setTimeout(()=>SG.build('farm',0,hx+4,hy+2),5500);setTimeout(()=>SG.build('barracks',0,hx+8,hy-3),11500);
+   setTimeout(()=>{for(let y=hy+4;y<=hy+6;y++)for(let x=hx+8;x<=hx+10;x++)G.hill[y*N+x]=1;for(let k=0;k<4;k++)SG.spawn('archer',0,hx+8.6+(k%2)*.8,hy+4.8+((k/2)|0)*.9)},8000);`),
+   async p=>{const t0=Date.now();while((Date.now()-t0)<21500){const t=(Date.now()-t0)/1000;await p.evaluate(t=>{const Z=innerWidth/360;const hx=__hx,hy=__hy;const k=t<9?[hx+4,hy-.5,1.5]:t<13?[hx+9,hy+4,1.7]:[hx+6,hy,1.05];SG.cam.z+=(k[2]*Z-SG.cam.z)*.06;SG.cam.x+=(((k[0]-k[1])*32)-SG.cam.x)*.06;SG.cam.y+=(((k[0]+k[1])*16)-SG.cam.y)*.06},t);await p.waitForTimeout(80)}});
  // y6 thuyền chiến (cận)
  await rec('y6',17,ev(`SG.start(1,1,0,1);${base.replace('clear(cx,cy,11);','')}
    let wx=-1,wy=-1;for(let y=8;y<N-8&&wx<0;y++)for(let x=8;x<N-8;x++){let ok=true;for(let dy=-3;dy<=3&&ok;dy++)for(let dx=-3;dx<=3;dx++)if(G.terr[(y+dy)*N+x+dx]!==1||G.obj[(y+dy)*N+x+dx]){ok=false;break}if(ok){wx=x;wy=y;break}}
@@ -51,7 +51,7 @@ const only=process.argv[2];
    setTimeout(()=>{a.forEach((u,k)=>{u.order={type:'attack',id:e[k].id,user:1}});e.forEach((u,k)=>{u.order={type:'attack',id:a[k].id,user:1}})},2500)`));
  // y7 mã bí mật
  await rec('y7',20,ev(`SG.start(1,5,0,1);const G=SG.G;G.ai.nextWave=1e9;G.rain=0;G.nextRain=1e9;G.time=60;G.reveal=false;${hallp}const Z=innerWidth/360;SG.cam.z=1.6*Z;SG.cam.x=((hx+1)-hy)*32;SG.cam.y=((hx+1)+hy)*16;window.__hx=hx;window.__hy=hy;
-   setTimeout(()=>{const r=G.teams[0].res;r.food+=1000;r.wood+=1000;r.gold+=1000},3000);
-   setTimeout(()=>{const t=['spear','spear','archer','archer','horse','hero'];t.forEach((ty,k)=>SG.spawn(ty,0,hx+2.5+(k%3)*.9,hy-1.2+((k/3)|0)*1.1))},8000);
-   setTimeout(()=>{G.reveal=true;const z=.7*Z;SG.cam.z=z},14000)`),null,HIDE.replace('#top,',''));
+   setTimeout(()=>{const r=G.teams[0].res;r.food+=1000;r.wood+=1000;r.gold+=1000},3500);
+   setTimeout(()=>{const t=['spear','spear','archer','archer','horse','hero'];t.forEach((ty,k)=>SG.spawn(ty,0,hx+2.5+(k%3)*.9,hy-1.2+((k/3)|0)*1.1))},6500);
+   setTimeout(()=>{G.reveal=true;const z=.7*Z;SG.cam.z=z},9500)`),null,HIDE.replace('#top,',''));
  await b.close()})();

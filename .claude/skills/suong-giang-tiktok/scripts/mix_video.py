@@ -16,10 +16,19 @@ V={
  'w0':('0b-gioi-thieu-man-rong',1.4,['Đây là Sương Giang,\ngame dựng làng, giữ đất,\nchơi ngay trên trình duyệt.','Bản đồ rộng với sông hồ,\nrừng rậm, voi, hổ\nvà cả bầy thú hoang.','Dựng nhà, nuôi lính,\nthuần hóa voi chiến,\nđối đầu trại Sơn.','Chơi miễn phí,\nlink ở bio!']),
  'y2':('2-chi-dung-dan-lang',2.2,['Thử thách:\nchỉ dùng dân làng.','Mười lăm người cầm cuốc\nđấu ba con sói.','Dân làng có thắng\nnổi không?']),
  'y3':('3-tua-nhanh-lang-lon',2.0,['Một ván Sương Giang,\ntua nhanh bằng\nchế độ tự chơi.','Từ vài dân làng,\nlàng lớn dần\nthành thị trấn.','Bạn muốn thử không?']),
+ 'y1':('1-ho-dau-ca-sau',2.2,['Hổ đấu cá sấu\nbên bờ sông.','Hổ nhanh hơn,\ncá sấu thì dai hơn.','Bạn đoán\ncon nào thắng?']),
+ 'y4':('4-bo-giap',2.0,['Bốn bộ giáp\ncho lính trong game.','Cấm vệ, Dạ hành,\nBộ đội và Cơ giáp.','Bạn thích\nbộ nào nhất?']),
+ 'y5':('5-nam-meo-nguoi-moi',2.2,['Năm mẹo cho người mới.','Một, xây nhà trước\nđể có thêm dân.','Hai, nhớ trồng\nruộng lúa.','Ba, đặt cung thủ lên đồi,\nbắn xa hơn một ô.','Bốn, luyện lính\nở trại lính.','Năm, bật chế độ tự chơi\nđể học cách làm.']),
+ 'y6':('6-thuyen-chien',2.0,['Thuyền chiến giao tranh\ntrên sông.','Ba thuyền xanh, ba thuyền đỏ,\ntên bay như mưa.','Bên nào chìm trước?']),
+ 'y7':('7-ma-bi-mat',2.2,['Ba mã bí mật\ntrong Sương Giang.','Phát tài:\nnhận 1000 mỗi loại.','Xin lính:\nsáu quân cạnh Đình làng.','Sương tan:\nnhìn thấy cả bản đồ.','Nhập thử đi!']),
 }
 WIDE={'w0'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
 CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
 DEL={}
+MANUAL={   # nhịp ngắt câu chọn tay khi lời đọc có nhiều dấu phẩy (silencedetect tự động dễ nhầm)
+ 'y5':[(0,1.26),(1.73,4.13),(4.48,6.41),(6.88,10.27),(10.66,12.68),(13.0,15.9)],
+ 'y7':[(0,1.77),(2.25,5.05),(5.48,7.88),(8.43,10.56),(10.84,11.6)],
+}
 def segs(mp3,n):
     d=float(subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',mp3],capture_output=True,text=True).stdout)
     out=subprocess.run(['ffmpeg','-hide_banner','-i',mp3,'-af','silencedetect=noise=-35dB:d=0.2','-f','null','-'],capture_output=True,text=True).stderr
@@ -30,7 +39,7 @@ def segs(mp3,n):
 name=sys.argv[1:] or list(V)
 for k in name:
     if not os.path.exists(f'vo/{k}.mp3'):print('thiếu',k);continue
-    scene,ss,caps=V[k];dl=DEL.get(k,[0]*len(caps));sg,d=segs(f'vo/{k}.mp3',len(caps));body=min(d+1.2+max(dl),CAP)
+    scene,ss,caps=V[k];dl=DEL.get(k,[0]*len(caps));sg,d=segs(f'vo/{k}.mp3',len(caps));sg=MANUAL.get(k,sg);body=min(d+1.2+max(dl),CAP)
     subprocess.run(['ffmpeg','-v','error','-y','-ss',str(ss),'-t',f'{body:.2f}','-i',f'{k}.webm','-vf',("split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:5[bg];[b]scale=1080:-2:flags=lanczos[fg];[bg][fg]overlay=0:(H-h)/2,fps=30,setsar=1,fade=t=in:st=0:d=0.2" if k in WIDE else 'fps=30,scale=1080:1920:flags=lanczos,setsar=1,fade=t=in:st=0:d=0.2'),'-an','-c:v','libx264','-crf','17','-pix_fmt','yuv420p','body.mp4'],check=True)
     subprocess.run(['ffmpeg','-v','error','-y','-loop','1','-t','2.8','-i',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','assets','end_card.png'),'-vf','fps=30,format=yuv420p,fade=t=in:st=0:d=0.3','-c:v','libx264','-crf','17','endc.mp4'],check=True)
     open('l.txt','w').write("file 'body.mp4'\nfile 'endc.mp4'\n");subprocess.run(['ffmpeg','-v','error','-y','-f','concat','-safe','0','-i','l.txt','-c','copy','b.mp4'],check=True)
