@@ -21,12 +21,26 @@ V={
  'y5':('5-nam-meo-nguoi-moi',2.2,['Năm mẹo cho người mới.','Một, xây nhà trước\nđể có thêm dân.','Hai, nhớ trồng\nruộng lúa.','Ba, đặt cung thủ lên đồi,\nbắn xa hơn một ô.','Bốn, luyện lính\nở trại lính.','Năm, bật chế độ tự chơi\nđể học cách làm.']),
  'y6':('6-thuyen-chien',2.0,['Thuyền chiến giao tranh\ntrên sông.','Ba thuyền xanh, ba thuyền đỏ,\ntên bay như mưa.','Bên nào chìm trước?']),
  'y7':('7-ma-bi-mat',2.2,['Ba mã bí mật\ntrong Sương Giang.','Phát tài:\nnhận 1000 mỗi loại.','Xin lính:\nsáu quân cạnh Đình làng.','Sương tan:\nnhìn thấy cả bản đồ.','Nhập thử đi!']),
+ 'z1':('1-voi-dau-linh',2.2,['Một con voi chiến đấu\nmười hai lính giáo.','Voi to,\nnhưng lính đông.','Bạn đoán ai thắng?']),
+ 'z2':('2-bao-thap',2.0,['Xây Bảo tháp,\ncông trình lớn nhất.','Cần thật nhiều\ngỗ và vàng.','Nhìn từ xa\ncũng thấy ngay!']),
+ 'z3':('3-thay-lang',2.2,['Thầy lang đứng sau\nchữa thương cho lính.','Máu tụt xuống,\nlại đầy lên.','Có thầy lang\nlà khác hẳn!']),
+ 'z4':('4-trai-chan-nuoi',2.0,['Trại chăn nuôi\ncho gà, heo và bò.','Có thịt cho cả làng,\nkhông lo đói.','Nuôi thử chưa?']),
+ 'z5':('5-sau-loai-ban-do',1.6,['Sáu loại bản đồ\ntrong Sương Giang.','Đồng bằng, sông lớn,\nrừng rậm, hồ lớn,\nvịnh biển, thảo nguyên.','Bạn thích\nbản đồ nào?']),
+ 'z6':('6-ky-binh-xong-tran',2.2,['Tám kỵ binh xông vào\ntám cung thủ.','Ngựa nhanh,\nnhưng cung tên bắn xa.','Bạn đoán\nbên nào thắng?']),
+ 'z7':('7-dem-soi',2.2,['Đêm xuống,\nbầy sói kéo đến làng.','Chòi canh bắn trả,\nlính giáo giữ cửa.','Sống sót qua đêm\nđược không?']),
 }
 WIDE={'w0'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
 CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
 DEL={}
 MANUAL={   # nhịp ngắt câu chọn tay khi lời đọc có nhiều dấu phẩy (silencedetect tự động dễ nhầm)
  'y5':[(0,1.26),(1.73,4.13),(4.48,6.41),(6.88,10.27),(10.66,12.68),(13.0,15.9)],
+ 'z1':[(0,2.29),(2.84,4.59),(5.18,6.35)],
+ 'z2':[(0,2.81),(3.22,4.76),(5.25,6.92)],
+ 'z3':[(0,2.12),(2.61,4.78),(5.38,6.84)],
+ 'z4':[(0,2.29),(2.65,4.56),(5.10,6.19)],
+ 'z5':[(0,1.86),(2.40,7.59),(8.26,9.4)],
+ 'z6':[(0,1.96),(2.33,4.47),(4.96,6.27)],
+ 'z7':[(0,2.21),(2.55,5.0),(5.39,7.0)],
  'y7':[(0,1.77),(2.25,5.05),(5.48,7.88),(8.43,10.56),(10.84,11.6)],
 }
 def segs(mp3,n):
