@@ -1,0 +1,44 @@
+# Ghép video: cắt cảnh .webm + giọng Adam (vo/<mã>.mp3) + phụ đề + thẻ kết.
+# Chạy trong thư mục chứa <mã>.webm và vo/ :  python3 mix_video.py x2 x3   (bỏ trống = tất cả)
+# Muốn thêm video mới: thêm một dòng vào dict V (mã -> (tên file, giây bắt đầu cắt, [các câu phụ đề])).
+import subprocess,re,os,sys
+FB='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
+# tên: (cảnh, giây bắt đầu cắt, [câu phụ đề theo thứ tự lời đọc])
+V={
+ 'x1':('1-voi-chien-pha-cong',2.2,['Voi chiến đập cổng thành!','Hai con voi lao tới,\ncổng thành rung lên từng nhát.','Ai dám chặn đường\nvoi chiến?']),
+ 'x2':('2-may-ban-da',2.2,['Ba máy bắn đá\ncùng nhả đạn.','Nhà địch bốc cháy,\nkhói đen bay lên.','Phá nhà từ xa,\nan toàn quá!']),
+ 'x3':('3-cung-thu-tren-doi',2.0,['Cung thủ đứng trên đồi\nbắn xa hơn một ô.','Địch xông tới,\nđã bị bắn rát từ xa.','Nhớ chiếm đồi\ntrước nhé!']),
+ 'x4':('4-tuong-dau-tuong',2.2,['Tướng quân đấu\nnữ tướng.','Một chọi một,\nkhông ai nhường ai.','Một vị tướng đã ngã xuống!\nBạn đoán đúng chưa?']),
+ 'x5':('5-thuyen-chien',2.0,['Thuyền chiến giao tranh\ntrên sông.','Ba thuyền xanh, ba thuyền đỏ,\ntên bay như mưa.','Bên nào chìm trước?']),
+ 'x6':('6-50-dau-50',2.2,['Năm mươi lính\nđấu năm mươi lính.','Hai đạo quân lao vào nhau,\nvoi chiến dẫn đầu.','Bụi mù mịt, xác ngổn ngang.\nBạn đoán bên nào thắng?']),
+ 'x7':('7-giu-lang',2.2,['Ba đợt địch kéo tới,\nmỗi đợt một đông hơn.','Chòi canh bắn xuống,\nlính giáo chặn cửa.','Giữ được làng không?\nXem đến cuối nhé!']),
+
+ 'w0':('0b-gioi-thieu-man-rong',1.4,['Đây là Sương Giang,\ngame dựng làng, giữ đất,\nchơi ngay trên trình duyệt.','Bản đồ rộng với sông hồ,\nrừng rậm, voi, hổ\nvà cả bầy thú hoang.','Dựng nhà, nuôi lính,\nthuần hóa voi chiến,\nđối đầu trại Sơn.','Chơi miễn phí,\nlink ở bio!']),
+}
+WIDE={'w0'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
+CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
+DEL={}
+def segs(mp3,n):
+    d=float(subprocess.run(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',mp3],capture_output=True,text=True).stdout)
+    out=subprocess.run(['ffmpeg','-hide_banner','-i',mp3,'-af','silencedetect=noise=-35dB:d=0.2','-f','null','-'],capture_output=True,text=True).stderr
+    st=[float(x) for x in re.findall(r'silence_start: ([0-9.]+)',out)];en=[float(x) for x in re.findall(r'silence_end: ([0-9.]+)',out)]
+    gaps=[(s,e) for s,e in zip(st,en) if s>0.3 and e<d-0.2]
+    gaps=sorted(sorted(gaps,key=lambda g:g[0]-g[1])[:n-1])   # n-1 quãng nghỉ dài nhất
+    b=[0]+[x for g in gaps for x in g]+[d];return [(b[2*i],b[2*i+1]) for i in range(n)],d
+name=sys.argv[1:] or list(V)
+for k in name:
+    if not os.path.exists(f'vo/{k}.mp3'):print('thiếu',k);continue
+    scene,ss,caps=V[k];dl=DEL.get(k,[0]*len(caps));sg,d=segs(f'vo/{k}.mp3',len(caps));body=min(d+1.2+max(dl),CAP)
+    subprocess.run(['ffmpeg','-v','error','-y','-ss',str(ss),'-t',f'{body:.2f}','-i',f'{k}.webm','-vf',("split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:5[bg];[b]scale=1080:-2:flags=lanczos[fg];[bg][fg]overlay=0:(H-h)/2,fps=30,setsar=1,fade=t=in:st=0:d=0.2" if k in WIDE else 'fps=30,scale=1080:1920:flags=lanczos,setsar=1,fade=t=in:st=0:d=0.2'),'-an','-c:v','libx264','-crf','17','-pix_fmt','yuv420p','body.mp4'],check=True)
+    subprocess.run(['ffmpeg','-v','error','-y','-loop','1','-t','2.8','-i',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','assets','end_card.png'),'-vf','fps=30,format=yuv420p,fade=t=in:st=0:d=0.3','-c:v','libx264','-crf','17','endc.mp4'],check=True)
+    open('l.txt','w').write("file 'body.mp4'\nfile 'endc.mp4'\n");subprocess.run(['ffmpeg','-v','error','-y','-f','concat','-safe','0','-i','l.txt','-c','copy','b.mp4'],check=True)
+    tot=body+2.8;dt=[];af=[];ins=['-i','b.mp4'];off=0.35
+    for i,((a0,a1),txt) in enumerate(zip(sg,caps)):
+        D=dl[i]
+        tf=f'wt{i}.txt';open(tf,'w').write(txt)
+        dt.append(f"drawtext=fontfile={FB}:textfile={tf}:fontsize=62:line_spacing=12:fontcolor=white:borderw=6:bordercolor=black@0.85:x=(w-text_w)/2:y=250:enable='between(t,{a0+off+D:.2f},{a1+off+D+0.3:.2f})'")
+        ins+=['-ss',f'{a0:.2f}','-t',f'{a1-a0+.05:.2f}','-i',f'vo/{k}.mp3'];ms=int((a0+off+D)*1000);af.append(f"[{i+1}:a]adelay={ms}|{ms}[a{i}]")
+    mix=';'.join(af)+';'+''.join(f'[a{i}]' for i in range(len(af)))+f"amix=inputs={len(af)}:normalize=0,alimiter=limit=0.7:level=0,apad,atrim=0:{tot:.2f},aresample=44100[aout]"
+    os.makedirs('final',exist_ok=True)
+    subprocess.run(['ffmpeg','-v','error','-y',*ins,'-filter_complex',f"[0:v]{','.join(dt)}[vout];{mix}",'-map','[vout]','-map','[aout]','-c:v','libx264','-crf','19','-pix_fmt','yuv420p','-c:a','aac','-b:a','160k','-movflags','+faststart',f'final/{scene}.mp4'],check=True)
+    print(k,scene,round(tot,1),[tuple(round(x,1) for x in s) for s in sg])
