@@ -14,6 +14,8 @@ V={
  'x7':('7-giu-lang',2.2,['Ba đợt địch kéo tới,\nmỗi đợt một đông hơn.','Chòi canh bắn xuống,\nlính giáo chặn cửa.','Giữ được làng không?\nXem đến cuối nhé!']),
 
  'w0':('0b-gioi-thieu-man-rong',1.4,['Đây là Sương Giang,\ngame dựng làng, giữ đất,\nchơi ngay trên trình duyệt.','Bản đồ rộng với sông hồ,\nrừng rậm, voi, hổ\nvà cả bầy thú hoang.','Dựng nhà, nuôi lính,\nthuần hóa voi chiến,\nđối đầu trại Sơn.','Chơi miễn phí,\nlink ở bio!']),
+ 'y2':('2-chi-dung-dan-lang',2.2,['Thử thách:\nchỉ dùng dân làng.','Mười lăm người cầm cuốc\nđấu ba con sói.','Dân làng có thắng\nnổi không?']),
+ 'y3':('3-tua-nhanh-lang-lon',2.0,['Một ván Sương Giang,\ntua nhanh bằng\nchế độ tự chơi.','Từ vài dân làng,\nlàng lớn dần\nthành thị trấn.','Bạn muốn thử không?']),
 }
 WIDE={'w0'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
 CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
