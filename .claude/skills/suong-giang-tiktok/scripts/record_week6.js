@@ -49,10 +49,10 @@ const only=process.argv[2];
  await rec('v11',14,ev(`SG.start(1,0,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.nextRain=1e9;G.time=60;G.rain=1e9;${village}`),vk([[0,5,0,1.3],[13,3,-1,1.8]]));
  // v12 mùa thu
  await rec('v12',14,ev(`SG.start(1,2,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.rain=0;G.nextRain=1e9;G.time=620;${village}`),vk([[0,6,-1,1.2],[13,3,-1,1.7]]));
- // v13 đua tốc độ
- await rec('v13',14,ev(`SG.start(1,5,0,1);${base}G.teams[0].age=3;['horse','scout','ele','vil'].forEach((t,k)=>SG.spawn(t,0,cx-7,cy-2.4+k*1.5));look(cx+1,cy,0.65);setTimeout(()=>{for(const u of G.units)if(u.team===0&&['horse','scout','ele','vil'].includes(u.type))u.order={type:'amove',goal:{t:0,x:cx+9,y:cy}}},2300)`));
- // v14 tướng đấu mười dân làng
- await rec('v14',15,ev(`SG.start(1,5,0,1);${base}G.teams[0].age=3;SG.spawn('hero',0,cx-2.5,cy);for(let k=0;k<10;k++)SG.spawn('vil',1,cx+3+(k%5)*.7,cy-1.2+((k/5)|0)*1);look(cx,cy,1.7);setTimeout(()=>{const h=G.units.find(u=>u.type==='hero'&&u.team===0),v=G.units.filter(u=>u.type==='vil'&&u.team===1);h.order={type:'attack',id:v[0].id,user:1};v.forEach(u=>u.order={type:'attack',id:h.id,user:1})},2400)`));
+ // v13 ba lính giáo đấu hổ
+ await rec('v13',14,ev(`SG.start(1,5,0,1);${base}G.teams[0].age=3;for(let k=0;k<3;k++)SG.spawn('spear',0,cx-2.2,cy-1+k*.9);SG.spawn('tiger',1,cx+2.2,cy);look(cx,cy,1.8);setTimeout(()=>{const t=G.units.find(u=>u.type==='tiger'&&u.team===1),a=G.units.filter(u=>u.type==='spear'&&u.team===0);a.forEach(u=>u.order={type:'attack',id:t.id,user:1});t.order={type:'attack',id:a[1].id,user:1}},2300)`));
+ // v14 tướng quân đấu năm cung thủ
+ await rec('v14',15,ev(`SG.start(1,5,0,1);${base}G.teams[0].age=3;G.teams[1].age=3;SG.spawn('hero',0,cx-2.6,cy);for(let k=0;k<5;k++)SG.spawn('archer',1,cx+2.4+(k%2)*.8,cy-1.4+k*.7);look(cx,cy,1.7);setTimeout(()=>{const h=G.units.find(u=>u.type==='hero'&&u.team===0),a=G.units.filter(u=>u.type==='archer'&&u.team===1);h.order={type:'attack',id:a[0].id,user:1};a.forEach(u=>u.order={type:'attack',id:h.id,user:1})},2400)`));
  // v15 nhà đổi hình theo đời
  await rec('v15',14,ev(`SG.start(1,0,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.rain=0;G.nextRain=1e9;G.time=60;${village}G.teams[0].age=0;SG.build('house',0,hx+4,hy-2);SG.build('barracks',0,hx+4,hy+2);
    [[3000,1],[5800,2],[8600,3]].forEach(([t,a])=>setTimeout(()=>{G.teams[0].age=a},t))`),vk([[0,2.5,0,1.7],[14,2.5,0,1.7]]));

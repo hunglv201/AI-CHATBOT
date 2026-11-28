@@ -40,16 +40,24 @@ V={
  'v10':('10-dom-dom-dem',1.5,['Đêm xuống,\\nđom đóm bay quanh\\nđình làng.']),
  'v11':('11-mua-tren-lang',1.5,['Mưa rơi trên làng.', 'Nghe thôi\\ncũng thấy yên.']),
  'v12':('12-mua-thu',1.5,['Mùa thu về,\\nlá đổi màu khắp làng.']),
- 'v13':('13-dua-toc-do',2.0,['Ai chạy nhanh nhất?', 'Ngựa, trinh sát,\\nvoi hay dân làng?']),
- 'v14':('14-tuong-dau-muoi-dan',2.2,['Một vị tướng đấu\\nmười dân làng.', 'Ai thắng?']),
  'v15':('15-nha-doi-hinh-theo-doi',1.5,['Nhà đổi hình\\ntheo từng đời.', 'Từ nhà tranh\\nđến đình ngói.']),
  'v16':('16-linh-qua-cac-doi',1.5,['Lính khoác giáp mới\\ntheo từng đời.', 'Bạn thích đời nào?']),
  'v17':('17-ca-sau-ven-song',2.0,['Cẩn thận ven sông.', 'Cá sấu rình\\nsẵn đấy!']),
+ 'v13':('13-ba-linh-giao-dau-ho',2.0,['Ba lính giáo\nđấu một con hổ.','Ai thắng?']),
+ 'v14':('14-tuong-dau-nam-cung-thu',2.0,['Tướng quân đấu\nnăm cung thủ.','Bạn đoán ai thắng?']),
+ 'v18':('18-may-ban-da-dau-choi-canh',2.0,['Máy bắn đá\nđấu chòi canh.','Bắn xa hay\nđứng cao?','Đoán đi!']),
+ 'v19':('19-mua-ten',2.0,['Hai mươi cung thủ\nbắn mưa tên.','Hai mươi lính giáo\nxông lên.']),
+ 'v20':('20-choi-ngay',1.4,['Bạn đã chơi\nSương Giang chưa?','Chơi miễn phí,\nlink ở bio.']),
 }
-WIDE={'w0'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
+WIDE={'w0','v20'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
 CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
 DEL={}
 MANUAL={
+ 'v13':[(0,1.55),(2.05,2.85)],
+ 'v14':[(0,1.46),(1.82,3.0)],
+ 'v18':[(0,1.45),(1.90,3.07),(3.53,4.13)],
+ 'v19':[(0,1.92),(2.29,4.2)],
+ 'v20':[(0,1.42),(1.89,4.05)],
  'v1':[(0, 1.25), (1.6, 2.56), (3.14, 4.28)],
  'v2':[(0, 1.1), (1.79, 3.36), (3.8, 4.99)],
  'v3':[(0, 1.74), (2.29, 3.32)],
@@ -62,8 +70,6 @@ MANUAL={
  'v10':[(0, 2.69)],
  'v11':[(0, 1.14), (1.69, 3.24)],
  'v12':[(0, 2.77)],
- 'v13':[(0, 0.98), (1.56, 4.83)],
- 'v14':[(0, 1.79), (2.17, 2.93)],
  'v15':[(0, 1.45), (1.85, 3.55)],
  'v16':[(0, 1.55), (2.08, 3.0)],
  'v17':[(0, 1.12), (1.57, 2.69)],
