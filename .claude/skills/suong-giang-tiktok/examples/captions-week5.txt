@@ -1,0 +1,36 @@
+Bạn là trợ lý điền form TikTok Studio. Hãy HẸN LỊCH đăng 7 video dưới đây trên tài khoản đang đăng nhập (kênh Sương Giang). Tuyệt đối KHÔNG bấm đăng ngay.
+
+Cách làm cho từng video:
+1. Vào TikTok Studio > Tải lên, chọn file trong thư mục Downloads theo đúng tên ở cột "File".
+2. Dán nguyên văn "Caption" (gồm cả hashtag).
+3. Bật mục "Nội dung do AI tạo" (AI-generated content).
+4. Quyền xem: Mọi người. Bình luận, Duet, Stitch để mặc định.
+5. Chọn "Lên lịch", đặt đúng ngày và giờ theo múi giờ của trình duyệt, rồi bấm Lên lịch.
+6. Sau mỗi video báo ngắn gọn: tên file, ngày giờ đã hẹn, thành công hay lỗi.
+
+Nếu gặp đăng nhập, mã xác minh, captcha, cảnh báo bản quyền hay lỗi lặp 2 lần thì DỪNG và hỏi tôi. Nếu file chưa có trong Downloads thì bỏ qua, ghi lại, làm tiếp video sau. Không xoá hay sửa video đã đăng trước đó.
+
+LỊCH (mỗi ngày 3 video: 12:00, 18:00, 21:00)
+
+03/12 12:00 | File: 1-voi-dau-linh.mp4
+Caption: Một con voi chiến đấu mười hai lính giáo 🐘⚔️ Voi to, nhưng lính đông. Bạn đoán ai thắng? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #voichien #rts #indiegame #AI #suonggiang #xuhuong
+
+03/12 18:00 | File: 2-bao-thap.mp4
+Caption: Xây Bảo tháp, công trình lớn nhất trong game 🏯 Cần thật nhiều gỗ và vàng, nhìn từ xa cũng thấy ngay! Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #baothap #xaydung #indiegame #AI #suonggiang #xuhuong
+
+03/12 21:00 | File: 3-thay-lang.mp4
+Caption: Thầy lang đứng sau chữa thương cho lính 💚 Máu tụt xuống, lại đầy lên. Có thầy lang là khác hẳn! Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #thaylang #meochoi #indiegame #AI #suonggiang #xuhuong
+
+04/12 12:00 | File: 4-trai-chan-nuoi.mp4
+Caption: Trại chăn nuôi cho gà, heo và bò 🐔🐖🐂 Có thịt cho cả làng, không lo đói. Nuôi thử chưa? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #channuoi #lang #indiegame #AI #suonggiang #xuhuong
+
+04/12 18:00 | File: 5-sau-loai-ban-do.mp4
+Caption: Sáu loại bản đồ trong Sương Giang 🗺️ Đồng bằng, sông lớn, rừng rậm, hồ lớn, vịnh biển, thảo nguyên. Bạn thích bản đồ nào? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #bando #indiegame #AI #suonggiang #xuhuong
+
+04/12 21:00 | File: 6-ky-binh-xong-tran.mp4
+Caption: Tám kỵ binh xông vào tám cung thủ 🐎🏹 Ngựa nhanh, nhưng cung tên bắn xa. Bạn đoán bên nào thắng? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #kybinh #cungthu #indiegame #AI #suonggiang #xuhuong
+
+05/12 12:00 | File: 7-dem-soi.mp4
+Caption: Đêm xuống, bầy sói kéo đến làng 🐺🌙 Chòi canh bắn trả, lính giáo giữ cửa. Sống sót qua đêm được không? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #soi #phongthu #indiegame #AI #suonggiang #xuhuong
+
+Khi xong, liệt kê bảng: file, ngày giờ hẹn, trạng thái.
