@@ -26,13 +26,13 @@ const only=process.argv[2];
     ${title?`c.font='800 40px sans-serif';c.fillStyle='#ffe9a8';c.textAlign='center';c.fillText(${JSON.stringify(title)},360,${y0-40});`:''}
     cells.forEach(([ty,lb],i)=>{const ox=10+(i%${cols})*${cw},oy=${y0}+((i/${cols})|0)*${ch};c.fillStyle='rgba(250,238,205,.14)';c.fillRect(ox,oy,${cw}-10,${ch}-10);c.strokeStyle='rgba(250,238,205,.5)';c.lineWidth=3;c.strokeRect(ox,oy,${cw}-10,${ch}-10);
      c.font='800 26px sans-serif';c.fillStyle='#ffe9a8';c.textAlign='center';c.fillText(lb,ox+(${cw}-10)/2,oy+34);
-     c.save();c.translate(ox+(${cw}-10)/2,oy+${ch}-34);c.scale(${sc},${sc});try{SG.drawUnit(c,ty,0,0,0,{face:1,anim:t*6,age:3,skin:'goc'})}catch(e){}c.restore()});requestAnimationFrame(draw)};draw()`;
+     c.save();c.translate(ox+(${cw}-10)/2,oy+${ch}-50);c.scale(${sc},${sc});try{SG.drawUnit(c,ty,0,0,0,{face:1,anim:t*6,age:3,skin:'goc'})}catch(e){}c.restore()});requestAnimationFrame(draw)};draw()`;
  // u1 xếp hạng ba binh chủng
- await rec('u1',13,ev(`SG.start(1,5,0,1);${base}${OV([['horse','Hạng 3'],['archer','Hạng 2'],['ele','Hạng 1']],1,700,330,3.4,330,'')}`));
+ await rec('u1',13,ev(`SG.start(1,5,0,1);${base}${OV([['horse','Hạng 3'],['archer','Hạng 2'],['ele','Hạng 1']],3,236,380,2.5,470,'')}`));
  // u2 mười ba loài thú
- await rec('u2',14,ev(`SG.start(1,5,0,1);${base}${OV([['tiger','Hổ'],['croc','Cá sấu'],['ele','Voi'],['rhino','Tê giác'],['bear','Gấu'],['wolf','Sói'],['buff','Trâu rừng'],['boar','Lợn rừng'],['whorse','Ngựa hoang'],['monkey','Khỉ'],['peacock','Công'],['deer','Hươu'],['snake','Rắn']],3,235,200,1.45,330,'')}`));
- // u3 một ngày ở làng
- await rec('u3',15,ev(`SG.start(1,0,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.rain=0;G.nextRain=1e9;G.time=60;${village}SG.ff(45)`),vk([[0,3,0,1.5],[14,4,1,1.8]]));
+ await rec('u2',14,ev(`SG.start(1,5,0,1);${base}${OV([['tiger','Hổ'],['croc','Cá sấu'],['ele','Voi'],['rhino','Tê giác'],['bear','Gấu'],['wolf','Sói'],['buff','Trâu rừng'],['boar','Lợn rừng'],['whorse','Ngựa hoang'],['monkey','Khỉ'],['peacock','Công'],['deer','Hươu'],['snake','Rắn']],4,178,230,1.7,330,'')}`));
+ // u3 một ngày ở làng (tự chơi cho dân làng làm việc)
+ await rec('u3',15,ev(`SG.start(1,0,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.rain=0;G.nextRain=1e9;G.time=60;${village}__setAuto(true);SG.ff(110);SG.speed=2;SG.cam.z=1.5*(innerWidth/360)`),vk([[0,3,1,1.5],[14,5,2,1.6]]));
  // u4 tường thành và voi
  await rec('u4',15,ev(`SG.start(1,5,0,1);${base}G.teams[0].age=3;G.teams[1].age=3;const ws=[];for(let k=0;k<5;k++)ws.push(SG.build('wall',0,cx+1,cy-2+k));SG.spawn('ele',1,cx+4,cy-.6);SG.spawn('ele',1,cx+4,cy+.9);look(cx+2,cy,1.7);
    setTimeout(()=>{G.units.filter(u=>u.type==='ele'&&u.team===1).forEach((u,k)=>u.order={type:'attack',id:ws[1+k*2],user:1})},2300)`));
@@ -42,7 +42,7 @@ const only=process.argv[2];
  await rec('u6',14,ev(`SG.start(1,0,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.rain=0;G.nextRain=1e9;G.time=60;${village}SG.cam.z=1.6*(innerWidth/360)`),
    async p=>{const h=await p.evaluate(()=>__h);for(let i=0;i<140;i++){await p.evaluate(([i,hx,hy])=>{const times=[60,310,620,745];G=SG.G;G.time=times[Math.min(3,Math.floor(i/35))]+((i%35)*.5);const z=(1.5+(i%35)*.004)*(innerWidth/360);SG.cam.z=z;SG.cam.x=((hx+4)-(hy-1))*32;SG.cam.y=((hx+4)+(hy-1))*16},[i,h[0],h[1]]);await p.waitForTimeout(95)}});
  // u7 bốn nhân vật đặc biệt
- await rec('u7',14,ev(`SG.start(1,5,0,1);${base}${OV([['hero','Tướng quân'],['heroine','Nữ tướng'],['healer','Thầy lang'],['monk','Thầy tu']],2,355,420,3.6,430,'')}`));
+ await rec('u7',14,ev(`SG.start(1,5,0,1);${base}${OV([['hero','Tướng quân'],['heroine','Nữ tướng'],['healer','Thầy lang'],['monk','Thầy tu']],2,355,420,4.8,430,'')}`));
  // u9 mã xây nhanh
  await rec('u9',16,ev(`SG.start(1,0,0,1);const G=SG.G;G.ai.nextWave=1e9;G.reveal=true;G.rain=0;G.nextRain=1e9;G.time=60;${village}const hx2=hx,hy2=hy;
    [[1500,'house',3,-3],[2300,'barracks',7,0],[3100,'tower',3,3],[3900,'store',7,-4]].forEach(([t,b,dx,dy])=>setTimeout(()=>SG.build(b,0,hx2+dx,hy2+dy),t));

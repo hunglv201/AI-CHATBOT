@@ -1,0 +1,47 @@
+Bạn là trợ lý điền form TikTok Studio. Hãy HẸN LỊCH đăng 10 video dưới đây trên tài khoản đang đăng nhập (kênh Sương Giang), từ 10/12 đến 13/12. Tuyệt đối KHÔNG bấm đăng ngay.
+
+Trước khi bắt đầu: mở danh sách video đã lên lịch trong TikTok Studio. Nếu khung giờ nào dưới đây đã có video khác hẹn sẵn thì DỪNG và hỏi tôi, đừng ghi đè.
+
+Cách làm cho từng video:
+1. Vào TikTok Studio > Tải lên, chọn file trong thư mục Downloads (thư mục giải nén suong-giang-10-video) theo đúng tên ở cột "File".
+2. Dán nguyên văn "Caption" (gồm cả hashtag).
+3. Bật mục "Nội dung do AI tạo" (AI-generated content).
+4. Quyền xem: Mọi người. Bình luận, Duet, Stitch để mặc định.
+5. Chọn "Lên lịch", đặt đúng ngày và giờ theo múi giờ của trình duyệt, rồi bấm Lên lịch.
+6. Sau mỗi video báo ngắn gọn: tên file, ngày giờ đã hẹn, thành công hay lỗi.
+
+Nếu gặp đăng nhập, mã xác minh, captcha, cảnh báo bản quyền hay lỗi lặp 2 lần thì DỪNG và hỏi tôi. Nếu file chưa có trong Downloads thì bỏ qua, ghi lại, làm tiếp video sau. Không xoá hay sửa video đã đăng trước đó.
+
+LỊCH (mỗi ngày 3 video: 12:00, 18:00, 21:00)
+
+10/12 21:00 | File: 1-xep-hang-ba-binh-chung.mp4
+Caption: Xếp hạng ba binh chủng 🏆 Hạng ba kỵ binh, hạng nhì cung thủ, hạng nhất voi chiến. Bạn xếp thế nào? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #xephang #binhchung #indiegame #AI #suonggiang #xuhuong
+
+11/12 12:00 | File: 2-muoi-ba-loai-thu.mp4
+Caption: Sương Giang có mười ba loài thú hoang 🐯🐘🦌 Bạn gặp được mấy con? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #thuhoang #dongvat #indiegame #AI #suonggiang #xuhuong
+
+11/12 18:00 | File: 3-mot-ngay-o-lang.mp4
+Caption: Một ngày ở làng 🌾 Người gặt lúa, người đốn củi, người xây nhà. Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #motngayolang #sinhhoat #indiegame #AI #suonggiang #xuhuong
+
+11/12 21:00 | File: 4-dung-hay-sai-tuong-thanh.mp4
+Caption: Đúng hay sai? Tường thành chặn được voi chiến 🐘🧱 Đáp án: sai, voi phá tường rất nhanh! Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #dungsai #voichien #indiegame #AI #suonggiang #xuhuong
+
+12/12 12:00 | File: 5-ngay-xua-co-mot-lang.mp4
+Caption: Ngày xưa, ven sông có một ngôi làng nhỏ 🌫️ Sương mù phủ kín. Giặc từ rừng kéo đến... Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #truyen #suong #indiegame #AI #suonggiang #xuhuong
+
+12/12 18:00 | File: 6-bon-mua.mp4
+Caption: Bốn mùa trong Sương Giang 🌸☀️🍂❄️ Xuân, hạ, thu, đông. Bạn thích mùa nào? Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #bonmua #canhdep #indiegame #AI #suonggiang #xuhuong
+
+12/12 21:00 | File: 7-bon-nhan-vat-dac-biet.mp4
+Caption: Gặp bốn nhân vật đặc biệt 👑 Tướng quân, nữ tướng, thầy lang và thầy tu. Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #nhanvat #tuongquan #indiegame #AI #suonggiang #xuhuong
+
+13/12 12:00 | File: 8-ban-do-rat-lon.mp4
+Caption: Chế độ hai đấu hai trên bản đồ rất lớn 🗺️ Đủ chỗ cho bốn phe tranh đất. Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #bandolon #2dau2 #indiegame #AI #suonggiang #xuhuong
+
+13/12 18:00 | File: 9-ba-ma-bi-mat-nua.mp4
+Caption: Ba mã bí mật nữa 🔑 Xây nhanh, luyện quân nhanh, đổi áo. Nhập thử đi! Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #macheat #bimat #indiegame #AI #suonggiang #xuhuong
+
+13/12 21:00 | File: 10-dung-lang-giu-dat.mp4
+Caption: Sương Giang: dựng làng, giữ đất 🏯 Chơi miễn phí trên trình duyệt, link ở bio. Game có AI hỗ trợ làm, giọng đọc AI 🤖 Link ở bio 👇 #game #gameviet #gamechienthuat #indiegame #AI #suonggiang #xuhuong
+
+Khi xong, liệt kê bảng: file, ngày giờ hẹn, trạng thái.
