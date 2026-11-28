@@ -28,11 +28,46 @@ V={
  'z5':('5-sau-loai-ban-do',1.6,['Sáu loại bản đồ\ntrong Sương Giang.','Đồng bằng, sông lớn,\nrừng rậm, hồ lớn,\nvịnh biển, thảo nguyên.','Bạn thích\nbản đồ nào?']),
  'z6':('6-ky-binh-xong-tran',2.2,['Tám kỵ binh xông vào\ntám cung thủ.','Ngựa nhanh,\nnhưng cung tên bắn xa.','Bạn đoán\nbên nào thắng?']),
  'z7':('7-dem-soi',2.2,['Đêm xuống,\nbầy sói kéo đến làng.','Chòi canh bắn trả,\nlính giáo giữ cửa.','Sống sót qua đêm\nđược không?']),
+ 'v1':('1-cho-san-dau-soi',2.0,['Chó săn đấu sói.', 'Bé mà có võ.', 'Bạn đoán ai thắng?']),
+ 'v2':('2-voi-dau-te-giac',2.0,['Voi đấu tê giác.', 'Hai gã khổng lồ\\nchạm trán.', 'Bạn chọn bên nào?']),
+ 'v3':('3-hai-tuong-dau-ky-binh',2.2,['Hai vị tướng đấu\\nsáu kỵ binh.', 'Ngược dòng\\nđược không?']),
+ 'v4':('4-tuong-thanh-chan-linh',2.0,['Mười hai lính\\ntấn công tường thành.', 'Chòi canh bắn\\ntừ trên cao.', 'Thủ được bao lâu?']),
+ 'v5':('5-xay-lang-20-giay',1.6,['Xây làng trong\\nhai mươi giây.', 'Nhà, ruộng, trại lính,\\nchòi canh.', 'Nhìn là mê!']),
+ 'v6':('6-meo-giao-khac-ngua',2.0,['Mẹo nhỏ.', 'Lính giáo\\nkhắc kỵ binh.', 'Đừng đưa ngựa\\nđấu giáo!']),
+ 'v7':('7-meo-cung-thu-sau-giao',2.0,['Mẹo nhỏ.', 'Cung thủ đứng\\nsau lính giáo.', 'Bắn thoải mái,\\nđịch không chạm tới.']),
+ 'v8':('8-meo-di-san-huou',2.0,['Mẹo nhỏ.', 'Cho dân làng đi săn\\nhươu lấy thịt.', 'Lúc đầu nhanh hơn\\ntrồng ruộng.']),
+ 'v9':('9-binh-minh-lang',1.5,['Bình minh ở làng\\nven sông.', 'Sương còn trên\\nmặt nước.']),
+ 'v10':('10-dom-dom-dem',1.5,['Đêm xuống,\\nđom đóm bay quanh\\nđình làng.']),
+ 'v11':('11-mua-tren-lang',1.5,['Mưa rơi trên làng.', 'Nghe thôi\\ncũng thấy yên.']),
+ 'v12':('12-mua-thu',1.5,['Mùa thu về,\\nlá đổi màu khắp làng.']),
+ 'v13':('13-dua-toc-do',2.0,['Ai chạy nhanh nhất?', 'Ngựa, trinh sát,\\nvoi hay dân làng?']),
+ 'v14':('14-tuong-dau-muoi-dan',2.2,['Một vị tướng đấu\\nmười dân làng.', 'Ai thắng?']),
+ 'v15':('15-nha-doi-hinh-theo-doi',1.5,['Nhà đổi hình\\ntheo từng đời.', 'Từ nhà tranh\\nđến đình ngói.']),
+ 'v16':('16-linh-qua-cac-doi',1.5,['Lính khoác giáp mới\\ntheo từng đời.', 'Bạn thích đời nào?']),
+ 'v17':('17-ca-sau-ven-song',2.0,['Cẩn thận ven sông.', 'Cá sấu rình\\nsẵn đấy!']),
 }
 WIDE={'w0'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
 CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
 DEL={}
-MANUAL={   # nhịp ngắt câu chọn tay khi lời đọc có nhiều dấu phẩy (silencedetect tự động dễ nhầm)
+MANUAL={
+ 'v1':[(0, 1.25), (1.6, 2.56), (3.14, 4.28)],
+ 'v2':[(0, 1.1), (1.79, 3.36), (3.8, 4.99)],
+ 'v3':[(0, 1.74), (2.29, 3.32)],
+ 'v4':[(0, 1.62), (2.05, 3.47), (3.89, 5.07)],
+ 'v5':[(0, 1.25), (1.72, 4.73), (5.11, 6.27)],
+ 'v6':[(0, 0.75), (1.51, 2.77), (3.49, 4.83)],
+ 'v7':[(0, 0.69), (1.16, 2.78), (3.2, 5.72)],
+ 'v8':[(0, 0.84), (1.42, 3.2), (3.74, 5.49)],
+ 'v9':[(0, 1.51), (2.04, 3.32)],
+ 'v10':[(0, 2.69)],
+ 'v11':[(0, 1.14), (1.69, 3.24)],
+ 'v12':[(0, 2.77)],
+ 'v13':[(0, 0.98), (1.56, 4.83)],
+ 'v14':[(0, 1.79), (2.17, 2.93)],
+ 'v15':[(0, 1.45), (1.85, 3.55)],
+ 'v16':[(0, 1.55), (2.08, 3.0)],
+ 'v17':[(0, 1.12), (1.57, 2.69)],
+   # nhịp ngắt câu chọn tay khi lời đọc có nhiều dấu phẩy (silencedetect tự động dễ nhầm)
  'y5':[(0,1.26),(1.73,4.13),(4.48,6.41),(6.88,10.27),(10.66,12.68),(13.0,15.9)],
  'z1':[(0,2.29),(2.84,4.59),(5.18,6.35)],
  'z2':[(0,2.81),(3.22,4.76),(5.25,6.92)],
@@ -53,7 +88,7 @@ def segs(mp3,n):
 name=sys.argv[1:] or list(V)
 for k in name:
     if not os.path.exists(f'vo/{k}.mp3'):print('thiếu',k);continue
-    scene,ss,caps=V[k];dl=DEL.get(k,[0]*len(caps));sg,d=segs(f'vo/{k}.mp3',len(caps));sg=MANUAL.get(k,sg);body=min(d+1.2+max(dl),CAP)
+    scene,ss,caps=V[k];dl=DEL.get(k,[0]*len(caps));sg,d=segs(f'vo/{k}.mp3',len(caps));sg=MANUAL.get(k,sg);body=max(min(d+1.2+max(dl),CAP),float(os.environ.get('MINB',0)))
     subprocess.run(['ffmpeg','-v','error','-y','-ss',str(ss),'-t',f'{body:.2f}','-i',f'{k}.webm','-vf',("split[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=30:5[bg];[b]scale=1080:-2:flags=lanczos[fg];[bg][fg]overlay=0:(H-h)/2,fps=30,setsar=1,fade=t=in:st=0:d=0.2" if k in WIDE else 'fps=30,scale=1080:1920:flags=lanczos,setsar=1,fade=t=in:st=0:d=0.2'),'-an','-c:v','libx264','-crf','17','-pix_fmt','yuv420p','body.mp4'],check=True)
     subprocess.run(['ffmpeg','-v','error','-y','-loop','1','-t','2.8','-i',os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','assets','end_card.png'),'-vf','fps=30,format=yuv420p,fade=t=in:st=0:d=0.3','-c:v','libx264','-crf','17','endc.mp4'],check=True)
     open('l.txt','w').write("file 'body.mp4'\nfile 'endc.mp4'\n");subprocess.run(['ffmpeg','-v','error','-y','-f','concat','-safe','0','-i','l.txt','-c','copy','b.mp4'],check=True)
