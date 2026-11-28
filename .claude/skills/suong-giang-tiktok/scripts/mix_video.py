@@ -47,12 +47,32 @@ V={
  'v14':('14-tuong-dau-nam-cung-thu',2.0,['Tướng quân đấu\nnăm cung thủ.','Bạn đoán ai thắng?']),
  'v18':('18-may-ban-da-dau-choi-canh',2.0,['Máy bắn đá\nđấu chòi canh.','Bắn xa hay\nđứng cao?','Đoán đi!']),
  'v19':('19-mua-ten',2.0,['Hai mươi cung thủ\nbắn mưa tên.','Hai mươi lính giáo\nxông lên.']),
- 'v20':('20-choi-ngay',1.4,['Bạn đã chơi\nSương Giang chưa?','Chơi miễn phí,\nlink ở bio.']),
+ 'v20':('20-choi-ngay',2.8,['Bạn đã chơi\nSương Giang chưa?','Chơi miễn phí,\nlink ở bio.']),
+ 'u1':('1-xep-hang-ba-binh-chung',1.6,['Xếp hạng\\nba binh chủng.', 'Hạng 3:\\nkỵ binh.', 'Hạng 2:\\ncung thủ.', 'Hạng 1:\\nvoi chiến.']),
+ 'u2':('2-muoi-ba-loai-thu',1.6,['Sương Giang có\\nmười ba loài thú hoang.', 'Bạn gặp được\\nmấy con?']),
+ 'u3':('3-mot-ngay-o-lang',1.8,['Một ngày ở làng.', 'Người gặt lúa,\\nngười đốn củi,\\nngười xây nhà.']),
+ 'u4':('4-dung-hay-sai-tuong-thanh',1.8,['Đúng hay sai?', 'Tường thành chặn\\nđược voi chiến.', 'Sai!', 'Voi phá tường\\nrất nhanh.']),
+ 'u5':('5-ngay-xua-co-mot-lang',1.8,['Ngày xưa, ven sông\\ncó một ngôi làng nhỏ.', 'Sương mù phủ kín.', 'Giặc từ rừng\\nkéo đến.']),
+ 'u6':('6-bon-mua',1.5,['Bốn mùa\\ntrong Sương Giang.', 'Xuân, hạ, thu, đông.', 'Bạn thích\\nmùa nào?']),
+ 'u7':('7-bon-nhan-vat-dac-biet',1.6,['Gặp bốn nhân vật\\nđặc biệt.', 'Tướng quân, nữ tướng,\\nthầy lang và thầy tu.']),
+ 'u8':('8-ban-do-rat-lon',2.8,['Chế độ hai đấu hai\\ntrên bản đồ rất lớn.', 'Đủ chỗ cho bốn phe\\ntranh đất.']),
+ 'u9':('9-ba-ma-bi-mat-nua',1.8,['Ba mã bí mật nữa.', 'Xây nhanh, luyện quân\\nnhanh, đổi áo.', 'Nhập thử đi!']),
+ 'u10':('10-dung-lang-giu-dat',2.8,['Sương Giang.', 'Dựng làng, giữ đất.', 'Chơi miễn phí\\ntrên trình duyệt.']),
 }
-WIDE={'w0','v20'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
+WIDE={'w0','v20','u8','u10'}   # cảnh quay màn rộng 1600x900: đặt giữa khung dọc trên nền mờ, chữ nằm phía trên
 CAP=float(os.environ.get('CAP',16.5))   # độ dài tối đa phần thân (video giới thiệu dài đặt CAP=24)
 DEL={}
 MANUAL={
+ 'u1':[(0, 1.31), (1.68, 2.91), (3.32, 4.68), (5.0, 6.48)],
+ 'u2':[(0, 1.92), (2.32, 3.47)],
+ 'u3':[(0, 1.13), (1.44, 4.11)],
+ 'u4':[(0, 0.81), (1.44, 2.89), (3.8, 4.27), (4.74, 6.27)],
+ 'u5':[(0, 2.74), (3.36, 4.56), (4.97, 6.19)],
+ 'u6':[(0, 1.38), (1.85, 4.01), (4.66, 5.64)],
+ 'u7':[(0, 1.34), (1.98, 5.49)],
+ 'u8':[(0, 2.33), (2.83, 4.99)],
+ 'u9':[(0, 1.34), (2.0, 4.69), (5.22, 6.11)],
+ 'u10':[(0, 0.69), (1.08, 2.3), (2.84, 4.6)],
  'v13':[(0,1.55),(2.05,2.85)],
  'v14':[(0,1.46),(1.82,3.0)],
  'v18':[(0,1.45),(1.90,3.07),(3.53,4.13)],
